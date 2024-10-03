@@ -107,6 +107,8 @@ print('rendering stage...')
 cmap = plt.get_cmap("gist_rainbow")
 colors = [(cmap(i / num_communities)[:3]) for i in range(num_communities)] 
 
+
+#need to figure out what is actually happening here
 plt.style.use('dark_background')
 fig = plt.figure(figsize=(1920/100, 1080/100))
 
@@ -121,6 +123,9 @@ ax.set_ylim(-25000, 25000)
 
 segments = []
 line_colors = []
+
+#uncomment this to draw edges
+#not recommended 
 '''
 #smart edge drawing algo?
 for idx, edge in enumerate(g.es):
@@ -145,10 +150,9 @@ for i in range(g.vcount()):
                   linewidth=0.1,
                   zorder=1))
     if g.vs[i]['size'] > 150:
-        # Calculate a font size based on the node size
-        font_size = g.vs[i]['size'] / 3000  # Ensure a minimum font size
+        
+        font_size = g.vs[i]['size'] / 3000  
 
-        # Add the label inside the circle
         ax.text(
             g.vs[i]['x'], 
             g.vs[i]['y'], 
@@ -160,5 +164,5 @@ for i in range(g.vcount()):
         )
 
 #plt.show()
-#ax.set_axis_off()
+ax.set_axis_off()
 plt.savefig('test.png', format='png', dpi = 600)

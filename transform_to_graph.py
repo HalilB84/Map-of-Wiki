@@ -112,6 +112,8 @@ def generate_edges(filename1, filename2):
                         writer.writerow([int(row[0]), int(row[1])])
 
 
+#files not included in github for obvious reasons
+#all data is from wikipedia dumps
 
 title_id_extract('titles-csv.txt')
 #remap('linktarget-csv.txt')
