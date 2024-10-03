@@ -19,7 +19,7 @@ To visualize the data I am using matplotlib, this is also subject to change
 - Look into creating animations
 
 ## Photos
-
+Most 60k popular articles from september 11, 2024. Each color indicates a diffferent community
 ![Most 60k popular articles from september 11, 2024. Each color indicates a diffferent community](https://github.com/HalilB84/Map-of-Wiki/blob/main/test.png)
 
 
