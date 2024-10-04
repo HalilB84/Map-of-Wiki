@@ -23,6 +23,6 @@ To visualize the data I am using matplotlib, this is also subject to change
 
 ## Photos
 Most 250k popular articles from September 11, 2024. Each Island indicates a diffferent community. Too see everything you need to download the file and zoom in.
-![Most 250k popular articles from september 11, 2024. Each Island indicates a diffferent community](https://github.com/HalilB84/Map-of-Wiki/blob/main/test.png)
+![Most 250k popular articles from september 11, 2024. Each Island indicates a diffferent community](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_2.png)
 
 
