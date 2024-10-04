@@ -26,3 +26,7 @@ Most 250k popular articles from September 11, 2024. Each Island indicates a diff
 ![Most 250k popular articles from september 11, 2024. Each Island indicates a diffferent community](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_2.png)
 
 
+And the 60k version with edges drawn.
+![60k with edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_4.png)
+
+
