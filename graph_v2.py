@@ -5,18 +5,19 @@ import pandas as pd
 import math
 import igraph as ig
 import leidenalg as la
+import numpy as np
 from matplotlib.collections import LineCollection
 import random
 
 
 #beware of this code, I have no idea what im doing. Implemented very naively.
 
-node_data = pd.read_csv('top_250k_page_counts.csv')
-edge_data = pd.read_csv('top_250kpage_edges.csv')
+node_data = pd.read_csv('Graph_Data/top_250k_page_counts.csv')
+edge_data = pd.read_csv('Graph_Data/top_250kpage_edges.csv')
 
 print('data loaded...')
 
-g = ig.Graph.TupleList(edge_data.itertuples(index=False), directed=True)
+g = ig.Graph.TupleList(edge_data.itertuples(index=False), directed=False)
 
 
 id_to_node = {}
@@ -41,23 +42,37 @@ for index, row in node_data.iterrows():
 
 print('partitioning stage...')
 
-partition = la.find_partition(g, la.ModularityVertexPartition, n_iterations=3)
+#a lot of interesting ways to do community detection...
+partition = la.find_partition(g, la.CPMVertexPartition, resolution_parameter=0.5)
+#partition = g.community_multilevel(return_levels=False, resolution = 0.5)
+
+
 num_communities = len(set(partition.membership))
+print('number of communities', num_communities)
+
+partitioned_nodes = [[] for _ in range(num_communities)]
+i=0
+
+partition_membership = np.array(partition.membership)  # Convert to NumPy array for fast indexing
+node_sizes = np.array(g.vs['size'])  # Access 'size' attribute for all nodes in one call
 
 partitioned_nodes = [[] for _ in range(num_communities)]
 
+#apperantly using np array is way faster
 for node_id in range(g.vcount()):
-    partition_id = partition.membership[node_id]
-    partitioned_nodes[partition_id].append([g.vs[node_id]['size'], node_id])
+    partition_id = partition_membership[node_id]
+    partitioned_nodes[partition_id].append([node_sizes[node_id], node_id])
 
-minx = 1e18
 miny = 1e18
-maxx = -1
 maxy = -1
 
 #needs refactoring asap, very ineffeicient implementation
 placed_circles = []
 
+print('layout generation stage...')
+
+#option 1: Find a way to place simmilar communities together
+#option 2: Place larger communities in the center and spiral outwards
 for i in range(num_communities):
     
      sorted_nodes = sorted(partitioned_nodes[i], reverse=True)
@@ -69,9 +84,19 @@ for i in range(num_communities):
      coords  = ly.coordinates
      main_size = ly.max_ring
 
+     dbg = 0
+     default_x = 60000
+     default_y = 40000
+
+     #placing communities
      while True:
-        x_offset = random.randint(-50000, 50000)
-        y_offset = random.randint(-30000, 30000)
+        x_offset = random.randint(-default_x, default_x)
+        y_offset = random.randint(-default_y, default_y)
+        dbg +=1
+        if(dbg % 1000 == 0): 
+            print('most likely stuck in infinite loop. Increase default_x and default_y')
+            default_x += 10000
+            default_y += 10000
 
         escape = True
         if(len(placed_circles) == 0): 
@@ -92,20 +117,20 @@ for i in range(num_communities):
           x = coords[i][0] + x_offset
           y = coords[i][1] + y_offset
 
-          miny = min(miny, y)
-          maxy = max(maxy, y)
-          minx = min(minx, x)
-          maxx = max(maxx, x)
+          miny = min(miny, y-ly.max_ring)
+          maxy = max(maxy, y+ly.max_ring)
 
           g.vs[nodes_index[i]]['size'] = coords[i][2]
           g.vs[nodes_index[i]]['x'] = x
           g.vs[nodes_index[i]]['y'] = y
 
 
-print('rendering stage...')
+print('initialzing canvas...')
 
 cmap = plt.get_cmap("gist_rainbow")
-colors = [(cmap(i / num_communities)[:3]) for i in range(num_communities)] 
+
+#looks better until i sort things out
+colors = [(cmap(random.random())[:3]) for _ in range(num_communities)]
 
 
 #need to figure out what is actually happening here
@@ -117,15 +142,16 @@ ax = fig.add_subplot()
 ax.set_aspect('equal', adjustable='datalim')  
 
 
-ax.set_xlim(-25000*1920/1080,25000*1920/1080)
-ax.set_ylim(-25000, 25000)
+ax.set_xlim(miny*1920/1080,maxy*1920/1080)
+ax.set_ylim(miny, maxy)
 
+print('rendering stage...')
 
 segments = []
 line_colors = []
 
 #uncomment this to draw edges
-#not recommended 
+#not recommended and does not lookg good
 '''
 #smart edge drawing algo?
 for idx, edge in enumerate(g.es):
@@ -144,15 +170,15 @@ ax.add_collection(lc)
 for i in range(g.vcount()):
     ax.add_artist(Circle(xy=(g.vs[i]['x'], g.vs[i]['y']), 
                   radius=g.vs[i]['size'],
-                  facecolor = colors[partition.membership[i]],
+                  facecolor = colors[partition_membership[i]],
                   alpha = 0.8,
                   edgecolor='black',  
                   linewidth=0.1,
                   zorder=1))
-    if g.vs[i]['size'] > 150:
-        
+    
+    if g.vs[i]['size'] > 200:
+    
         font_size = g.vs[i]['size'] / 3000  
-
         ax.text(
             g.vs[i]['x'], 
             g.vs[i]['y'], 
@@ -164,5 +190,5 @@ for i in range(g.vcount()):
         )
 
 #plt.show()
-ax.set_axis_off()
-plt.savefig('test.png', format='png', dpi = 600)
+#ax.set_axis_off()
+plt.savefig('Images/test.png', format='png', dpi = 600)
