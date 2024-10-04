@@ -81,9 +81,9 @@ def get_nodes(filename):
 
         sorted_page_id_cnt = sorted(page_id_cnt.items(), key=lambda item: item[1], reverse=True)
 
-        top_ = sorted_page_id_cnt[:250000]
+        top_ = sorted_page_id_cnt#[:250000]
 
-        with open('top_250k_page_counts.csv', mode='w', newline='', encoding='utf-8') as file:
+        with open('top_all_page_counts.csv', mode='w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
 
             writer.writerow(['page_id', 'count', 'title'])
@@ -103,7 +103,7 @@ def generate_edges(filename1, filename2):
 
     with open(filename2, 'r') as file:
         reader = csv.reader(file)
-        with open('top_250kpage_edges.csv', mode='w', newline='') as file:
+        with open('top_allpage_edges.csv', mode='w', newline='') as file:
             writer = csv.writer(file)
 
             writer.writerow(['Source', 'Target'])
@@ -119,7 +119,7 @@ title_id_extract('titles-csv.txt')
 #remap('linktarget-csv.txt')
 #page2page('pagelinks-csv.txt', 'final_links_V2.csv')
 get_nodes('pageviews-20240911-user')
-generate_edges('top_250k_page_counts.csv', 'final_links-csv.csv')
+generate_edges('top_all_page_counts.csv', 'final_links-csv.csv')
 
 print('Done!')
 
