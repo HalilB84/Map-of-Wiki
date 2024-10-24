@@ -1,1 +1,4 @@
 *.pyc
+Data/
+Graph_Data/
+old/

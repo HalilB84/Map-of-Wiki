@@ -12,7 +12,7 @@ To visualize the data I am using matplotlib, this is also subject to change
 ## TODO
 - Fix label sizes
 - Fix community detection (needs to be more accurate) 
-- Placing communuties non randomly
+- Placing communuties non randomly -> cluster using force directed or somehow using the similarity between communities
 - Fix nodes with no links
 - interactive website? -> would solve the problem of labels and edges
 - rewrite the entire code (most of transform_to_graph is absolute garbage right now) - Priority

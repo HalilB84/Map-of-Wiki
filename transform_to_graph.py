@@ -64,7 +64,7 @@ def page2page(input_filename, output_filename):
                     if(cnt % 1000000 == 0): print(cnt)
 
 
-def get_nodes(filename):
+def get_nodes(filename, filename2):
     with open(filename, 'r', encoding='utf-8') as txt_file:
 
         for line in txt_file:
@@ -81,9 +81,9 @@ def get_nodes(filename):
 
         sorted_page_id_cnt = sorted(page_id_cnt.items(), key=lambda item: item[1], reverse=True)
 
-        top_ = sorted_page_id_cnt#[:250000]
+        top_ = sorted_page_id_cnt[:60000]
 
-        with open('top_all_page_counts.csv', mode='w', newline='', encoding='utf-8') as file:
+        with open(filename2, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
 
             writer.writerow(['page_id', 'count', 'title'])
@@ -91,7 +91,7 @@ def get_nodes(filename):
             for page in top_:
                 writer.writerow([page[0], page[1][0], page[1][1]])
 
-def generate_edges(filename1, filename2):
+def generate_edges(filename1, filename2, filename3):
     arc = {}
     with open(filename1, 'r') as file:
         reader = csv.reader(file)
@@ -103,7 +103,7 @@ def generate_edges(filename1, filename2):
 
     with open(filename2, 'r') as file:
         reader = csv.reader(file)
-        with open('top_allpage_edges.csv', mode='w', newline='') as file:
+        with open(filename3, mode='w', newline='') as file:
             writer = csv.writer(file)
 
             writer.writerow(['Source', 'Target'])
@@ -115,11 +115,11 @@ def generate_edges(filename1, filename2):
 #files not included in github for obvious reasons
 #all data is from wikipedia dumps
 
-title_id_extract('titles-csv.txt')
-#remap('linktarget-csv.txt')
-#page2page('pagelinks-csv.txt', 'final_links_V2.csv')
-get_nodes('pageviews-20240911-user')
-generate_edges('top_all_page_counts.csv', 'final_links-csv.csv')
+title_id_extract('Data/titles-csv.txt')
+#remap('Data/linktarget-csv.txt')
+#page2page('Data/pagelinks-csv.txt', 'Data/final_links_V2.csv')
+get_nodes('Data/pageviews-20160101-user', 'Graph_Data/top_60k_jan0126_page_counts.csv')
+generate_edges('Graph_Data/top_60k_jan0126_page_counts.csv', 'Data/final_links-csv.csv', 'Graph_Data/top_60k_jan0126_page_edges.csv')
 
 print('Done!')
 
