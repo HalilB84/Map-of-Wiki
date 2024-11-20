@@ -14,8 +14,8 @@ import time
 
 start_time = time.time()
 
-node_data = pd.read_csv('Graph_Data/top_60k_jan0116_page_counts.csv')
-edge_data = pd.read_csv('Graph_Data/top_60k_jan0116_page_edges.csv')
+node_data = pd.read_csv('Graph_Data/top_60k_sep1124_page_counts.csv')
+edge_data = pd.read_csv('Graph_Data/top_60k_sep1124_page_edges.csv')
 
 print(f'data loaded... {time.time() - start_time:.2f} seconds')
 
@@ -44,15 +44,16 @@ for index, row in node_data.iterrows():
 
 print(f'partitioning stage... {time.time() - start_time:.2f} seconds')
 
-partition = la.find_partition(g, la.CPMVertexPartition, resolution_parameter=0.1)
-#partition = g.community_multilevel(return_levels=False, resolution = 0.5)
+partition = la.find_partition(g, la.CPMVertexPartition, resolution_parameter=0.01)
+#partition = la.find_partition(g, la.RBConfigurationVertexPartition, resolution_parameter=20)
+
 
 num_communities = len(set(partition.membership))
 print('number of communities', num_communities)
 
 partitioned_nodes = [[] for _ in range(num_communities)]
 
-partition_membership = np.array(partition.membership)  # Convert to NumPy array for fast indexing
+partition_membership = np.array(partition.membership)  
 node_sizes = np.array(g.vs['size'])  
 
 partitioned_nodes = [[] for _ in range(num_communities)]
@@ -66,8 +67,8 @@ for node_id in range(g.vcount()):
 print(f'layout generation stage... {time.time() - start_time:.2f} seconds')
 
 #the axis limits are experimentally measured? Very bad practice needs a good algorithm
+layout = RandomCircleLayout(partitioned_nodes, 30)
 #layout = SpiralLayout(partitioned_nodes, 20)
-layout = RandomCircleLayout(partitioned_nodes, 20)
 
 for i in range(g.vcount()):
     g.vs[layout.final_coords[i][2]]['x'] = layout.final_coords[i][0]
@@ -87,7 +88,8 @@ ax.set_aspect('equal', adjustable='datalim')
 ax.set_xlim(-layout.axis_limits, layout.axis_limits)
 ax.set_ylim(-layout.axis_limits*9/16, layout.axis_limits*9/16)
 
-#plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+ax.set_axis_off()
 
 print(f'rendering stage... {time.time() - start_time:.2f} seconds')
 
@@ -113,30 +115,28 @@ ax.add_collection(lc)
 
 print(f'drawing nodes... {time.time() - start_time:.2f} seconds')
 
+
 for i in range(g.vcount()):
-    circle__obj = ax.add_artist(Circle(xy=(g.vs[i]['x'], g.vs[i]['y']), 
+             ax.add_artist(Circle(xy=(g.vs[i]['x'], g.vs[i]['y']), 
                   radius=g.vs[i]['size'],
                   facecolor = colors[partition_membership[i]],
-                  alpha = 0.7,
+                  alpha = 1,
                   edgecolor='black',  
-                  linewidth=0.1,
+                  linewidth=0,
                   zorder=1))
-    
-    if g.vs[i]['size'] > 30:
-    
-        font_size = g.vs[i]['size']  
-        text_obj = ax.text(
-                g.vs[i]['x'], 
-                g.vs[i]['y'], 
-                str(g.vs[i]['title']),  # Use the node name or any other attribute as label
-                ha='center',  # Horizontal alignment
-                va='center',  # Vertical alignment
-                fontsize=font_size,  # Set the font size based on node size
-                color='white'  # Color of the text
-            )
-
+             
+             if(g.vs[i]['size'] > 0.08):
+                ax.text(
+                    g.vs[i]['x'], 
+                    g.vs[i]['y'], 
+                    str(g.vs[i]['title']),  
+                    ha='center', 
+                    va='center',  
+                    fontsize=g.vs[i]['size'],  
+                    color='white'  
+                )
         
 print('final rendering...')
-#ax.set_axis_off()
+
 plt.savefig('Images/test.png', format='png', dpi = 600)
 print(f'finished... {time.time() - start_time:.2f} seconds')

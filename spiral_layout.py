@@ -28,7 +28,7 @@ class SpiralLayout:
         self.axis_limits = axis_limits
 
         for i in range(len(partitioned_nodes)):
-            self.initialize(sorted(self.partitioned_nodes[i], key=lambda x: x[0], reverse=True), 50)
+            self.initialize(sorted(self.partitioned_nodes[i], key=lambda x: x[0], reverse=True), 0)
             self.coords.append([self.max_ring, self.coordinates])
 
         self.coords = sorted(self.coords, key=lambda x: x[0], reverse=True)
@@ -40,14 +40,14 @@ class SpiralLayout:
             dbg = 0   
   
             while True:
-                x_offset = random.randint(-self.axis_limits, self.axis_limits)
-                y_offset = random.randint(-int(self.axis_limits*9/16), int(self.axis_limits*9/16))
+                x_offset = random.uniform(-self.axis_limits, self.axis_limits)
+                y_offset = random.uniform(-self.axis_limits*9/16, self.axis_limits*9/16)
 
                 dbg +=1
                 print(i)
                 if(dbg % 1000 == 0): 
                     print(i, 'most likely stuck in infinite loop. Increase limits')
-                    self.axis_limits += 1000
+                    self.axis_limits += main_size * 2
 
                 escape = True
                 if(len(self.placed_circles) == 0): 

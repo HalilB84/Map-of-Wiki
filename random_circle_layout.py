@@ -1,6 +1,8 @@
 import math
 import random
 
+#heuristic approach, seems to work well with max 2000 nodes
+
 class RandomCircleLayout:
 
     def __init__(self, partitioned_nodes, axis_limits):
@@ -26,7 +28,7 @@ class RandomCircleLayout:
             # Randomly place communities in non-overlapping positions
             while True:
                 x_offset = random.uniform(-self.axis_limits, self.axis_limits)
-                y_offset = random.uniform(-int(self.axis_limits * 9 / 16), int(self.axis_limits * 9 / 16))
+                y_offset = random.uniform(-self.axis_limits * 9 / 16, self.axis_limits * 9 / 16)
 
                 dbg += 1
                 print(i)

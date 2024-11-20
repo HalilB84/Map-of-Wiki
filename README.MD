@@ -10,23 +10,20 @@ The graph layout (spiral_layout.py) is something I randomly came up with. Basica
 To visualize the data I am using matplotlib, this is also subject to change
 
 ## TODO
-- Fix label sizes -> no improvement
 - ~~Fix community detection (needs to be more accurate)~~
-- Placing communuties non randomly -> cluster using force directed or somehow using the similarity between communities -> I have a plan for this
-- Fix nodes with no links
+- ~~Placing communuties non randomly -> cluster using force directed or somehow using the similarity between communities -> I have a plan for this -> hiererchal layout -> completely switching to force directed layouts~~
+- Fix label sizes -> no improvement 
 - interactive website? -> would solve the problem of labels and edges
-- rewrite the entire code - Very High Priority
-- optimize accesing node and edge attributes maybe switch to neo4j?
+- Fix nodes with no links 
+- rewrite the entire code - Very High Priority -> In progress
+- optimize accesing node and edge attributes maybe switch to neo4j? -> needs research
 - create a new layout (force directed)
 - Look into creating animations
 
 
 ## Photos
-Most 250k popular articles from September 11, 2024. Each Island indicates a diffferent community. Too see everything you need to download the file and zoom in.
-![Most 250k popular articles from september 11, 2024. Each Island indicates a diffferent community](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_2.png)
+Most 60k popular articles from September 11, 2024. Each Island indicates a diffferent community. Too see everything you need to download the file and zoom in.
 
-
-And the 60k version with edges drawn.
 ![60k with edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_4.png)
 
 Latest Iteration (Quality dropped because file size is too big for github)
