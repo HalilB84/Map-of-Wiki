@@ -24,9 +24,11 @@ To visualize the data I am using matplotlib, this is also subject to change
 ## Photos
 Most 60k popular articles from September 11, 2024. Each Island indicates a diffferent community. Too see everything you need to download the file and zoom in.
 
-![60k with edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_4.png)
+![4th Iteration, with edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_4.png)
 
-Latest Iteration (Quality dropped because file size is too big for github)
-![Latest Iteration](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_5_lowered.png)
+Another iteration (Quality dropped because file size is too big for github)
+![5th Iteration, with edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_5_lowered.png)
 
+Latest iteration (Hierarchal layout, WIP) 
+![6th Iteration, without edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_6.png)
 
