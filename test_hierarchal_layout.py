@@ -11,11 +11,15 @@ import time
 from matplotlib.collections import LineCollection
 
 
+
+#there are many many ways the following algorithm can be optimized
+#but reearching it will take time
+
 start_time = time.time()
 
 # Load node and edge data
-node_data = pd.read_csv('Graph_Data/top_60k_sep1124_page_counts.csv')
-edge_data = pd.read_csv('Graph_Data/top_60k_sep1124_page_edges.csv')
+node_data = pd.read_csv('Graph_Data/top_500k_sep1024_page_counts.csv')
+edge_data = pd.read_csv('Graph_Data/top_500k_sep1024_page_edges.csv')
 print(f'Data loaded... {time.time() - start_time:.2f} seconds')
 
 # Create graph from edge list
@@ -124,7 +128,7 @@ def hierarchical_partition(graph, max_levels):
         for i in range(len(parition_history[_])):
             nodes = [[current_partitions_size[index], current_partitions[index]] for index in parition_history[_][i]]
             nodes = sorted(nodes, key=lambda x: x[0], reverse=True)
-            level_circles[_] = sorted(level_circles[_], key=lambda x: x[2], reverse=True)
+            #level_circles[_] = sorted(level_circles[_], key=lambda x: x[2], reverse=True)
 
             random_placed_circles = []
             radius = nodes[0][0]
@@ -152,8 +156,8 @@ def hierarchical_partition(graph, max_levels):
 
                         if escape:
                             random_placed_circles.append([x, y, nodes[j][0]])
-                            level_circles[_][j][0] += x
-                            level_circles[_][j][1] += y
+                            #level_circles[_][j][0] += x
+                            #level_circles[_][j][1] += y
 
                             for node in nodes[j][1]:
                                 g.vs[node]['x'] += x
@@ -177,7 +181,7 @@ def hierarchical_partition(graph, max_levels):
                 
 
 
-lvls = hierarchical_partition(g, max_levels=4)
+lvls = hierarchical_partition(g, max_levels=6)
 
 print(f'Hierarchical partitioning completed... {time.time() - start_time:.2f} seconds')
 
@@ -191,7 +195,7 @@ fig = plt.figure(figsize=(19.2, 10.8))
 ax = fig.add_subplot()
 ax.set_aspect('equal', adjustable='datalim')  
 
-axis_limits = 150
+axis_limits = 300
 
 ax.set_xlim(-axis_limits, axis_limits)
 ax.set_ylim(-axis_limits*9/16, axis_limits*9/16)
@@ -245,6 +249,7 @@ for i in range(g.vcount()):
                     color='white'  
                 )
 
+'''
 for i in range(len(lvls)):
     for x, y, r in lvls[i]:
         ax.add_artist(Circle(xy=(x, y), 
@@ -253,7 +258,7 @@ for i in range(len(lvls)):
                     edgecolor='white',  
                     linewidth=0.1,
                     zorder=2))
-
+'''
 
 print('final rendering...')
 
