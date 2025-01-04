@@ -1,4 +1,4 @@
-## All credits go to the original authors, all I did was change 2 lines of code to make it compatible with windows
+## All credits go to the original authors, all I did was change 2 lines of code to make it compatible with windows (https://github.com/jamesmishra/mysqldump-to-csv)
 
 # MySQL dump to CSV
 ## Background

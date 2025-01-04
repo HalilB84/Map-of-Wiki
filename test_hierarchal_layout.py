@@ -13,17 +13,18 @@ from matplotlib.collections import LineCollection
 
 
 #there are many many ways the following algorithm can be optimized
-#but reearching it will take time
+#but researching it will take time
 
 start_time = time.time()
 
 # Load node and edge data
-node_data = pd.read_csv('Graph_Data/top_500k_sep1024_page_counts.csv')
-edge_data = pd.read_csv('Graph_Data/top_500k_sep1024_page_edges.csv')
+node_data = pd.read_csv('Graph_Data/top_60k_sep1024_page_counts.csv')
+edge_data = pd.read_csv('Graph_Data/top_60k_sep1024_page_edges.csv')
 print(f'Data loaded... {time.time() - start_time:.2f} seconds')
 
 # Create graph from edge list
 g = ig.Graph.TupleList(edge_data.itertuples(index=False), directed=False)
+
 
 # Map IDs to nodes and set initial attributes
 id_to_node = {}
@@ -51,7 +52,6 @@ def hierarchical_partition(graph, max_levels):
     current_partitions = []
     parition_history = [[] for _ in range(max_levels)]
     current_partitions_size = []
-    level_circles = [[] for _ in range(max_levels)]
 
     current_partitions.append(list(range(0, graph.vcount())))
 
@@ -116,7 +116,6 @@ def hierarchical_partition(graph, max_levels):
                         break
 
         current_partitions_size.append(radius)
-        level_circles[max_levels-1].append([0, 0, radius])
         
     #then aggregate all the partitions level by level, print time it took
     print(f'Random layout completed... {time.time() - start_time:.2f} seconds')
@@ -128,7 +127,6 @@ def hierarchical_partition(graph, max_levels):
         for i in range(len(parition_history[_])):
             nodes = [[current_partitions_size[index], current_partitions[index]] for index in parition_history[_][i]]
             nodes = sorted(nodes, key=lambda x: x[0], reverse=True)
-            #level_circles[_] = sorted(level_circles[_], key=lambda x: x[2], reverse=True)
 
             random_placed_circles = []
             radius = nodes[0][0]
@@ -156,16 +154,14 @@ def hierarchical_partition(graph, max_levels):
 
                         if escape:
                             random_placed_circles.append([x, y, nodes[j][0]])
-                            #level_circles[_][j][0] += x
-                            #level_circles[_][j][1] += y
-
+    
                             for node in nodes[j][1]:
                                 g.vs[node]['x'] += x
                                 g.vs[node]['y'] += y
+
                             break
 
             temp_sizes.append(radius)
-            if(_ != 0): level_circles[_ - 1].append([0, 0, radius])
 
         current_partitions_size = temp_sizes
 
@@ -176,12 +172,11 @@ def hierarchical_partition(graph, max_levels):
         
         current_partitions = temp_partitions
 
-    return level_circles
 
                 
 
 
-lvls = hierarchical_partition(g, max_levels=6)
+hierarchical_partition(g, max_levels=5)
 
 print(f'Hierarchical partitioning completed... {time.time() - start_time:.2f} seconds')
 
@@ -191,12 +186,19 @@ print('initializing canvas...')
 
 plt.style.use('dark_background')
 fig = plt.figure(figsize=(19.2, 10.8))
-
 ax = fig.add_subplot()
+
+# doesnt work for some reason
+min_x, max_x, min_y, max_y = 0, 0, 0, 0
+for i in range(g.vcount()):
+    min_x = min(min_x, g.vs[i]['x']-g.vs[i]['size'])
+    max_x = max(max_x, g.vs[i]['x']+g.vs[i]['size'])
+    min_y = min(min_y, g.vs[i]['y']-g.vs[i]['size'])
+    max_y = max(max_y, g.vs[i]['y']+g.vs[i]['size'])
+
+axis_limits = max_x-min_x
+
 ax.set_aspect('equal', adjustable='datalim')  
-
-axis_limits = 300
-
 ax.set_xlim(-axis_limits, axis_limits)
 ax.set_ylim(-axis_limits*9/16, axis_limits*9/16)
 
@@ -249,20 +251,10 @@ for i in range(g.vcount()):
                     color='white'  
                 )
 
-'''
-for i in range(len(lvls)):
-    for x, y, r in lvls[i]:
-        ax.add_artist(Circle(xy=(x, y), 
-                    radius=r,
-                    facecolor = 'none',
-                    edgecolor='white',  
-                    linewidth=0.1,
-                    zorder=2))
-'''
 
 print('final rendering...')
 
-plt.savefig('Images/tests.png', format='png', dpi = 600)
+plt.savefig('Images/tests.png', format='png', dpi = 900)
 #plt.savefig('Images/tests.svg', format='svg', dpi = 600)
 print(f'finished... {time.time() - start_time:.2f} seconds')
 

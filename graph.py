@@ -1,21 +1,18 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle 
-from spiral_layout import SpiralLayout
-from random_circle_layout import RandomCircleLayout
-import leidenalg as la
-import numpy as np
 from matplotlib.collections import LineCollection
 import random
 import pandas as pd
 import igraph as ig
 import math
 import time
+import layouts.layout_manager as la
 
 
 start_time = time.time()
 
-node_data = pd.read_csv('Graph_Data/top_60k_sep1124_page_counts.csv')
-edge_data = pd.read_csv('Graph_Data/top_60k_sep1124_page_edges.csv')
+node_data = pd.read_csv('Graph_Data/top_60k_sep1024_page_counts.csv')
+edge_data = pd.read_csv('Graph_Data/top_60k_sep1024_page_edges.csv')
 
 print(f'data loaded... {time.time() - start_time:.2f} seconds')
 
@@ -26,6 +23,8 @@ id_to_node = {}
 
 for i in range(g.vcount()):
      id_to_node[g.vs[i]['name']] = i
+     g.vs[i]['x'] = 0
+     g.vs[i]['y'] = 0
 
 
 #fix nodes with no links
@@ -37,47 +36,34 @@ for index, row in node_data.iterrows():
     count = int(row['count'])
 
     if page_id in id_to_node:
-     g.vs[id_to_node[page_id]]['size'] = (math.pow(count/_max,0.4))
+     g.vs[id_to_node[page_id]]['size'] = (math.pow(count/_max, 0.5 ))
      g.vs[id_to_node[page_id]]['title'] = row['title']
 
 
 
-print(f'partitioning stage... {time.time() - start_time:.2f} seconds')
-
-partition = la.find_partition(g, la.CPMVertexPartition, resolution_parameter=0.01)
-#partition = la.find_partition(g, la.RBConfigurationVertexPartition, resolution_parameter=20)
+print(f'layout stage... {time.time() - start_time:.2f} seconds')
 
 
-num_communities = len(set(partition.membership))
-print('number of communities', num_communities)
+graph_params = {
+    'partitioning': 'hierarchical',
+    'resolution_parameter': 0.1,
+    'axis_limits': None,
+    'max_levels': 4,
+    'level1': "random_circle",
+    'level2': "random_circle",
+    'level3': 'random_circle',
+    'level4': 'random_circle',
+    'level5': 'random_circle',
+    'level6': 'random_circle',
+}
 
-partitioned_nodes = [[] for _ in range(num_communities)]
+layout = la.LayoutManager(g, graph_params)
+layout.apply_community_partitioning()
+maxx, minx, maxy, miny = layout.get_axis_limits()
 
-partition_membership = np.array(partition.membership)  
-node_sizes = np.array(g.vs['size'])  
-
-partitioned_nodes = [[] for _ in range(num_communities)]
-
-#apperantly using np array is way faster
-for node_id in range(g.vcount()):
-    partition_id = partition_membership[node_id]
-    partitioned_nodes[partition_id].append([node_sizes[node_id], node_id])
-
-
-print(f'layout generation stage... {time.time() - start_time:.2f} seconds')
-
-#the axis limits are experimentally measured? Very bad practice needs a good algorithm
-layout = RandomCircleLayout(partitioned_nodes, 30)
-#layout = SpiralLayout(partitioned_nodes, 20)
-
-for i in range(g.vcount()):
-    g.vs[layout.final_coords[i][2]]['x'] = layout.final_coords[i][0]
-    g.vs[layout.final_coords[i][2]]['y'] = layout.final_coords[i][1]
+print(minx, miny, maxx, maxy)
 
 print('initializing canvas...')
-
-cmap = plt.get_cmap("gist_rainbow")
-colors = [(cmap(random.random())[:3]) for _ in range(num_communities)]
 
 plt.style.use('dark_background')
 fig = plt.figure(figsize=(19.2, 10.8))
@@ -85,8 +71,9 @@ fig = plt.figure(figsize=(19.2, 10.8))
 ax = fig.add_subplot()
 ax.set_aspect('equal', adjustable='datalim')  
 
-ax.set_xlim(-layout.axis_limits, layout.axis_limits)
-ax.set_ylim(-layout.axis_limits*9/16, layout.axis_limits*9/16)
+limit = (maxx - minx) if (maxx - minx) > (maxy - miny) else (maxy - miny)
+ax.set_xlim(-limit, limit)
+ax.set_ylim(-limit*9/16, limit*9/16)
 
 plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
 ax.set_axis_off()
@@ -94,7 +81,6 @@ ax.set_axis_off()
 print(f'rendering stage... {time.time() - start_time:.2f} seconds')
 
 #uncomment this to draw edges
-#not recommended and does not lookg good
 '''
 segments = []
 line_colors = []
@@ -119,13 +105,13 @@ print(f'drawing nodes... {time.time() - start_time:.2f} seconds')
 for i in range(g.vcount()):
              ax.add_artist(Circle(xy=(g.vs[i]['x'], g.vs[i]['y']), 
                   radius=g.vs[i]['size'],
-                  facecolor = colors[partition_membership[i]],
+                  facecolor = g.vs[i]['color'], 
                   alpha = 1,
                   edgecolor='black',  
                   linewidth=0,
                   zorder=1))
              
-             if(g.vs[i]['size'] > 0.08):
+             if(g.vs[i]['size'] > 1.0):
                 ax.text(
                     g.vs[i]['x'], 
                     g.vs[i]['y'], 
@@ -138,5 +124,5 @@ for i in range(g.vcount()):
         
 print('final rendering...')
 
-plt.savefig('Images/test.png', format='png', dpi = 600)
+plt.savefig('Images/test3.png', format='png', dpi = 900)
 print(f'finished... {time.time() - start_time:.2f} seconds')
