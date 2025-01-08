@@ -11,16 +11,19 @@ if (!gl) {
 const vertexShaderSource = `
   attribute vec2 a_position;    
   attribute vec2 a_offset;     
-  attribute float a_size;       
+  attribute float a_size;
+  attribute vec4 a_color;       
 
   uniform mat4 u_projection;   
 
-  varying vec2 v_point;         
+  varying vec2 v_point;    
+  varying vec4 v_color;     
 
   void main() {
     vec2 scaledPosition = a_position * a_size + a_offset; // Scale and offset quad
     gl_Position = u_projection * vec4(scaledPosition, 0.0, 1.0);
     v_point = a_position; // Pass point to fragment shader
+    v_color = a_color;
   }
 `;
 
@@ -28,11 +31,12 @@ const fragmentShaderSource = `
   precision mediump float;
 
   varying vec2 v_point;         
+  varying vec4 v_color; 
 
   void main() {
     float dist = length(v_point); 
     if (dist > 1.0) discard;     
-    gl_FragColor = vec4(0.2, 0.6, 0.8, 1.0); // Circle color
+    gl_FragColor = v_color;
   }
 `;
 
@@ -70,6 +74,7 @@ const program = createProgram(gl, vertexShader, fragmentShader);
 const a_position = gl.getAttribLocation(program, 'a_position');
 const a_offset = gl.getAttribLocation(program, 'a_offset');
 const a_size = gl.getAttribLocation(program, 'a_size');
+const a_color = gl.getAttribLocation(program, 'a_color');
 const u_projection = gl.getUniformLocation(program, 'u_projection');
 
 // Set up geometry for a quad (representing a circle)
@@ -89,10 +94,15 @@ gl.bufferData(gl.ARRAY_BUFFER, quadVertices, gl.STATIC_DRAW);
 const numCircles = 500000; // wow no issues with this many circles tested upto 50 million
 const offsets = new Float32Array(numCircles * 2);
 const sizes = new Float32Array(numCircles);
+const colors = new Float32Array(numCircles * 4); // RGBA
 for (let i = 0; i < numCircles; i++) {
   offsets[i * 2] = Math.random() * 10000;
-  offsets[i * 2 + 1] = Math.random() * 10000 - 50;
-  sizes[i] = Math.random() * 2;
+  offsets[i * 2 + 1] = Math.random() * 10000 ;
+  sizes[i] = Math.random() * 10;
+  colors[i * 4] = Math.random();      
+  colors[i * 4 + 1] = Math.random();  
+  colors[i * 4 + 2] = Math.random();  
+  colors[i * 4 + 3] = 1.0;  
 }
 
 const offsetBuffer = gl.createBuffer();
@@ -103,14 +113,19 @@ const sizeBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, sizes, gl.STATIC_DRAW);
 
+const colorBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+
 // Configure WebGL
 gl.clearColor(0, 0, 0, 1);
 gl.enable(gl.BLEND);
 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-let zoomLevel = 1;
-let cameraX = 0;
-let cameraY = 0;
+
+let zoomLevel = 1000;
+let cameraX = 5000;
+let cameraY = 5000;
 let isDragging = false;
 let lastMouseX = 0;
 let lastMouseY = 0;
@@ -138,7 +153,7 @@ canvas.addEventListener('mousemove', (e) => {
 });
 
 canvas.addEventListener('wheel', (e) => {
-  const zoomFactor = Math.exp(e.deltaY * -0.001);
+  const zoomFactor = Math.exp(e.deltaY * 0.001);
   zoomLevel *= zoomFactor;
 });
 
@@ -171,6 +186,11 @@ function draw() {
   gl.vertexAttribPointer(a_size, 1, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(a_size);
   gl.vertexAttribDivisor(a_size, 1);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+  gl.vertexAttribPointer(a_color, 4, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(a_color);
+  gl.vertexAttribDivisor(a_color, 1);
 
   const projectionMatrix = createProjectionMatrix();
   gl.uniformMatrix4fv(u_projection, false, projectionMatrix);
