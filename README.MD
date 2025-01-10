@@ -16,17 +16,22 @@ Right now, there are two layouts possible, "singular" and "hierarchal." These tw
 Many things are in WIP, like faster collision detection for random circle placement, combining article titles with the actual graph render, etc. 
 
 
-## TODO
+## TODO (For getting the graph layout)
 
 - ~~Fix community detection (needs to be more accurate)~~
 - ~~Placing communities non randomly -> cluster using force-directed or somehow using the similarity between communities -> I have a plan for this -> hierarchal layout -> completely switching to force-directed layouts~~
 - ~~rewrite the entire code - Very High Priority -> In progress _> Done!~~
 - Faster collision detection for random circle placement.
-- Fix labels -> no improvement
-- interactive website? -> Would it solve the problem of labels and edges -> SVG parsing?
+- ~~Fix labels -> no improvement -> will solve this by using a interactive renderer on the browser~~
+- interactive website? -> Would it solve the problem of labels and edges -> Webgl renderer?
 - Optimize accessing node and edge attributes, and maybe switch to neo4j? -> needs research
 - create a new layout (force-directed) -> needs extensive research
 - Look into creating animations -> need to have a force-directed layout
+
+## TODO (For the webgl renderer)
+
+ - ~~Understand instanced rendering and create circles (Tested upto 5 million with no issues)~~
+ - instanced MSDF text rendering for text placement, harder than I thought but it is possible. Working on it
 
 ## Photos
 
