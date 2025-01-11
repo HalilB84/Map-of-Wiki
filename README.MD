@@ -57,3 +57,7 @@ Hierarchal layout with 60k nodes
 Singluar layout (random, random) with 60k nodes
 
 ![random, without edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/test2.png)
+
+Cursed webgl renderer that is in works
+
+![webgl-render](https://github.com/HalilB84/Map-of-Wiki/blob/main/webgl-render/lol.png)
