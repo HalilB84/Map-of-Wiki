@@ -31,7 +31,10 @@ Many things are in WIP, like faster collision detection for random circle placem
 ## TODO (For the webgl renderer)
 
  - ~~Understand instanced rendering and create circles (Tested upto 5 million with no issues)~~
- - instanced MSDF text rendering for text placement, harder than I thought but it is possible. Working on it
+ - ~~instanced MSDF text rendering for text placement, harder than I thought but it is possible. Working on it -> Done!~~
+ - Improved text memory management
+ - Clicking functionality 
+ - Structures code
 
 ## Photos
 

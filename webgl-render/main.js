@@ -1,3 +1,5 @@
+import MSDFTextRenderer from './test.js';
+
 const canvas = document.getElementById('webgl-canvas');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -141,14 +143,18 @@ canvas.addEventListener('mouseup', () => {
 });
 
 // is not dragging properly zoom levels are off
+// im stupid my brain is not functioning right now ill fix this later
 canvas.addEventListener('mousemove', (e) => {
   if (isDragging) {
-    const dx = (e.clientX - lastMouseX) / 1;
-    const dy = (e.clientY - lastMouseY) / 1;
+    const dx = (e.clientX - lastMouseX);
+    const dy = (e.clientY - lastMouseY) ;
     cameraX -= dx ;
-    cameraY += dy;
+    cameraY += dy ;
     lastMouseX = e.clientX;
     lastMouseY = e.clientY;
+
+    console.log(e.clientX, e.clientY);
+
   }
 });
 
@@ -156,6 +162,33 @@ canvas.addEventListener('wheel', (e) => {
   const zoomFactor = Math.exp(e.deltaY * 0.001);
   zoomLevel *= zoomFactor;
 });
+
+
+const textRenderer = new MSDFTextRenderer(gl, {
+  fontPath: 'fonts/Roboto',
+  fontSize: 24,
+  opacity: 1.0
+});
+
+
+textRenderer.loadFont().then(() => {
+  // 1m works but a single tab requires 2.8 gb of ram which is kinda insane 
+  // might need to implement something
+  for (let i = 0; i < 100000; i++) {
+    textRenderer.addText({
+      text: "Hello, WebGL!",
+      x: Math.random() * 50000,
+      y: Math.random() * 50000,
+      fontSize: 24
+    });
+  }
+  textRenderer.uploadBuffers();
+}).catch(err => {
+  console.error('Font loading failed:', err);
+});
+
+textRenderer.uploadBuffers();
+
 
 function createProjectionMatrix() {
   const aspectRatio = canvas.width / canvas.height;
@@ -169,6 +202,7 @@ function createProjectionMatrix() {
 }
 
 function draw() {
+  
   gl.clear(gl.COLOR_BUFFER_BIT);
 
   gl.useProgram(program);
@@ -196,6 +230,7 @@ function draw() {
   gl.uniformMatrix4fv(u_projection, false, projectionMatrix);
 
   gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, numCircles);
+  textRenderer.draw(projectionMatrix, 1.);
 
   requestAnimationFrame(draw);
 }
