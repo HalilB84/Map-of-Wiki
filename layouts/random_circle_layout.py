@@ -15,7 +15,7 @@ class RandomCircleLayout:
         self.radius = nodes[0][0]  # Initial radius based on the first node
         self.max_radius = self.radius #Keeps track of the largest radius encountered.
         self.coordinates = []
-        self.ring = 0
+        self.ring = 1
 
         for i, (size, data) in enumerate(nodes):
             self._place_circle(size, data, i)

@@ -17,7 +17,7 @@ edge_data = pd.read_csv('Graph_Data/top_60k_sep1024_page_edges.csv')
 print(f'data loaded... {time.time() - start_time:.2f} seconds')
 
 g = ig.Graph.TupleList(edge_data.itertuples(index=False), directed=False)
-
+save_layout = True
 
 id_to_node = {}
 
@@ -49,7 +49,7 @@ graph_params = {
     'resolution_parameter': 0.1,
     'axis_limits': None,
     'max_levels': 4,
-    'level1': "random_circle",
+    'level1': "spiral",
     'level2': "random_circle",
     'level3': 'random_circle',
     'level4': 'random_circle',
@@ -59,6 +59,11 @@ graph_params = {
 
 layout = la.LayoutManager(g, graph_params)
 layout.apply_community_partitioning()
+
+if (save_layout == True):
+    layout.save_layout('layout.csv')
+    print('layout saved')
+
 maxx, minx, maxy, miny = layout.get_axis_limits()
 
 print(minx, miny, maxx, maxy)
@@ -126,3 +131,6 @@ print('final rendering...')
 
 plt.savefig('Images/test3.png', format='png', dpi = 900)
 print(f'finished... {time.time() - start_time:.2f} seconds')
+
+
+

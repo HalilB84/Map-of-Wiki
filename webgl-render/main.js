@@ -1,4 +1,6 @@
 import MSDFTextRenderer from './test.js';
+import Papa from 'papaparse';
+
 
 const canvas = document.getElementById('webgl-canvas');
 canvas.width = window.innerWidth;
@@ -93,7 +95,7 @@ const quadBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, quadVertices, gl.STATIC_DRAW);
 
-const numCircles = 500000; // wow no issues with this many circles tested upto 50 million
+const numCircles = 1000000; // wow no issues with this many circles tested upto 50 million
 const offsets = new Float32Array(numCircles * 2);
 const sizes = new Float32Array(numCircles);
 const colors = new Float32Array(numCircles * 4); // RGBA
@@ -164,22 +166,21 @@ canvas.addEventListener('wheel', (e) => {
 });
 
 
-const textRenderer = new MSDFTextRenderer(gl, {
-  fontPath: 'fonts/Roboto',
-  fontSize: 24,
-  opacity: 1.0
-});
+const textRenderer = new MSDFTextRenderer(gl);
 
 
 textRenderer.loadFont().then(() => {
+  textRenderer.clear();
   // 1m works but a single tab requires 2.8 gb of ram which is kinda insane 
   // might need to implement something
-  for (let i = 0; i < 100000; i++) {
+  for (let i = 0; i < numCircles; i++) {
     textRenderer.addText({
-      text: "Hello, WebGL!",
-      x: Math.random() * 50000,
-      y: Math.random() * 50000,
-      fontSize: 24
+      text: "jklhjkghui",
+      x: offsets[i * 2],
+      y: offsets[i * 2 + 1],
+      limit: 2. * sizes[i],
+      cx: 0.51,
+      cy: 0.5,
     });
   }
   textRenderer.uploadBuffers();
@@ -187,7 +188,6 @@ textRenderer.loadFont().then(() => {
   console.error('Font loading failed:', err);
 });
 
-textRenderer.uploadBuffers();
 
 
 function createProjectionMatrix() {

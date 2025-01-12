@@ -16,6 +16,8 @@ export default class MSDFTextRenderer {
     this.charSizes = [];
     this.texturePositions = [];
 
+
+
     this.initShaders();
     this.initBuffers();
     this.loadFont();
@@ -199,11 +201,11 @@ export default class MSDFTextRenderer {
 
   addText(textInfo) {
     if (!this.isReady) {
-      //should come here anymore
+      //shouldn't come here anymore
       return;
     }
 
-    const { text, x = 0, y = 0, z = 0} = textInfo;
+    let { text, x = 0, y = 0, z = 0} = textInfo;
     if (!text) return;
 
     let dx = 0;
@@ -228,6 +230,10 @@ export default class MSDFTextRenderer {
         if (sdfPos) w += sdfPos.xadvance;
       }
       dx -= w * textInfo.cx * scale;
+    }
+
+    if (textInfo.cy !== undefined) {
+      y += fontSize * textInfo.cy;
     }
 
     for (const char of text) {
