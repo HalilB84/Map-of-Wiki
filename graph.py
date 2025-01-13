@@ -11,8 +11,8 @@ import layouts.layout_manager as la
 
 start_time = time.time()
 
-node_data = pd.read_csv('Graph_Data/top_1m_sep1024_page_counts.csv')
-edge_data = pd.read_csv('Graph_Data/top_1m_sep1024_page_edges.csv')
+node_data = pd.read_csv('Graph_Data/top_500k_sep1024_page_counts.csv')
+edge_data = pd.read_csv('Graph_Data/top_500k_sep1024_page_edges.csv')
 
 print(f'data loaded... {time.time() - start_time:.2f} seconds')
 
@@ -37,7 +37,7 @@ for index, row in node_data.iterrows():
 
     if page_id in id_to_node:
      g.vs[id_to_node[page_id]]['size'] = (math.pow(count/_max, 0.5 ))
-     g.vs[id_to_node[page_id]]['title'] = row['title']
+     g.vs[id_to_node[page_id]]['title'] = str(row['title'])
 
 
 

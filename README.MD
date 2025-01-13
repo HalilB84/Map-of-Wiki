@@ -9,7 +9,7 @@ Although I am not satisfied with the looks compared to other actual layouts so I
 Finally, I would like to add that this is the first project that I have worked on for more than a single day, so I am in the process of learning things. I assume my code structure and how some things are implemented are not the best. Hopefully, I will have time to fix those. 
 
 ## Quick Rundown
-All of the data is collected from Wikimedia dumps. Igraph is used to make it easier to handle data, and the backbone of the project relies on the Leiden algorithm package for Python. The layout of the graph is custom-built, and finally, the rendering is done by Matplotlib. 
+All of the data is collected from Wikimedia dumps. Igraph is used to make it easier to handle data, and the backbone of the project relies on the Leiden algorithm package for Python. The layout of the graph is custom-built, and finally, the rendering is done by Matplotlib. Recently also implemented a interactive webgl renderer (not really interactive but working on it). The webgl renderer is very Beta right now.
 
 Right now, there are two layouts possible, "singular" and "hierarchal." These two modes place nodes based on spiral_layout.py and random_circle_layout.py. You will see the results in the photos section below. I would argue that the hierarchal layout looks cool and more "galaxy" like.  
 
@@ -23,7 +23,7 @@ Many things are in WIP, like faster collision detection for random circle placem
 - ~~rewrite the entire code - Very High Priority -> In progress _> Done!~~
 - Faster collision detection for random circle placement.
 - ~~Fix labels -> no improvement -> will solve this by using a interactive renderer on the browser~~
-- interactive website? -> Would it solve the problem of labels and edges -> Webgl renderer?
+- interactive website? -> Would it solve the problem of labels and edges -> Webgl renderer? -> Proof of concept is done it seems to work
 - Optimize accessing node and edge attributes, and maybe switch to neo4j? -> needs research
 - create a new layout (force-directed) -> needs extensive research
 - Look into creating animations -> need to have a force-directed layout
@@ -32,9 +32,14 @@ Many things are in WIP, like faster collision detection for random circle placem
 
  - ~~Understand instanced rendering and create circles (Tested upto 5 million with no issues)~~
  - ~~instanced MSDF text rendering for text placement, harder than I thought but it is possible. Working on it -> Done!~~
- - Improved text memory management
+ - Projection matrix bug fix
+ - Actual wikipedia page pop out from the left side -> Literally will just embed the wiki page
+ - Search function with smooth camera transitions - > Search done needs work tho
  - Clicking functionality 
- - Structures code
+ - control configurations and a tab for it
+ - Structure code - > Done for now -> I have to structure again looool
+ - Improved memory management
+
 
 ## Photos
 

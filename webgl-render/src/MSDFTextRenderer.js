@@ -230,7 +230,8 @@ export default class MSDFTextRenderer {
       let w = 0;
       for (const char of text) {
         let sdfPos = this.alphabet.get(char);
-        if (sdfPos) w += sdfPos.xadvance;
+        if(!sdfPos) {sdfPos = this.alphabet.get('_');}
+         w += sdfPos.xadvance;
       }
       dx -= w * textInfo.cx * scale;
     }
@@ -313,6 +314,11 @@ export default class MSDFTextRenderer {
     gl.uniform1i(this.locations.msdf, 0);
 
     const instanceCount = this.positions.length / 3;
+
+    //outline is good but it introduces artificats at a certain zoom level
+    //gl.uniform4f(this.locations.color, 0.2, 0.2, 0.2, 1.0);
+    //gl.uniform1f(this.locations.bias, 0.35);
+    //gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, instanceCount);
 
     gl.uniform4f(this.locations.color, 1., 1., 1, 1.0);
     gl.uniform1f(this.locations.bias, 0.5);

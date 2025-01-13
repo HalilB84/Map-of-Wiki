@@ -172,20 +172,13 @@ class LayoutManager:
         maxy = max(self.graph.vs['y'])
 
         return maxx, minx, maxy, miny
-    '''
-    def save_layout(self, filename):
-        #save layout to csv in this order: id, title, x, y, size, color
-        with open(filename, 'w',  encoding='utf-8') as f:
-            f.write('id,title,x,y,size,r,g,b\n')
-            for i in range(self.graph.vcount()):
-                print(self.graph.vs[i]['name'], self.graph.vs[i]['title'], self.graph.vs[i]['x'], self.graph.vs[i]['y'], self.graph.vs[i]['size'], self.graph.vs[i]['color'])
-                f.write(f"{self.graph.vs[i]['name']},{self.graph.vs[i]['title']},{self.graph.vs[i]['x']},{self.graph.vs[i]['y']},{self.graph.vs[i]['size']},{self.graph.vs[i]['color'][0]},{self.graph.vs[i]['color'][1]},{self.graph.vs[i]['color'][2]}\n")
-    '''
+   
     def save_layout(self, filename):
     # Save layout to CSV in this order: id, title, x, y, size, r, g, b
         with open(filename, 'w', encoding='utf-8') as f:
             f.write('id,title,x,y,size,r,g,b\n')
             for i in range(self.graph.vcount()):
                 # Escape commas and double quotes in the title
+                #print(self.graph.vs[i]['name'], self.graph.vs[i]['title'], self.graph.vs[i]['x'], self.graph.vs[i]['y'], self.graph.vs[i]['size'], self.graph.vs[i]['color'])
                 title = self.graph.vs[i]['title'].replace('"', '""')  # Escape double quotes
                 f.write(f'{self.graph.vs[i]["name"]},"{title}",{self.graph.vs[i]["x"]},{self.graph.vs[i]["y"]},{self.graph.vs[i]["size"]},{self.graph.vs[i]["color"][0]},{self.graph.vs[i]["color"][1]},{self.graph.vs[i]["color"][2]}\n')      

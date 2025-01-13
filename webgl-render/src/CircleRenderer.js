@@ -21,7 +21,6 @@ export default class CircleRenderer {
         data.forEach((item, i) => {
           this.ids[i] = parseInt(item.id);
           this.titles[i] = item.title;
-          //console.log(item.title);
           this.offsets[i * 2] = parseFloat(item.x);
           this.offsets[i * 2 + 1] = parseFloat(item.y);
           
