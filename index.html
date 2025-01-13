@@ -4,13 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WebGL Circles</title>
-  <script type="module" crossorigin src="/Map-of-Wiki/assets/index-CibyiPrJ.js"></script>
+  <script type="module" crossorigin src="/Map-of-Wiki/assets/index-CseQ0b_V.js"></script>
   <link rel="stylesheet" crossorigin href="/Map-of-Wiki/assets/index-BS0Wf98y.css">
 </head>
 <body> 
   <div id="search-container"> 
     <input type="text" id="search" placeholder="Search an article..." /> 
     <div id="search-results"></div> <!-- Results will show here -->
+  </div>
+  <div id="dropdown-container">
+    <label for="csv-select">Choose a layout:</label>
+    <select id="csv-select">
+      <option value="/Map-of-Wiki/layout.csv">layout.csv</option>
+      <option value="/Map-of-Wiki/layout3.csv">layout3.csv</option>
+    </select>
+    <button id="load-button">Load</button>
   </div>
   <canvas id="webgl-canvas"></canvas>
 </body>
