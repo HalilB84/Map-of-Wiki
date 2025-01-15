@@ -11,6 +11,15 @@
     <input type="text" id="search" placeholder="Search an article..." /> 
     <div id="search-results"></div> <!-- Results will show here -->
   </div>
+</div>
+<div id="dropdown-container">
+  <label for="csv-select">Choose a layout:</label>
+  <select id="csv-select">
+    <option value="/layouts/layout60k-Sep-10-2024.csv">60k September 10 2024</option>
+    <option value="/layouts/layout500k-Sep-10-2024.csv">500k September 10 2024</option>
+  </select>
+  <button id="load-button">Load</button>
+</div>
   <canvas id="webgl-canvas"></canvas>
   <script type="module" src="src/main.js"></script>
 </body>

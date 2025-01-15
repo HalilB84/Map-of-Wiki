@@ -34,11 +34,11 @@ Many things are in WIP, like faster collision detection for random circle placem
  - ~~instanced MSDF text rendering for text placement, harder than I thought but it is possible. Working on it -> Done!~~
  - Projection matrix bug fix
  - Actual wikipedia page pop out from the left side -> Literally will just embed the wiki page
- - Search function with smooth camera transitions - > Search done needs work tho
+ - Search function with smooth camera transitions - > Search done needs work tho -> async search but raises questions about the method being used. Maybe should learn about databases? Costs make me freak out tho
  - Clicking functionality 
  - control configurations and a tab for it
  - Structure code - > Done for now -> I have to structure again looool
- - Improved memory management
+ - Improved memory management -> Priority as this is the main culprit for the 500k layout
 
 
 ## Photos

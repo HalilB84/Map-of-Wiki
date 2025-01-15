@@ -4,6 +4,11 @@
 // Evey living day I will thank anvaka for the code
 // Also I have to credit claude as it helped me a lot with this, Im cooked bro ai is replacing me
 
+//1/15 Update: Needs optimization, the memory usage is too high, I think I can optimize the way the text is stored
+// Moreover its needs gpu optimization, the text is not rendering as fast as I would like it to be
+// so small text wont render at all and out of bounds text also wont render
+// the only problem is I have no idea how to implement this
+
 export default class MSDFTextRenderer {
   constructor(gl) {
     this.gl = gl;
@@ -328,6 +333,7 @@ export default class MSDFTextRenderer {
   }
 
   //there should be no need for this
+  //im stupid
   clear() {
     this.positions = [];
     this.charSizes = [];

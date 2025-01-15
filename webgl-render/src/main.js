@@ -65,7 +65,7 @@ function createProjectionMatrix() {
 }
 
 // Function to handle search also have to make this async
-function search() {
+function search(results) {
   const query = document.getElementById('search').value;
   const resultsContainer = document.getElementById('search-results');
 
@@ -75,7 +75,6 @@ function search() {
     return;
   }
 
-  const results = fuzzysort.go(query, circleRenderer.titles, { limit: 5 });
 
   if (results.length > 0) {
     resultsContainer.innerHTML = results
@@ -95,15 +94,33 @@ function search() {
   }
 }
 
+// ok so again from anvakas repo but I dont know why the author of fuzzysort removed this feature on later versions
+// maybe it suggests that there is a better way to do this?
+// performance is still not great worst case will swtich to map of githubs strategy where text is dynamically loaded
+let lastPromise = null;
+function actSearch() {
+  if (lastPromise) {
+    lastPromise.cancel();
+  }
+  const query = document.getElementById('search').value;
+  let noSpaces = query.replace(/\s+/g, '');  
+  lastPromise = fuzzysort.goAsync(noSpaces, circleRenderer.titles, {limit: 5})
+
+  return lastPromise.then(results => {
+    return search(results);
+  }); 
+
+}
+
 function handleResultClick(event) {
   const clickedElement = event.target;
   const title = clickedElement.dataset.title; 
 
-  //console.log(`User clicked on result: ${title} (Index: ${index})`);
+  //console.log(`User clicked on result: ${title}`);
   smoothTransition(title);
 }
 
-document.getElementById('search').addEventListener('input', search);
+document.getElementById('search').addEventListener('input', actSearch);
 
 
 function smoothTransition(title){
@@ -137,9 +154,10 @@ function loadCSV(filePath) {
 
 async function initialize() {
   try {
-    const data = await loadCSV('/layout3.csv'); 
+    var selectedValue = document.getElementById("csv-select").value;
+    const data = await loadCSV(selectedValue); 
     circleRenderer.setData(data);
-
+    textRenderer.clear();
     await textRenderer.loadFont();
     for (let i = 0; i < circleRenderer.numCircles; i++) {
 
@@ -172,3 +190,6 @@ function draw() {
 }
 
 initialize().then(draw);
+document.getElementById('load-button').addEventListener('click', function() {
+  initialize().then(draw);
+});
