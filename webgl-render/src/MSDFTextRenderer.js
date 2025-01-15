@@ -32,7 +32,7 @@ export default class MSDFTextRenderer {
     return new Promise((resolve, reject) => {
       (async () => {
         try {
-          const response = await fetch('/fonts/Roboto.json', { mode: 'cors' });
+          const response = await fetch('/Map-of-Wiki/fonts/Roboto.json', { mode: 'cors' });
           const fontInfo = await response.json();
           this.fontInfo = fontInfo;
           this.alphabet = new Map();
@@ -66,7 +66,7 @@ export default class MSDFTextRenderer {
             resolve(); 
           };
   
-          img.src = '/fonts/Roboto0.png';
+          img.src = '/Map-of-Wiki/fonts/Roboto0.png';
         } 
         catch (err) {
           reject(err); 
