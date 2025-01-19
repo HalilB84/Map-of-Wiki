@@ -37,8 +37,8 @@ canvas.addEventListener('mouseup', () => {
 
 canvas.addEventListener('mousemove', (e) => {
   if (isDragging) {
-    const dx = (e.clientX - lastMouseX) * (zoomLevel / 1000);
-    const dy = (e.clientY - lastMouseY) * (zoomLevel / 1000);
+    const dx = (e.clientX - lastMouseX) * zoomLevel / 1000;
+    const dy = (e.clientY - lastMouseY) * zoomLevel / 1000;
     cameraX -= dx;
     cameraY += dy;
     lastMouseX = e.clientX;
@@ -113,6 +113,11 @@ function actSearch() {
 }
 
 function handleResultClick(event) {
+  document.getElementById('search').value = '';
+  const resultsContainer = document.getElementById('search-results');
+  resultsContainer.innerHTML = '';
+  resultsContainer.style.display = 'none';
+
   const clickedElement = event.target;
   const title = clickedElement.dataset.title; 
 

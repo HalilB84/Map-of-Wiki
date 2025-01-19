@@ -11,8 +11,8 @@ import layouts.layout_manager as la
 
 start_time = time.time()
 
-node_data = pd.read_csv('Graph_Data/top_500k_sep1024_page_counts.csv')
-edge_data = pd.read_csv('Graph_Data/top_500k_sep1024_page_edges.csv')
+node_data = pd.read_csv('Graph_Data/top_120k_jan1625_page_counts.csv')
+edge_data = pd.read_csv('Graph_Data/top_120k_jan1625_page_edges.csv')
 
 print(f'data loaded... {time.time() - start_time:.2f} seconds')
 
@@ -48,8 +48,8 @@ graph_params = {
     'partitioning': 'hierarchical',
     'resolution_parameter': 0.1,
     'axis_limits': None,
-    'max_levels': 6,
-    'level1': "spiral",
+    'max_levels': 5,
+    'level1': "random_circle",
     'level2': "random_circle",
     'level3': 'random_circle',
     'level4': 'random_circle',

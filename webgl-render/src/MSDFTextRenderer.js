@@ -117,18 +117,18 @@ export default class MSDFTextRenderer {
   
       in vec3 position;
       in vec2 point;
-      in vec3 charSize;
+      in vec2 charSize;
       in vec4 texturePosition;
   
       out vec2 vPoint;
       out vec4 vColor;
   
       void main() {
+        
         vec3 pos = position + vec3(vec2(point) * charSize.xy, 0.0);
         gl_Position = modelViewProjection * vec4(pos, 1.0);
         vPoint = texturePosition.xy + point * texturePosition.zw;
         vColor = color;
-        //vColor[3] *= (1. - smoothstep(0.0, 1., cameraDistance / (5000. * charSize.z)));
       }`;
   
     const fragmentShaderSource = 
@@ -149,6 +149,7 @@ export default class MSDFTextRenderer {
       }
   
       void main() {
+        //if( 1 == 1) {discard;}
         vec3 tsample = texture(msdf, vPoint).rgb;
         float sigDist = median(tsample.r, tsample.g, tsample.b) - bias;
         float alpha = clamp(sigDist / fwidth(sigDist) + bias, 0.0, 1.0);
@@ -253,13 +254,13 @@ export default class MSDFTextRenderer {
       }
 
       this.positions.push(x + dx, y - sdfPos.yoffset * scale, z);
-      
+  
+      //these will be gone soon both combined take about 500mb of memory
+
       this.charSizes.push(
         (fontSize * sdfPos.width) / 42,
-        (-fontSize * sdfPos.height) / 42,
-        fontSize
-      );
-      //can this be further optimized? because its taking way too much memory 
+        (-fontSize * sdfPos.height) / 42);
+
       this.texturePositions.push(
         sdfPos.x / this.sdfTextureWidth,
         1 - sdfPos.y / this.sdfTextureHeight,
@@ -287,7 +288,7 @@ export default class MSDFTextRenderer {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.charSize);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.charSizes), gl.STATIC_DRAW);
     gl.enableVertexAttribArray(this.locations.charSize);
-    gl.vertexAttribPointer(this.locations.charSize, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(this.locations.charSize, 2, gl.FLOAT, false, 0, 0);
     gl.vertexAttribDivisor(this.locations.charSize, 1);
 
     //texturePosition
@@ -332,8 +333,6 @@ export default class MSDFTextRenderer {
     gl.bindVertexArray(null);
   }
 
-  //there should be no need for this
-  //im stupid
   clear() {
     this.positions = [];
     this.charSizes = [];

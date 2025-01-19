@@ -144,7 +144,7 @@ title_id_extract('Data/titles.txt')
 # remap('Data/linktarget.txt')  # Uncomment if link remapping is needed
 # page2page('Data/pagelinks.txt', 'Data/final_links.csv')  # Uncomment if page linking is needed
   
-get_nodes('Data/pageviews-20240910-user', 'Graph_Data/top_60k_sep1024_page_counts.csv', 60000)
-generate_edges("Graph_Data/top_60k_sep1024_page_counts.csv", 'Data/final_links.csv', 'Graph_Data/top_60k_sep1024_page_edges.csv')
+get_nodes('Data/pageviews-20250116-user', 'Graph_Data/top_120k_jan1625_page_counts.csv', 120000)
+generate_edges("Graph_Data/top_120k_jan1625_page_counts.csv", 'Data/final_links.csv', 'Graph_Data/top_120k_jan1625_page_edges.csv')
 
 print("Done!")

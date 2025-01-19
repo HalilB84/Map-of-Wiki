@@ -27,6 +27,7 @@ Many things are in WIP, like faster collision detection for random circle placem
 - Optimize accessing node and edge attributes, and maybe switch to neo4j? -> needs research
 - create a new layout (force-directed) -> needs extensive research
 - Look into creating animations -> need to have a force-directed layout
+- highly possible change of switching to wikitext parsing for better layout results
 
 ## TODO (For the webgl renderer)
 
@@ -38,7 +39,7 @@ Many things are in WIP, like faster collision detection for random circle placem
  - Clicking functionality 
  - control configurations and a tab for it
  - Structure code - > Done for now -> I have to structure again looool
- - Improved memory management -> Priority as this is the main culprit for the 500k layout
+ - Improved memory management -> Priority as this is the main culprit for the 500k layout -> deload csv files and remove duplicate data 
 
 
 ## Photos
