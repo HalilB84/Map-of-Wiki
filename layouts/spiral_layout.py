@@ -1,5 +1,4 @@
 import math
-import random
 
 class SpiralLayout:
     """Arranges nodes in a spiral layout, attempting to avoid overlaps."""

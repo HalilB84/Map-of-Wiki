@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle 
 from matplotlib.collections import LineCollection
-import random
 import pandas as pd
 import igraph as ig
 import math
@@ -28,7 +27,6 @@ for i in range(g.vcount()):
 
 
 #fix nodes with no links
-#this size thing is so stupid, im doing something wrong. Currently experimentally measured
 _max = node_data['count'].iloc[0]
 for index, row in node_data.iterrows():
 

@@ -1,7 +1,6 @@
 import math
 import random
 import matplotlib.pyplot as plt
-import networkx as nx
 
 def fruchterman_reingold_layout(graph, iterations=100, area=1.0, gravity=1.0, k=None, temperature=0.1):
     """

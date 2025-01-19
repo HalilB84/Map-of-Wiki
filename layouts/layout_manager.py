@@ -108,7 +108,7 @@ class LayoutManager:
                     nodes = [[current_partitions_size[index], current_partitions[index]] for index in parition_history[level_num][i]]
                     nodes = sorted(nodes, key=lambda x: x[0], reverse=True)
  
-                    coords, radius = self.apply_layout(nodes, self.graph_params['level2']) #level X
+                    coords, radius = self.apply_layout(nodes, self.graph_params['level2']) #should be level X, fix it
                     self.add_coords(coords, color = False)
 
                     temp_sizes.append(radius)
