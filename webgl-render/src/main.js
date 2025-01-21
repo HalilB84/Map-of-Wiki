@@ -37,8 +37,8 @@ canvas.addEventListener('mouseup', () => {
 
 canvas.addEventListener('mousemove', (e) => {
   if (isDragging) {
-    const dx = (e.clientX - lastMouseX) * zoomLevel / 1000;
-    const dy = (e.clientY - lastMouseY) * zoomLevel / 1000;
+    const dx = (e.clientX - lastMouseX) * (zoomLevel / 350);
+    const dy = (e.clientY - lastMouseY) * (zoomLevel / 350);
     cameraX -= dx;
     cameraY += dy;
     lastMouseX = e.clientX;
@@ -51,10 +51,21 @@ canvas.addEventListener('wheel', (e) => {
   zoomLevel *= zoomFactor;
 });
 
-// Create projection matrix but no idea if its right???
-//nvm this is wrong need to fix
+// cool
+function resizeCanvas(canvas) {
+  const dpr = window.devicePixelRatio;
+  const displayWidth = canvas.clientWidth;
+  const displayHeight = canvas.clientHeight;
+
+  canvas.width = displayWidth * dpr;
+  canvas.height = displayHeight * dpr;
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
+}
+
+//Fix draging
 function createProjectionMatrix() {
-  const aspectRatio = canvas.width / canvas.height;
+  const aspectRatio = (canvas.width / canvas.height);
   const scale = 1 / zoomLevel;
   return new Float32Array([
     scale / aspectRatio, 0, 0, 0,
@@ -174,7 +185,6 @@ async function initialize() {
         cx: 0.51, //gotta figure out these
         cy: 0.5,
       });
-
     }
     textRenderer.uploadBuffers();
 
@@ -185,6 +195,8 @@ async function initialize() {
 
 
 function draw() {
+  resizeCanvas(canvas); 
+
   gl.clear(gl.COLOR_BUFFER_BIT);
   
   const projectionMatrix = createProjectionMatrix();
