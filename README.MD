@@ -20,7 +20,7 @@ Right now, there are two layouts possible, "singular" and "hierarchal." These tw
 - ~~Placing communities non randomly -> cluster using force-directed or somehow using the similarity between communities -> I have a plan for this -> hierarchal layout -> completely switching to force-directed layouts~~
 - ~~rewrite the entire code - Very High Priority -> In progress _> Done!~~
 - ~~Fix labels -> no improvement -> will solve this by using an interactive renderer on the browser~~
-- interactive website? -> Would it solve the problem of labels and edges -> Webgl renderer? -> Proof of concept is done it seems to work
+- ~~interactive website? -> Would it solve the problem of labels and edges -> Webgl renderer? -> Proof of concept is done it seems to work~~
 - Optimize accessing node and edge attributes, and maybe switch to neo4j? -> needs research
 - create a new layout (force-directed) -> needs extensive research
 - Look into creating animations -> need to have a force-directed layout
@@ -30,17 +30,18 @@ Right now, there are two layouts possible, "singular" and "hierarchal." These tw
 
  - ~~Understand instanced rendering and create circles (Tested up to 5 million with no issues)~~
  - ~~instanced MSDF text rendering for text placement, which is harder than I thought, but it is possible. Working on it -> Done!~~
- - Projection matrix bug fix
- - The actual Wikipedia page pops out from the left side -> Literally will just embed the Wiki page
- - Structure code - > Done for now -> I have to structure again looool
- - Improved memory management -> Priority as this is the main culprit for the 500k layout -> Deload CSV files and remove duplicate data 
- - Make it usable for mobile
+ - ~~Projection matrix bug fix~~
+ - ~~The actual Wikipedia page pops out from the left side -> Literally will just embed the Wiki page~~
+ - Structure code - > Done for now -> I have to structure again -> Done -> AGAIN
+ - ~~Improved memory management~~
+ - ~~screen space to world space (for clicking and text optimization)~~
+ - Make it usable for mobile -> Partly done
+ - Fix search delay
+ - File Uploading -> Right now it is hosted under github which is probably not nice.
+ - Create UI (Right now its just html/css/js)
  - After getting the WebGL renderer to a reasonable state, I am just planning to move on. Although it's been fun, I want to move on to another project. 
 
 
-## Webgl Renderer!
-
-![Im sorry github servers](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/Demo.mp4)
 
 
 ## Photos

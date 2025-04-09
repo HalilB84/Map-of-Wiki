@@ -57,6 +57,8 @@ class LayoutManager:
 
 
 #################################################################################################################
+
+        #Not sure why I didn't go for a recursive approach, but this is the current implementation
             
         elif(self.graph_params['partitioning'] == 'hierarchical'):
 
@@ -122,6 +124,15 @@ class LayoutManager:
                 
                 current_partitions = temp_partitions
 
+#################################################################################################################
+
+        #New layout details:
+
+        #Use leidens algorithm to partition the graph into sqrt(n) communities (assuming a graph size of n)
+        #For each community, apply the FA2 layout algorithm. Since there is only about a maximum of 3000 nodes in a community this should be fine
+        #For each community make sure no nodes overlap, this is the trick part and I don't know how to do it yet
+        #For each community make sure that its in a circle. This should be fine I think?
+        #Now repeat the process, but this time apply the FA2 layout to the communities (Aggregated nodes)
 
         else:
             print('Invalid partitioning type')
