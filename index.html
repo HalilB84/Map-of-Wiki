@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Map of Wikipedia</title>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HTVMYJR7TY"></script>
@@ -13,27 +13,29 @@
 
     gtag('config', 'G-HTVMYJR7TY');
   </script>
-  <script type="module" crossorigin src="/Map-of-Wiki/assets/index-7-YdSMia.js"></script>
-  <link rel="stylesheet" crossorigin href="/Map-of-Wiki/assets/index-DcuABK77.css">
+  <script type="module" crossorigin src="/Map-of-Wiki/assets/index-Bv_mQZxR.js"></script>
+  <link rel="stylesheet" crossorigin href="/Map-of-Wiki/assets/index-Cws7Znwv.css">
 </head>
 <body> 
   <!-- Intro overlay -->
   <div id="intro-overlay" class="overlay">
     <div class="overlay-content">
       <h1>Map of Wikipedia</h1>
-      <p>Welcome to a visual representation of Wikipedia.</p>
+      <p>Welcome to a visual representation of Wikipedia. This project creates an interactive visualization of Wikipedia articles based on their semantic relationships.</p>
       
       <div class="intro-section">
         <h2>About this Project</h2>
-        <p>This visualization maps the connections between Wikipedia articles based on their semantic relationships. Articles that are connected by similar content appear closer together on the map. 
-          The size of each circle represents the number of visits to that page in a particular day.</p>
+        <p>This project was inspired by adumb's graphing Wikipedia video and aims to create different graph visualizations with an interactive web interface. The visualization maps connections between Wikipedia articles based on their semantic relationships, where articles with similar content appear closer together on the map.</p>
+        <p>The size of each circle represents the number of visits to that page in a particular day.</p>
       </div>
+
+      
 
       <div class="intro-section">
         <h2>WARNINGS</h2>
         <ul>
           <li>Due to the nature of Wikipedia, the dataset contains NSFW elements.</li>
-          <li>The placement of the articles is not perfect, the current algorithm needs to be improved. You might see that some artcles are wildly out of place. </li>
+          <li>The placement of the articles is not perfect, the current algorithm needs to be improved. You might see that some articles are wildly out of place.</li>
           <li>The dataset is from September 10, 2024. The dataset is not updated, so the articles might not be the same as the current Wikipedia articles.</li>
           <li>The dataset is not perfect, there might be some errors in the dataset.</li>
           <li>The placement of the nodes is not manipulated. It is only a result of the algorithm.</li>
@@ -49,6 +51,17 @@
           <li><strong>Performance:</strong> If the visualization runs slowly, try selecting a smaller dataset.</li>
         </ul>
       </div>
+
+      <div class="intro-section">
+        <h2>Technical Details</h2>
+        <ul>
+          <li>Data is collected from Wikimedia dumps</li>
+          <li>Uses Leiden algorithm for community detection (and to build the graph itself) </li>
+          <li>Custom-built graph layout algorithm (very naive tho)</li>
+          <li>WebGL-based rendering for high performance</li>
+          <li>Link to repo: <a href="https://github.com/HalilB84/Map-of-Wiki">https://github.com/HalilB84/Map-of-Wiki</a></li>
+        </ul>
+      </div>
       
       <div class="intro-section">
         <h2>Choose a Dataset</h2>
@@ -59,7 +72,7 @@
             <input type="radio" id="dataset-60k" name="dataset" value="/Map-of-Wiki/layouts/layout60k-Sep-10-2024.csv">
             <label for="dataset-60k">
               <strong>60,000 Articles (September, 10, 2024)</strong>
-              <span>Recommended for very slow computers</span>
+              <span>Recommended for very slow computers. Shows the most popular articles with clear community clusters.</span>
             </label>
           </div>
           
@@ -67,7 +80,7 @@
             <input type="radio" id="dataset-500k" name="dataset" value="/Map-of-Wiki/layouts/layout500k-Sep-10-2024.csv" checked>
             <label for="dataset-500k">
               <strong>500,000 Articles (September, 10, 2024)</strong>
-              <span>Should run good in any computer</span>
+              <span>Should run well on any computer. Provides a good balance between detail and performance.</span>
             </label>
           </div>
           
@@ -75,7 +88,7 @@
             <input type="radio" id="dataset-1m" name="dataset" value="/Map-of-Wiki/layouts/layout1m-part1-Sep-10-2024.csv,/Map-of-Wiki/layouts/layout1m-part2-Sep-10-2024.csv">
             <label for="dataset-1m">
               <strong>1,000,000 Articles (Experimental) (September, 10, 2024)</strong>
-              <span>Not tested enough but it runs good on my thinkpad l13</span>
+              <span>Not fully tested but runs well on modern systems. Best for exploring the full depth of Wikipedia's knowledge graph.</span>
             </label>
           </div>
         </div>
@@ -86,8 +99,15 @@
   </div>
 
   <div id="search-container"> 
-    <input type="text" id="search" placeholder="Search an article..." /> 
-    <div id="search-results"></div> <!-- Results will show here -->
+    <div class="search-input-container">
+      <input type="text" id="search" placeholder="Search an article..." />
+      <div class="search-loading"></div>
+    </div>
+    <div id="search-results"></div>
+    <button id="random-button" class="random-button">
+      <span class="random-icon">⟳</span>
+      Random Article
+    </button>
   </div>
   
   <div id="dropdown-container">
@@ -98,6 +118,7 @@
       <option value="/Map-of-Wiki/layouts/layout60k-Sep-10-2024.csv">60k September 10 2024</option>
     </select>
     <button id="load-button">Load</button>
+    
   </div>
   
   <div id="wiki-embed-container">
@@ -109,11 +130,17 @@
     <canvas id="webgl-canvas"></canvas>
   </div>
   
-  <!-- FPS counter -->
   <div id="fps-counter"></div>
-  
-  <!-- Loading indicator -->
-  <div id="loading" style="display: none;">Loading data...</div>
+  <div id="loading" style="display: none;">
+    <div class="loading-content">
+      <p class="loading-text">Loading visualization...</p>
+      <div class="loading-circles">
+        <div class="loading-circle"></div>
+        <div class="loading-circle"></div>
+        <div class="loading-circle"></div>
+      </div>
+    </div>
+  </div>
   
 </body>
 </html>
