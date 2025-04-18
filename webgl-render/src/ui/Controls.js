@@ -16,8 +16,8 @@ export default class Controls {
     this.stage1Duration = 0;
     this.stage2Duration = 0;
     this.transitionStartTime = 0;
-    this.transitionDuration = 1000;
-    this.zoomSensitivity = 0.0040;
+    this.wheelSensitivity = 0.0020;
+    this.touchSensitivity = 0.0040;
     this.lastTouchDistance = null;
     this.wikiEmbedInitialized = false;
 
@@ -119,12 +119,16 @@ export default class Controls {
   handleZoom(e) {
     if (this.transitionActive) return;
 
-    const worldPos = this.screenToWorld(e.clientX, e.clientY);
+    e.preventDefault();
 
-    const zoomFactor = Math.exp(e.deltaY * this.zoomSensitivity);
-    this.zoomLevel *= zoomFactor;
-    //??? no idea why this works
+    // https://stackoverflow.com/questions/77863197/distinguish-trackpad-and-mouse-on-wheel-event
+    const isMouseWheel = Number.isInteger(e.deltaY) && e.deltaX === 0;
+    const sens = isMouseWheel ? this.wheelSensitivity : this.touchSensitivity;
+    const zoomFactor = Math.exp(e.deltaY * sens);
+    
     // Adjust camera position to maintain cursor's world position
+    const worldPos = this.screenToWorld(e.clientX, e.clientY);
+    this.zoomLevel *= zoomFactor;
     const newWorldPos = this.screenToWorld(e.clientX, e.clientY);
     //console.log(worldPos, newWorldPos);
     this.cameraX += (worldPos.x - newWorldPos.x);

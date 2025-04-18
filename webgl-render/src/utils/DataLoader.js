@@ -1,6 +1,13 @@
 import Papa from 'papaparse';
 
 export default class DataLoader {
+  // hardcoded uncompressed byte sizes for CSVs
+  static FILE_SIZES = {
+    'layout60k-Sep-10-2024.csv': 6792224,
+    'layout500k-Sep-10-2024.csv': 57693366,
+    'layout1m-part1-Sep-10-2024.csv': 59988553,
+    'layout1m-part2-Sep-10-2024.csv': 56877942
+  };
 
   async loadCSV(filePath, onProgress) {
       const paths = filePath.split(',');
@@ -21,8 +28,10 @@ export default class DataLoader {
   async loadSingleCSV(filePath, onProgress) {
     try {
       const response = await fetch(filePath);
-      const contentLength = response.headers.get('Content-Length');
-      const total = contentLength ? parseInt(contentLength, 10) : null;
+      const fileName = filePath.split('/').pop();
+      //const contentLengthHeader = response.headers.get('Content-Length');
+      const total = DataLoader.FILE_SIZES[fileName];
+        //?? (contentLengthHeader ? parseInt(contentLengthHeader, 10) : null);
       const reader = response.body.getReader();
       let received = 0;
       const chunks = [];
