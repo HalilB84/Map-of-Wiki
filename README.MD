@@ -32,13 +32,12 @@ Right now, there are two layouts possible, "singular" and "hierarchal." These tw
  - ~~instanced MSDF text rendering for text placement, which is harder than I thought, but it is possible. Working on it -> Done!~~
  - ~~Projection matrix bug fix~~
  - ~~The actual Wikipedia page pops out from the left side -> Literally will just embed the Wiki page~~
- - Structure code - > Done for now -> I have to structure again -> Done -> AGAIN
+ - Structure code - > Done for now -> I have to structure again -> Done -> AGAIN -> beyond repair
  - ~~Improved memory management~~
  - ~~screen space to world space (for clicking and text optimization)~~
- - Make it usable for mobile -> Partly done
- - Fix search delay
+ - ~~Make it usable for mobile -> Partly done~
  - File Uploading -> Right now it is hosted under github which is probably not nice.
- - Create UI (Right now its just html/css/js)
+ - Create better UI (Right now its just html/css/js)
  - After getting the WebGL renderer to a reasonable state, I am just planning to move on. Although it's been fun, I want to move on to another project. 
 
 

@@ -5,11 +5,23 @@ import DataLoader from './utils/DataLoader.js';
 import SearchManager from './ui/SearchManager.js';
 import Controls from './ui/Controls.js';
 
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    new Visualization();
+  } catch (error) {
+    console.error('Failed to initialize application:', error);
+    alert('Failed to initialize the application. See console for details.');
+  }
+});
+
+
 class Visualization {
   constructor() {
     
     this.canvas = document.getElementById('webgl-canvas');
-    this.canvas.visualization = this;
+    this.canvas.visualization = this; 
+    //as much as I hate this, it is the easiest way to get the canvas in the controls
+    //I think, uhhhhhhhhh this code is a mess
     
     this.webgl = new WebGLContext(this.canvas);
     this.controls = new Controls(this.canvas);
@@ -18,20 +30,20 @@ class Visualization {
     this.textRenderer = new TextRenderer(this.webgl.gl);
     this.searchManager = new SearchManager(this.circleRenderer, this.controls);    
     
-    this.setupIntroOverlay();
-
-    document.getElementById('load-button').addEventListener('click', () => this.initialize());
-
     this.animationFrameId = null;
     
     this.lastTextUpdateTime = 0;
     this.textUpdateInterval = 1000;
     
     this.fpsCounter = document.getElementById('fps-counter');
+    this.pctEl = document.getElementById('loading-percent');
     this.lastFrameTime = 0;
     this.frameCount = 0;
     this.lastFpsUpdate = 0;
     this.fps = 0;
+
+    this.setupIntroOverlay();
+
   }
   
   //Assuming this is gonna be a simple website I can go the vanilla way. Or use vue like anvaka
@@ -52,7 +64,12 @@ class Visualization {
     
     
   }
-  
+
+  showLoadingIndicator(show) {
+    const loadingElement = document.getElementById('loading');
+    loadingElement.style.display = show ? 'flex' : 'none';
+    this.pctEl.textContent = show ? '0%' : '';
+  }
   
   updateFpsCounter(timestamp) {
     this.frameCount++;
@@ -71,63 +88,42 @@ class Visualization {
   }
   
   async initialize() {
-    try {
-      const selector = document.getElementById("csv-select");
-      const selectedValue = selector.value;
-      if (!selectedValue) {
-        throw new Error('No CSV file selected');
-      }
-      
-      this.showLoadingIndicator(true);
-      
-      let rawData;
-      try {
-        rawData = await this.DataLoader.loadCSV(selectedValue);
-        console.log(`Loaded ${rawData.length} data points from CSV`);
-      } catch (error) {
-        throw new Error(`Failed to load CSV file: ${error.message}`);
-      }
-      
-      let processedData;
-      try {
-        processedData = this.DataLoader.processData(rawData);
-        console.log(`Processed data: ${processedData.numItems} items`);
-      } catch (error) {
-        throw new Error(`Failed to process data: ${error.message}`);
-      }
-      
-      try {
-        this.circleRenderer.setData(processedData);
-        
-        this.textRenderer.clear();
-        await this.textRenderer.loadFont();
-        
-        this.allTextData = processedData.titles.map((title, i) => ({
-          text: title,
-          x: processedData.offsets[i * 2],
-          y: processedData.offsets[i * 2 + 1],
-          limit: 2 * processedData.sizes[i],
-          cx: 0.51,
-          cy: 0.5,
-          radius: processedData.sizes[i]
-        }));
-        
-        this.updateVisibleText();
-      } catch (error) {
-        throw new Error(`Failed to initialize renderers: ${error.message}`);
-      }
-      
-      this.controls.reset();
-      
-      this.showLoadingIndicator(false);
-      
-      if (!this.animationFrameId) {
-        this.startRenderLoop();
-      }
-    } catch (error) {
-      console.error('Error initializing the application:', error);
-      this.showLoadingIndicator(false);
+    // get selected CSV and handle missing selection
+    const selector = document.getElementById("csv-select");
+    const selectedValue = selector.value;
+    
+    this.showLoadingIndicator(true);
+
+    const rawData = await this.DataLoader.loadCSV(selectedValue, percent => {
+      this.pctEl.textContent = `${Math.floor(percent)}%`;
+    });
+    console.log(`Loaded ${rawData.length} data points from CSV`);
+
+    // process data
+    const processedData = this.DataLoader.processData(rawData);
+    console.log(`Processed data: ${processedData.numItems} items`);
+
+    // initialize renderers
+    this.circleRenderer.setData(processedData);
+    this.textRenderer.characterCount = 0;
+    await this.textRenderer.loadFont();
+
+    this.allTextData = processedData.titles.map((title, i) => ({
+      text: title,
+      x: processedData.offsets[i * 2],
+      y: processedData.offsets[i * 2 + 1],
+      limit: 2 * processedData.sizes[i],
+      cx: 0.51, // Still not sure how these work
+      cy: 0.5,
+      radius: processedData.sizes[i]
+    }));
+    this.updateVisibleText();
+
+    this.controls.reset();
+    if (!this.animationFrameId) {
+      this.startRenderLoop();
     }
+    this.showLoadingIndicator(false);
   }
   
   startRenderLoop() {
@@ -166,16 +162,8 @@ class Visualization {
     this.animationFrameId = requestAnimationFrame(timestamp => this.draw(timestamp));
   }
   
-  showLoadingIndicator(show) {
-    const loadingElement = document.getElementById('loading');
-    if (loadingElement) {
-      loadingElement.style.display = show ? 'flex' : 'none';
-    }
-  }
-  
   
   updateVisibleText() {    
-    this.textRenderer.clear();
     
     const topLeft = this.controls.screenToWorld(0, 0);
     const bottomRight = this.controls.screenToWorld(this.canvas.width, this.canvas.height);
@@ -218,13 +206,4 @@ class Visualization {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    const viz = new Visualization();
-    
-  } catch (error) {
-    console.error('Failed to initialize application:', error);
-    alert('Failed to initialize the application. See console for details.');
-  }
-});
 

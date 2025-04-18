@@ -2,7 +2,6 @@ export default class WebGLContext {
   constructor(canvas) {
     this.canvas = canvas;
     this.initWebGL();
-    //window.addEventListener('resize', () => this.resizeCanvas());
   }
 
   initWebGL() {
@@ -38,7 +37,7 @@ export default class WebGLContext {
   }
 
   createProjectionMatrix(cameraX, cameraY, zoomLevel) {
-    const aspectRatio = (this.canvas.width / this.canvas.height); //wait  is thi also not the same as the canvas size? wtf
+    const aspectRatio = (this.canvas.width / this.canvas.height); //wait is this also not the same as the canvas size? wtf
     const scale = 1 / zoomLevel;
     return new Float32Array([
       scale / aspectRatio, 0, 0, 0,

@@ -1,8 +1,8 @@
 *.pyc
 Data/
 Graph_Data/
-old/
 layouts/
+read.txt
 
 # Logs
 logs

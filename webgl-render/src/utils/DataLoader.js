@@ -1,33 +1,61 @@
 import Papa from 'papaparse';
 
 export default class DataLoader {
-  async loadCSV(filePath) {
-    if (filePath.includes(',')) {
-      const filePaths = filePath.split(',');
-      const loadPromises = filePaths.map(path => this.loadSingleCSV(path));
-      const results = await Promise.all(loadPromises);
-      return results.flat(); //this is where you appen the information
-    }
-    return this.loadSingleCSV(filePath);
-  }
 
-  async loadSingleCSV(filePath) {
-    return new Promise((resolve, reject) => {
-      Papa.parse(filePath, {
-        download: true,
-        header: true,
-        dynamicTyping: false,
-        skipEmptyLines: true,
-        complete: results => { //no idea what this is but it works. 
-          if (!results.data || results.data.length === 0) {
-            reject(new Error('CSV file contains no data'));
-            return;
-          }
-          resolve(results.data);
-        },
-        error: error => reject(error),
+  async loadCSV(filePath, onProgress) {
+      const paths = filePath.split(',');
+      const totalFiles = paths.length;
+      let allData = [];
+
+      for (let i = 0; i < totalFiles; i++) {
+        const data = await this.loadSingleCSV(paths[i], p => {
+          onProgress(Math.floor(((i + p / 100) / totalFiles) * 100));
+        });
+        allData = allData.concat(data);
+      }
+      return allData;
+  }
+  
+
+  // wtf is this, it works tho. Will make sure to understand how it works before publishing
+  async loadSingleCSV(filePath, onProgress) {
+    try {
+      const response = await fetch(filePath);
+      const contentLength = response.headers.get('Content-Length');
+      const total = contentLength ? parseInt(contentLength, 10) : null;
+      const reader = response.body.getReader();
+      let received = 0;
+      const chunks = [];
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        if (total && onProgress) {
+          received += value.length;
+          onProgress((received / total) * 100);
+        }
+      }
+      const blob = new Blob(chunks);
+      const text = await blob.text();
+
+      return new Promise((resolve, reject) => {
+        Papa.parse(text, {
+          header: true,
+          dynamicTyping: false,
+          skipEmptyLines: true,
+          complete: results => {
+            if (!results.data || results.data.length === 0) {
+              reject(new Error('CSV file contains no data'));
+            } else {
+              resolve(results.data);
+            }
+          },
+          error: error => reject(error),
+        });
       });
-    });
+    } catch (err) {
+      throw err;
+    }
   }
 
   processData(data) {
@@ -74,4 +102,4 @@ export default class DataLoader {
       ids
     };
   }
-} 
+}

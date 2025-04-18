@@ -88,9 +88,9 @@ export default class SearchManager {
     
     const targetX = this.circleRenderer.offsets[index * 2];
     const targetY = this.circleRenderer.offsets[index * 2 + 1];
-    const targetZoom = this.circleRenderer.sizes[index] * 10;
+    const targetZoom = this.circleRenderer.sizes[index] * 5;
     
-    this.controls.smoothTransition(targetX, targetY, targetZoom);
+    this.controls.smoothTransition(targetX, targetY, targetZoom, 2);
   }
 
   clearSearch() {

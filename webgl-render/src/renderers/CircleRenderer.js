@@ -4,7 +4,6 @@ export default class CircleRenderer extends ShaderProgram {
   constructor(gl) {
     super(gl);
     this.numCircles = 0;
-    this.maxCircles = 0;
     this.offsets = null;
     this.sizes = null;
     this.colors = null;
@@ -63,39 +62,22 @@ export default class CircleRenderer extends ShaderProgram {
   }
 
   setData(processedData) {
-    const numItems = processedData.numItems;
-    this.allocateBuffers(numItems);
+    this.numCircles = processedData.numItems;
+    this.allocateBuffers(this.numCircles);
     
     this.offsets.set(processedData.offsets);
     this.sizes.set(processedData.sizes);
     this.colors.set(processedData.colors);
     this.titles = processedData.titles;
     this.ids = processedData.ids;
-    this.numCircles = numItems;
     
     this.initBuffers();
   }
 
-  //Better memory management, should be called once
   allocateBuffers(circleCount) {
-    if (this.maxCircles >= circleCount) return;
-    
-    const newCapacity = Math.max(circleCount, Math.ceil(this.maxCircles * 1.5));
-    
-    const newOffsets = new Float32Array(newCapacity * 2);
-    const newSizes = new Float32Array(newCapacity);
-    const newColors = new Float32Array(newCapacity * 4);
-    
-    if (this.offsets) {
-      newOffsets.set(this.offsets.subarray(0, this.numCircles * 2));
-      newSizes.set(this.sizes.subarray(0, this.numCircles));
-      newColors.set(this.colors.subarray(0, this.numCircles * 4));
-    }
-    
-    this.offsets = newOffsets;
-    this.sizes = newSizes;
-    this.colors = newColors;
-    this.maxCircles = newCapacity;
+    this.offsets = new Float32Array(circleCount * 2);
+    this.sizes = new Float32Array(circleCount);
+    this.colors = new Float32Array(circleCount * 4);
   }
 
   initBuffers() {
@@ -144,19 +126,14 @@ export default class CircleRenderer extends ShaderProgram {
   }
 
   draw(projectionMatrix, zoomLevel) {
-    if (this.numCircles === 0) return;
 
     const gl = this.gl;
     gl.useProgram(this.program);
     gl.bindVertexArray(this.vao);
 
     gl.uniformMatrix4fv(this.locations.projection, false, projectionMatrix);
-    gl.uniform1f(this.locations.cameraDistance, zoomLevel * 0.0006);
+    gl.uniform1f(this.locations.cameraDistance, zoomLevel * 0.0006); //This magic number is to make things more visible
 
     gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, this.numCircles);
-  }
-
-  clear() {
-    this.numCircles = 0;
   }
 } 

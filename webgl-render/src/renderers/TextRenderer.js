@@ -8,7 +8,6 @@ export default class TextRenderer extends ShaderProgram {
     this.opacity = 1;
     this.isReady = false;
     this.fontInfo = null;
-    this.maxCharacters = 0;
     this.characterCount = 0;
     this.positions = null;
     this.charSizes = null;
@@ -200,26 +199,10 @@ export default class TextRenderer extends ShaderProgram {
   }
 
 
-  //Better memory management, should be called once
-  allocateBuffers(charCount) {
-    if (this.maxCharacters >= charCount) return;
-    
-    const newCapacity = Math.max(charCount, Math.ceil(this.maxCharacters * 1.5));
-    
-    const newPositions = new Float32Array(newCapacity * 3);
-    const newCharSizes = new Float32Array(newCapacity * 2);
-    const newTexturePositions = new Float32Array(newCapacity * 4);
-    
-    if (this.positions) {
-      newPositions.set(this.positions.subarray(0, this.characterCount * 3));
-      newCharSizes.set(this.charSizes.subarray(0, this.characterCount * 2));
-      newTexturePositions.set(this.texturePositions.subarray(0, this.characterCount * 4));
-    }
-    
-    this.positions = newPositions;
-    this.charSizes = newCharSizes;
-    this.texturePositions = newTexturePositions;
-    this.maxCharacters = newCapacity;
+  allocateBuffers(charCount) { 
+    this.positions = new Float32Array(charCount * 3);;
+    this.charSizes = new Float32Array(charCount * 2);
+    this.texturePositions = new Float32Array(charCount * 4);
   }
 
   batchAddText(textInfoArray) {
@@ -230,6 +213,7 @@ export default class TextRenderer extends ShaderProgram {
       }
     }
     
+    this.characterCount = 0;
     this.allocateBuffers(totalChars);
     
     for (const info of textInfoArray) {
@@ -324,11 +308,5 @@ export default class TextRenderer extends ShaderProgram {
     gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, this.characterCount);
 
     gl.bindVertexArray(null);
-  }
-
-  clear() {
-    this.characterCount = 0;
-  }
-
-  
+  }  
 }
