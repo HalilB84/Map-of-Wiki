@@ -40,7 +40,7 @@ export default class Controls {
       this.wasDragging = false;
     });
 
-    document.getElementById('random-button').addEventListener('click', () => this.goToRandomArticle());
+    document.getElementById('random-button').addEventListener('click', () => this.canvas.visualization.goToRandomArticle());
     document.getElementById('load-button').addEventListener('click', () => this.canvas.visualization.initialize());
   }
 
@@ -125,6 +125,7 @@ export default class Controls {
     const isMouseWheel = Number.isInteger(e.deltaY) && e.deltaX === 0;
     const sens = isMouseWheel ? this.wheelSensitivity : this.touchSensitivity;
     const zoomFactor = Math.exp(e.deltaY * sens);
+    //console.log(e.deltaY, zoomFactor);
     
     // Adjust camera position to maintain cursor's world position
     const worldPos = this.screenToWorld(e.clientX, e.clientY);
@@ -296,47 +297,5 @@ export default class Controls {
         return;
       }
     }
-  }
-
-  showEmbeddedWikiArticle(id) {
-    const container = document.getElementById('wiki-embed-container');
-    const iframe = document.getElementById('wiki-iframe');
-    const closeBtn = document.getElementById('close-wiki-btn');
-
-    const wikiUrl = `https://en.wikipedia.org/?curid=${id}`;
-
-    iframe.src = wikiUrl;
-    container.classList.add('active');
-
-    closeBtn.onclick = () => {
-      container.classList.remove('active');
-      setTimeout(() => {
-        iframe.src = 'about:blank';
-      }, 300);
-    };
-
-    if (!this.wikiEmbedInitialized) {
-      this.wikiEmbedInitialized = true;
-
-      document.addEventListener('click', (e) => {
-        if (!container.contains(e.target) &&
-          container.classList.contains('active') &&
-          !e.target.closest('#webgl-canvas')) {
-          closeBtn.click();
-        }
-      });
-    }
-  }
-
-  goToRandomArticle() {
-    const circleRenderer = this.canvas.visualization.circleRenderer;
-
-    const randomIndex = Math.floor(Math.random() * circleRenderer.numCircles);
-
-    const targetX = circleRenderer.offsets[randomIndex * 2];
-    const targetY = circleRenderer.offsets[randomIndex * 2 + 1];
-    const targetZoom = circleRenderer.sizes[randomIndex] * 5;
-
-    this.smoothTransition(targetX, targetY, targetZoom);
   }
 }

@@ -31,6 +31,7 @@ class Visualization {
     this.searchManager = new SearchManager(this.circleRenderer, this.controls);    
     
     this.animationFrameId = null;
+    this.initializing = false;
     
     this.lastTextUpdateTime = 0;
     this.textUpdateInterval = 1000;
@@ -87,24 +88,29 @@ class Visualization {
     }
   }
   
+  //Needs cleaning
   async initialize() {
-    // get selected CSV and handle missing selection
+
+    if (this.initializing) return;
+    this.initializing = true;
+
     const selector = document.getElementById("csv-select");
     const selectedValue = selector.value;
     
     this.showLoadingIndicator(true);
 
+    // Process data
     const rawData = await this.DataLoader.loadCSV(selectedValue, percent => {
       this.pctEl.textContent = `${Math.floor(percent)}%`;
     });
     console.log(`Loaded ${rawData.length} data points from CSV`);
 
-    // process data
     const processedData = this.DataLoader.processData(rawData);
     console.log(`Processed data: ${processedData.numItems} items`);
 
     // initialize renderers
     this.circleRenderer.setData(processedData);
+
     this.textRenderer.characterCount = 0;
     await this.textRenderer.loadFont();
 
@@ -124,6 +130,7 @@ class Visualization {
       this.startRenderLoop();
     }
     this.showLoadingIndicator(false);
+    this.initializing = false;
   }
   
   startRenderLoop() {
@@ -203,6 +210,44 @@ class Visualization {
     console.log(`Showing ${labelsToShow.length} labels out of ${visibleTextData.length} visible circles`);
     
     this.textRenderer.batchAddText(labelsToShow);
+  }
+
+  showEmbeddedWikiArticle(id) {
+    const container = document.getElementById('wiki-embed-container');
+    const iframe = document.getElementById('wiki-iframe');
+    const closeBtn = document.getElementById('close-wiki-btn');
+
+    const wikiUrl = `https://en.wikipedia.org/?curid=${id}`;
+
+    iframe.src = wikiUrl;
+    container.classList.add('active');
+
+    closeBtn.onclick = () => {
+      container.classList.remove('active');
+      setTimeout(() => {
+        iframe.src = 'about:blank';
+      }, 300);
+    };
+
+
+      document.addEventListener('click', (e) => {
+        if (!container.contains(e.target) &&
+          container.classList.contains('active') &&
+          !e.target.closest('#webgl-canvas')) {
+          closeBtn.click();
+        }
+      });
+  }
+
+  goToRandomArticle() {
+
+    const randomIndex = Math.floor(Math.random() * this.circleRenderer.numCircles);
+
+    const targetX = this.circleRenderer.offsets[randomIndex * 2];
+    const targetY = this.circleRenderer.offsets[randomIndex * 2 + 1];
+    const targetZoom = this.circleRenderer.sizes[randomIndex] * 5;
+
+    this.controls.smoothTransition(targetX, targetY, targetZoom);
   }
 }
 

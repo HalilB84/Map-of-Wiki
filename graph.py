@@ -26,7 +26,7 @@ for i in range(g.vcount()):
      g.vs[i]['y'] = 0
 
 
-#fix nodes with no links
+#fix nodes with no links / still havent fixed this
 _max = node_data['count'].iloc[0]
 for index, row in node_data.iterrows():
 
