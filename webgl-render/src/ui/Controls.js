@@ -19,7 +19,6 @@ export default class Controls {
     this.wheelSensitivity = 0.0020;
     this.touchSensitivity = 0.0040;
     this.lastTouchDistance = null;
-    this.wikiEmbedInitialized = false;
 
     this.canvas = canvas;
 
@@ -293,7 +292,7 @@ export default class Controls {
         console.log(cx, cy, radius);
         console.log(`Clicked on article: ${articleTitle} (ID: ${articleId})`);
 
-        this.showEmbeddedWikiArticle(articleId);
+        this.canvas.visualization.showEmbeddedWikiArticle(articleId);
         return;
       }
     }
