@@ -153,7 +153,7 @@ export default class TextRenderer extends ShaderProgram {
   
   async loadFont() {
     try {
-      const response = await fetch('/Map-of-Wiki/fonts/Roboto.json', { mode: 'cors' });
+      const response = await fetch('/fonts/Roboto.json'); // fetch the font metadata from public/fonts
       const fontInfo = await response.json();
       this.fontInfo = fontInfo;
       this.alphabet = new Map();
@@ -190,7 +190,7 @@ export default class TextRenderer extends ShaderProgram {
           reject(new Error('Failed to load font texture'));
         };
 
-        img.src = '/Map-of-Wiki/fonts/Roboto0.png';
+        img.src = '/fonts/Roboto0.png'; // load the font texture from public/fonts
       });
     } catch (err) {
       console.error('Failed to load font:', err);
