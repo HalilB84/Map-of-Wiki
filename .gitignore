@@ -2,8 +2,6 @@
 Data/
 Graph_Data/
 public/layouts/
-!functions/layouts/
-!functions/layouts/**
 read.txt
 .wrangler/
 
