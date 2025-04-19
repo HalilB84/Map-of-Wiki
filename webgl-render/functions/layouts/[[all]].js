@@ -1,7 +1,8 @@
 // /functions/layouts/[[all]].js
 
 export async function onRequestGet(ctx) {
-    // strip the `/layouts/` prefix and pull from your bucket
+    // So every /layout request is routed to this function
+    // can someone abuse this?
     let path = new URL(ctx.request.url).pathname.replace(/^\/layouts\//, "");
     console.log(path);
     let obj  = await ctx.env.LAYOUTS.get(path);

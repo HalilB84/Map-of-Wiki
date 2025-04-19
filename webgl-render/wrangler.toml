@@ -1,9 +1,0 @@
-name = "map-of-wiki"               
-pages_build_output_dir = "./dist"
-
-#-------------------------------
-# bind your R2 bucket
-#-------------------------------
-[[r2_buckets]]
-binding    = "LAYOUTS"    # this becomes ctx.env.LAYOUTS in your functions​
-bucket_name = "layouts"   # the exact name of your R2 bucket
