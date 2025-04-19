@@ -1,8 +1,11 @@
 *.pyc
 Data/
 Graph_Data/
-layouts/
+public/layouts/
+!functions/layouts/
+!functions/layouts/**
 read.txt
+.wrangler/
 
 # Logs
 logs

@@ -11,7 +11,8 @@
     "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
-    "vite": "^6.0.5"
+    "vite": "^6.0.5",
+    "wrangler": "^4.12.0"
   },
   "dependencies": {
     "fuzzysort": "^1.1.4",
