@@ -1,4 +1,4 @@
-export default class WebGLContext {
+export default class WebGLContext { //fix
   constructor(canvas) {
     this.canvas = canvas;
     this.initWebGL();
@@ -16,14 +16,12 @@ export default class WebGLContext {
     this.gl.clearColor(0, 0, 0, 1);
     this.clear();
     this.gl.enable(this.gl.BLEND);
-    //this.gl.enable(this.gl.DEPTH_TEST);
-    //this.gl.depthFunc(this.gl.LEQUAL); 
+    this.gl.enable(this.gl.DEPTH_TEST);
+    this.gl.depthFunc(this.gl.LEQUAL); 
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
   }
 
-  
-
-  resizeCanvas() {
+  resizeCanvas() { //needs fixes see webgl2 fundamentals resizing section
     const dpr = window.devicePixelRatio || 1;
     const displayWidth = this.canvas.clientWidth;
     const displayHeight = this.canvas.clientHeight;

@@ -1,26 +1,30 @@
 export default class Controls {
-  constructor(canvas) {
+  constructor(canvas, visualization) {
     this.zoomLevel = 1;
     this.cameraX = 0;
     this.cameraY = 0;
+
     this.isDragging = false;
     this.wasDragging = false;
     this.lastMouseX = 0;
     this.lastMouseY = 0;
+
     this.transitionActive = false;
     this.startState = null;
     this.endState = null;
     this.midState = null;
     this.stageCount = 0;
     this.stage = 0;
-    this.stage1Duration = 0;
-    this.stage2Duration = 0;
+    this.stage1Duration = 2000;
+    this.stage2Duration = 2000;
     this.transitionStartTime = 0;
+    
     this.wheelSensitivity = 0.0020;
     this.touchSensitivity = 0.0040;
     this.lastTouchDistance = null;
 
     this.canvas = canvas;
+    this.visualization = visualization;
 
     this.canvas.addEventListener('mousedown', e => this.handleMouseDown(e));
     this.canvas.addEventListener('touchstart', e => this.handleTouchStart(e), { passive: false });
@@ -31,7 +35,7 @@ export default class Controls {
     this.canvas.addEventListener('mousemove', e => this.handleMouseMove(e));
     this.canvas.addEventListener('touchmove', e => this.handleTouchMove(e), { passive: false });
 
-    this.canvas.addEventListener('wheel', e => this.handleZoom(e));
+    this.canvas.addEventListener('wheel', e => this.handleZoom(e), { passive: true });
     this.canvas.addEventListener('click', e => { //This is probably not the best way to do this
       if (!this.wasDragging) {
         this.clickArticle(e);
@@ -39,8 +43,7 @@ export default class Controls {
       this.wasDragging = false;
     });
 
-    document.getElementById('random-button').addEventListener('click', () => this.canvas.visualization.goToRandomArticle());
-    document.getElementById('load-button').addEventListener('click', () => this.canvas.visualization.initialize());
+    document.getElementById('random-button').addEventListener('click', () => this.goToRandomArticle());
   }
 
 
@@ -118,19 +121,16 @@ export default class Controls {
   handleZoom(e) {
     if (this.transitionActive) return;
 
-    e.preventDefault();
-
     // https://stackoverflow.com/questions/77863197/distinguish-trackpad-and-mouse-on-wheel-event
     const isMouseWheel = Number.isInteger(e.deltaY) && e.deltaX === 0;
     const sens = isMouseWheel ? this.wheelSensitivity : this.touchSensitivity;
     const zoomFactor = Math.exp(e.deltaY * sens);
-    //console.log(e.deltaY, zoomFactor);
-    
+
     // Adjust camera position to maintain cursor's world position
     const worldPos = this.screenToWorld(e.clientX, e.clientY);
     this.zoomLevel *= zoomFactor;
     const newWorldPos = this.screenToWorld(e.clientX, e.clientY);
-    //console.log(worldPos, newWorldPos);
+
     this.cameraX += (worldPos.x - newWorldPos.x);
     this.cameraY += (worldPos.y - newWorldPos.y);
   }
@@ -170,114 +170,103 @@ export default class Controls {
     this.lastMouseY = currY;
   }
 
-  //The durations need work, right now its all over the place
   smoothTransition(targetX, targetY, targetZoom, multi) {
     this.transitionActive = true;
 
     this.startState = { x: this.cameraX, y: this.cameraY, zoom: this.zoomLevel };
     this.endState = { x: targetX, y: targetY, zoom: targetZoom };
 
-    if (multi === 0) {
+    this.stage1Duration = 2000; // to be changed
+    this.stage2Duration = 2000; 
+
+    if (multi === false) {
         this.stageCount = 1;
-        this.stage1Duration = 2000;
     } 
     
-    else {
-        const dx = this.endState.x - this.startState.x;
-        const dy = this.endState.y - this.startState.y;
+    else { //fix timing late, right now its just 2000ms
+      const dx = this.endState.x - this.startState.x;
+      const dy = this.endState.y - this.startState.y;
 
-        //this also a lil random
+      const dist = Math.hypot(dx, dy);
+      const midZoom = Math.max(this.startState.zoom, dist * 0.8);
 
-        const dist = Math.hypot(dx, dy);
-        
-        const midZoom = Math.max(this.startState.zoom, dist * 0.8);
-        this.midState = { x: this.cameraX, y: this.cameraY, zoom: midZoom };
-        this.stageCount = 2;
-        this.stage = 0;
+      this.midState = { x: this.cameraX, y: this.cameraY, zoom: midZoom };
+      this.stageCount = 2;
+      this.stage = 0;
 
-        //I need some sort of normalization here
-
-        this.stage1Duration = Math.min(Math.max(Math.abs(50 * (midZoom - this.startState.zoom)), 700), 2000);
-
-        if(midZoom == this.startState.zoom){
-            this.stage1Duration = 0;
-        }
-
-        //these values make no sense
-        
-        this.stage2Duration = Math.min(Math.max(Math.abs(50 * (dx + dy)), 1500), 2000);
+      if(this.zoomLevel === midZoom) {
+        this.stage1Duration = 0; //to be removed with proper timings
+      }
     }
     this.transitionStartTime = performance.now();
   }
 
   updateTransition(timestamp) {
     const elapsed = timestamp - this.transitionStartTime;
-    let progress, eased;
+    
+    let duration;
+
     if (this.stageCount === 1) {
-        // only zoom out
-        progress = Math.min(elapsed / this.stage1Duration, 1);
-
-        eased = progress < 0.5 ? 2 * progress * progress : 
-                1 - Math.pow(-2 * progress + 2, 2) / 2;
-
-        this.zoomLevel = this.startState.zoom + (this.endState.zoom - this.startState.zoom) * eased;
-
-        if (progress >= 1) {
-            this.cameraX = this.endState.x;
-            this.cameraY = this.endState.y;
-            this.transitionActive = false;
-        }
-
-        return;
+      duration = this.stage1Duration;
+    } else if (this.stage === 0) {
+      duration = this.stage1Duration;
+    } else {
+      duration = this.stage2Duration;
     }
-    if (this.stage === 0) {
-        // first zoom out
-        progress = Math.min(elapsed / this.stage1Duration, 1);
-        eased = progress < 0.5 ? 2 * progress * progress :
-                1 - Math.pow(-2 * progress + 2, 2) / 2;
+    
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
 
-        this.zoomLevel = this.startState.zoom + (this.midState.zoom - this.startState.zoom) * eased;
+    if (this.stageCount === 1) {
+      // only zoom out
+      this.zoomLevel = this.startState.zoom + (this.endState.zoom - this.startState.zoom) * eased;
 
-        if (progress >= 1) {
-            this.stage = 1;
-            this.transitionStartTime = timestamp;
-        }
-        return;
-    }
-    // pan and zoom in
-    progress = Math.min(elapsed / this.stage2Duration, 1);
-    eased = progress < 0.5 ? 2 * progress * progress :
-            1 - Math.pow(-2 * progress + 2, 2) / 2;
-
-    const s1 = this.midState;
-    const e1 = this.endState;
-    this.cameraX = s1.x + (e1.x - s1.x) * eased;
-    this.cameraY = s1.y + (e1.y - s1.y) * eased;
-    this.zoomLevel = s1.zoom + (e1.zoom - s1.zoom) * eased;
-
-    if (progress >= 1) {
-        this.transitionActive = false;
+      if (progress >= 1) {
+          this.cameraX = this.endState.x;
+          this.cameraY = this.endState.y;
+          this.transitionActive = false;
+      }
     }
 
+    else if (this.stageCount ===  2 && this.stage === 0) {
+      // first zoom out
+      this.zoomLevel = this.startState.zoom + (this.midState.zoom - this.startState.zoom) * eased;
+
+      if (progress >= 1) {
+          this.stage = 1;
+          this.transitionStartTime = timestamp;
+      }
+    }
+
+    else if (this.stageCount ===  2 && this.stage === 1) {
+      // pan and zoom in
+      const s1 = this.midState;
+      const e1 = this.endState;
+      this.cameraX = s1.x + (e1.x - s1.x) * eased;
+      this.cameraY = s1.y + (e1.y - s1.y) * eased;
+      this.zoomLevel = s1.zoom + (e1.zoom - s1.zoom) * eased;
+
+      if (progress >= 1) {
+          this.transitionActive = false;
+      }
+    }
   }
 
   reset() {
     this.cameraX = 0;
     this.cameraY = 0;
     this.zoomLevel = 1;
-    this.smoothTransition(0, 0, 60, 0);
+    this.smoothTransition(0, 0, 60, false);
   }
 
-  //THESE BELOW NEED TO BE MOVED TO SOMEWHERE ELSE
   clickArticle(e) {
+    
     const worldPos = this.screenToWorld(e.clientX, e.clientY);
     console.log('cursor', worldPos);
 
+    const { offsets, sizes, ids, titles, numItems } = this.visualization.processedData;
 
-    const circleRenderer = this.canvas.visualization.circleRenderer;
-    const { offsets, sizes, ids, titles } = circleRenderer;
-
-    for (let i = 0; i < circleRenderer.numCircles; i++) {
+    for (let i = 0; i < numItems; i++) {
       const cx = offsets[i * 2];
       const cy = offsets[i * 2 + 1];
       const radius = sizes[i];
@@ -292,9 +281,50 @@ export default class Controls {
         console.log(cx, cy, radius);
         console.log(`Clicked on article: ${articleTitle} (ID: ${articleId})`);
 
-        this.canvas.visualization.showEmbeddedWikiArticle(articleId);
+        this.showEmbeddedWikiArticle(articleId);
         return;
       }
     }
+  }
+
+  showEmbeddedWikiArticle(id) {
+    const container = document.getElementById('wiki-embed-container');
+    const iframe = document.getElementById('wiki-iframe');
+    const closeBtn = document.getElementById('close-wiki-btn');
+
+    const wikiUrl = `https://en.wikipedia.org/?curid=${id}`;
+
+    iframe.src = wikiUrl;
+    container.classList.add('active');
+
+    if (!this._outsideClickHandler) {
+      this._outsideClickHandler = (e) => {
+        if (!container.contains(e.target) &&
+            container.classList.contains('active') &&
+            !e.target.closest('#webgl-canvas')) {
+          closeBtn.click();
+        }
+      };
+    }
+
+    closeBtn.onclick = () => {
+      container.classList.remove('active');
+      document.removeEventListener('click', this._outsideClickHandler);
+      setTimeout(() => {
+        iframe.src = 'about:blank';
+      }, 300);
+    };
+
+    document.addEventListener('click', this._outsideClickHandler);
+  }
+
+  goToRandomArticle() {
+    const randomIndex = Math.floor(Math.random() * this.visualization.processedData.numItems);
+
+    const targetX = this.visualization.processedData.offsets[randomIndex * 2];
+    const targetY = this.visualization.processedData.offsets[randomIndex * 2 + 1];
+    const targetZoom = this.visualization.processedData.sizes[randomIndex] * 5;
+
+    this.smoothTransition(targetX, targetY, targetZoom, true);
   }
 }

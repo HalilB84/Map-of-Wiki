@@ -9,11 +9,12 @@ export default class CircleRenderer extends ShaderProgram {
     this.colors = null;
     this.titles = null;
     this.ids = null;
+
+    this.vao = null;
+    this.buffers = { position: null, offset: null, size: null, color: null };
     
     this.initShaders();
   }
-
-  
 
   initShaders() {
     const vertexShaderSource = `#version 300 es
@@ -26,7 +27,7 @@ export default class CircleRenderer extends ShaderProgram {
       out vec2 v_point;    
       out vec4 v_color;     
       void main() {
-        vec2 scaledPosition = a_position * (a_size + cameraDistance) + a_offset;
+        vec2 scaledPosition = a_position * (a_size  + cameraDistance) + a_offset;
         gl_Position = u_projection * vec4(scaledPosition, 0.0, 1.0);
         v_point = a_position;
         v_color = a_color;
@@ -34,7 +35,7 @@ export default class CircleRenderer extends ShaderProgram {
     `;
 
     const fragmentShaderSource = `#version 300 es
-      precision mediump float;
+      precision highp float;
       in vec2 v_point;         
       in vec4 v_color; 
       out vec4 fragColor;
@@ -63,61 +64,52 @@ export default class CircleRenderer extends ShaderProgram {
 
   setData(processedData) {
     this.numCircles = processedData.numItems;
-    this.allocateBuffers(this.numCircles);
-    
-    this.offsets.set(processedData.offsets);
-    this.sizes.set(processedData.sizes);
-    this.colors.set(processedData.colors);
+    this.offsets = processedData.offsets;
+    this.sizes = processedData.sizes;
+    this.colors = processedData.colors;
     this.titles = processedData.titles;
     this.ids = processedData.ids;
     
     this.initBuffers();
   }
 
-  allocateBuffers(circleCount) {
-    this.offsets = new Float32Array(circleCount * 2);
-    this.sizes = new Float32Array(circleCount);
-    this.colors = new Float32Array(circleCount * 4);
-  }
-
   initBuffers() {
     const gl = this.gl;
-    
+
+    this.clean();
+
     this.vao = gl.createVertexArray();
     gl.bindVertexArray(this.vao);
     
-    this.buffers = {
-      position: gl.createBuffer(),
-      offset: gl.createBuffer(),
-      size: gl.createBuffer(),
-      color: gl.createBuffer()
-    };
-
     const quadVertices = new Float32Array([
       -1, -1,  1, -1, -1,  1,
        1, -1,  1,  1, -1,  1,
     ]);
 
+    this.buffers.position = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
     gl.bufferData(gl.ARRAY_BUFFER, quadVertices, gl.STATIC_DRAW);
     gl.enableVertexAttribArray(this.locations.position);
     gl.vertexAttribPointer(this.locations.position, 2, gl.FLOAT, false, 0, 0);
     gl.vertexAttribDivisor(this.locations.position, 0);
 
+    this.buffers.offset = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.offset);
-    gl.bufferData(gl.ARRAY_BUFFER, this.offsets.subarray(0, this.numCircles * 2), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, this.offsets, gl.DYNAMIC_DRAW);
     gl.enableVertexAttribArray(this.locations.offset);
     gl.vertexAttribPointer(this.locations.offset, 2, gl.FLOAT, false, 0, 0);
     gl.vertexAttribDivisor(this.locations.offset, 1);
 
+    this.buffers.size = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.size);
-    gl.bufferData(gl.ARRAY_BUFFER, this.sizes.subarray(0, this.numCircles), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, this.sizes, gl.DYNAMIC_DRAW);
     gl.enableVertexAttribArray(this.locations.size);
     gl.vertexAttribPointer(this.locations.size, 1, gl.FLOAT, false, 0, 0);
     gl.vertexAttribDivisor(this.locations.size, 1);
 
+    this.buffers.color = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.color);
-    gl.bufferData(gl.ARRAY_BUFFER, this.colors.subarray(0, this.numCircles * 4), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.DYNAMIC_DRAW);
     gl.enableVertexAttribArray(this.locations.color);
     gl.vertexAttribPointer(this.locations.color, 4, gl.FLOAT, false, 0, 0);
     gl.vertexAttribDivisor(this.locations.color, 1);
@@ -132,8 +124,18 @@ export default class CircleRenderer extends ShaderProgram {
     gl.bindVertexArray(this.vao);
 
     gl.uniformMatrix4fv(this.locations.projection, false, projectionMatrix);
-    gl.uniform1f(this.locations.cameraDistance, zoomLevel * 0.0006); //This magic number is to make things more visible
+    gl.uniform1f(this.locations.cameraDistance, zoomLevel * 0.0006); //fix
 
     gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, this.numCircles);
+  }
+
+  clean() {
+    const gl = this.gl;
+
+    if (this.vao) { gl.deleteVertexArray(this.vao); this.vao = null; }
+    if (this.buffers.position) { gl.deleteBuffer(this.buffers.position); this.buffers.position = null; }
+    if (this.buffers.offset) { gl.deleteBuffer(this.buffers.offset); this.buffers.offset = null; }
+    if (this.buffers.size) { gl.deleteBuffer(this.buffers.size); this.buffers.size = null; }
+    if (this.buffers.color) { gl.deleteBuffer(this.buffers.color); this.buffers.color = null; }
   }
 } 

@@ -1,21 +1,17 @@
 import fuzzysort from 'fuzzysort';
 
 export default class SearchManager {
-  constructor(circleRenderer, controls) {
-    this.circleRenderer = circleRenderer;
+  constructor(visualization, controls) {
+    this.visualization = visualization;
     this.controls = controls;
     this.searchInput = document.getElementById('search');
     this.resultsContainer = document.getElementById('search-results');
     this.loadingIndicator = document.querySelector('.search-loading');
-    this.debounceTimer = null;
-    this.lastSearchPromise = null;
+    this.searchButton = document.getElementById('search-button');
     
-    this.searchInput.addEventListener('input', () => this.debounceSearch());
-  }
-
-  debounceSearch() { //Searchs after 500ms of no input
-    clearTimeout(this.debounceTimer);
-    this.debounceTimer = setTimeout(() => this.performSearch(), 500);
+    this.searchButton.addEventListener('click', () => this.performSearch());
+    this.searchInput.addEventListener('input', () => this.clearResults());
+    
   }
 
   showLoading(show) {
@@ -24,33 +20,25 @@ export default class SearchManager {
     }
   }
 
-  async performSearch() {
-    if (this.lastSearchPromise) {
-      this.lastSearchPromise.cancel();
-    }
-    
+  performSearch() { //implement a web worker fo this to not freeze the UI 
     const query = this.searchInput.value.trim();
     
     if (!query) {
       this.clearResults();
-      this.showLoading(false);
       return;
     }
-    
-    const cleanQuery = query.replace(/\s+/g, '');
+
+    this.showLoading(true);
     
     try {
-      this.showLoading(true);
-      this.lastSearchPromise = fuzzysort.goAsync(cleanQuery, this.circleRenderer.titles, {
+      const results = fuzzysort.go(query, this.visualization.processedData.titles, {
         limit: 5,
+        threshold: -10000 
       });
       
-      const results = await this.lastSearchPromise;
       this.displayResults(results);
     } catch (err) {
-      if (err.name !== 'CancelError') {
-        console.error('Search error:', err);
-      }
+      console.error('Search error:', err);
     } finally {
       this.showLoading(false);
     }
@@ -65,10 +53,10 @@ export default class SearchManager {
     
     this.resultsContainer.innerHTML = results
       .map(result => {
-        const highlighted = fuzzysort.highlight(result, '<span class="highlight">', '</span>');
-        return `<div class="search-result-item" data-title="${result.target}">${highlighted || result.target}</div>`;
+        return `<div class="search-result-item" data-title="${result.target}">${result.target}</div>`;
       })
       .join('');
+      
     this.resultsContainer.style.display = 'block';
     
     this.resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
@@ -83,14 +71,15 @@ export default class SearchManager {
   }
 
   handleSearchResult(title) {
-    const index = this.circleRenderer.titles.indexOf(title);
+    
+    const index = this.visualization.processedData.titles.indexOf(title);
     if (index === -1) return;
+
+    const targetX = this.visualization.processedData.offsets[index * 2];
+    const targetY = this.visualization.processedData.offsets[index * 2 + 1];
+    const targetZoom = this.visualization.processedData.sizes[index] * 5;
     
-    const targetX = this.circleRenderer.offsets[index * 2];
-    const targetY = this.circleRenderer.offsets[index * 2 + 1];
-    const targetZoom = this.circleRenderer.sizes[index] * 5;
-    
-    this.controls.smoothTransition(targetX, targetY, targetZoom, 2);
+    this.controls.smoothTransition(targetX, targetY, targetZoom, true);
   }
 
   clearSearch() {

@@ -132,7 +132,7 @@ canvas {
   border-color: rgba(255,255,255,0.4);
 }
 .search-loading {
-  position: absolute; right: 10px;
+  position: absolute; right: 80px;
   width: 16px; height: 16px;
   border: 2px solid rgba(255,255,255,0.3);
   border-top-color: #ffffff;

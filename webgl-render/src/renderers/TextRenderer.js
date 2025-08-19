@@ -4,18 +4,18 @@ import ShaderProgram from '../core/ShaderProgram.js';
 export default class TextRenderer extends ShaderProgram {
   constructor(gl) {
     super(gl);
-    this.fontSize = 2;
-    this.opacity = 1;
-    this.isReady = false;
     this.fontInfo = null;
     this.characterCount = 0;
     this.positions = null;
     this.charSizes = null;
     this.texturePositions = null;
+
+    this.vao = null;
+    this.texture = null;
+    this.buffers = { point: null, position: null, charSize: null, texturePosition: null };
     
     this.initShaders();
   }
-
  
   initShaders() {
     const vertexShaderSource = 
@@ -48,8 +48,6 @@ export default class TextRenderer extends ShaderProgram {
       
       uniform sampler2D msdf;
       uniform float bias;
-      uniform float opacity;
-      uniform float screenPxRange;
   
       in vec2 vPoint;
       in vec4 vColor;
@@ -70,11 +68,10 @@ export default class TextRenderer extends ShaderProgram {
         
         vec3 saple = texture(msdf, vPoint).rgb;
         float sigDist = median(saple.r, saple.g, saple.b) - bias;
-        
-        float screenPxDistance = screenPxRange * sigDist;
-        float alpha = clamp(screenPxDistance + 0.5, 0.0, 1.0);
-        
-        fragColor = vec4(vColor.rgb, vColor.a * alpha * opacity);
+
+        float alpha = clamp(sigDist / fwidth(sigDist) + bias, 0.0, 1.0);
+
+        fragColor = vec4(vColor.rgb, vColor.a * alpha);
         
         if (fragColor.a < 0.01) discard;
       }`;
@@ -94,62 +91,57 @@ export default class TextRenderer extends ShaderProgram {
       modelViewProjection: this.gl.getUniformLocation(this.program, 'modelViewProjection'),
       color: this.gl.getUniformLocation(this.program, 'color'),
       bias: this.gl.getUniformLocation(this.program, 'bias'),
-      opacity: this.gl.getUniformLocation(this.program, 'opacity'),
       msdf: this.gl.getUniformLocation(this.program, 'msdf'),
-      viewportSize: this.gl.getUniformLocation(this.program, 'viewportSize'), //these two are not needed
-      screenPxRange: this.gl.getUniformLocation(this.program, 'screenPxRange') //will remove
     };
   }
 
   initBuffers() {
-    const gl = this.gl; //too many gls
-    
-    this.vao = gl.createVertexArray();
-    gl.bindVertexArray(this.vao);
-    
-    this.buffers = {
-      position: gl.createBuffer(),
-      point: gl.createBuffer(),
-      charSize: gl.createBuffer(),
-      texturePosition: gl.createBuffer()
-    };
+    const gl = this.gl;
 
-    const quadPoints = new Float32Array([
-      0, 0,
-      1, 0,
-      1, 1,
-      1, 1,
-      0, 0,
-      0, 1
-    ]);
-    
+    this.clean();
+
+    this.vao = gl.createVertexArray();
+      gl.bindVertexArray(this.vao);
+      
+      const quadPoints = new Float32Array([
+        0, 0,
+        1, 0,
+        1, 1,
+        1, 1,
+        0, 0,
+        0, 1
+      ]);
+      
+    this.buffers.point = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.point);
     gl.bufferData(gl.ARRAY_BUFFER, quadPoints, gl.STATIC_DRAW);
     gl.enableVertexAttribArray(this.locations.point);
     gl.vertexAttribPointer(this.locations.point, 2, gl.FLOAT, false, 0, 0);
     gl.vertexAttribDivisor(this.locations.point, 0);
 
+    this.buffers.position = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
-    gl.bufferData(gl.ARRAY_BUFFER, this.positions.subarray(0, this.characterCount * 3), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.DYNAMIC_DRAW);
     gl.enableVertexAttribArray(this.locations.position);
     gl.vertexAttribPointer(this.locations.position, 3, gl.FLOAT, false, 0, 0);
     gl.vertexAttribDivisor(this.locations.position, 1);
 
+    this.buffers.charSize = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.charSize);
-    gl.bufferData(gl.ARRAY_BUFFER, this.charSizes.subarray(0, this.characterCount * 2), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, this.charSizes, gl.DYNAMIC_DRAW);
     gl.enableVertexAttribArray(this.locations.charSize);
     gl.vertexAttribPointer(this.locations.charSize, 2, gl.FLOAT, false, 0, 0);
     gl.vertexAttribDivisor(this.locations.charSize, 1);
 
+    this.buffers.texturePosition = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.texturePosition);
-    gl.bufferData(gl.ARRAY_BUFFER, this.texturePositions.subarray(0, this.characterCount * 4), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, this.texturePositions, gl.DYNAMIC_DRAW);
     gl.enableVertexAttribArray(this.locations.texturePosition);
     gl.vertexAttribPointer(this.locations.texturePosition, 4, gl.FLOAT, false, 0, 0);
     gl.vertexAttribDivisor(this.locations.texturePosition, 1);
 
     gl.bindVertexArray(null);
   }
-
   
   async loadFont() {
     try {
@@ -168,6 +160,11 @@ export default class TextRenderer extends ShaderProgram {
         
         img.onload = () => {
           const gl = this.gl;
+
+          if (this.texture) {
+            gl.deleteTexture(this.texture);
+            this.texture = null;
+          }
           this.texture = gl.createTexture();
 
           gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -181,7 +178,6 @@ export default class TextRenderer extends ShaderProgram {
 
           this.sdfTextureWidth = img.width;
           this.sdfTextureHeight = img.height;
-          this.isReady = true;
 
           resolve();
         };
@@ -228,9 +224,7 @@ export default class TextRenderer extends ShaderProgram {
   addText(textInfo) {
 
     let { text, x = 0, y = 0, z = 0 } = textInfo;
-    
-    //this.allocateBuffers(this.characterCount + text.length);
-    
+        
     let dx = 0;
     let fontSize = textInfo.fontSize;
 
@@ -293,15 +287,10 @@ export default class TextRenderer extends ShaderProgram {
     gl.bindVertexArray(this.vao);
 
     gl.uniformMatrix4fv(this.locations.modelViewProjection, false, modelViewProjection);
-    gl.uniform1f(this.locations.opacity, this.opacity);
-    gl.uniform2f(this.locations.viewportSize, gl.canvas.width, gl.canvas.height);
-    gl.uniform1f(this.locations.screenPxRange, 8.0);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.uniform1i(this.locations.msdf, 0);
-
-    //Outline omitted, too many artifacts
 
     gl.uniform4f(this.locations.color, 1.0, 1.0, 1.0, 1.0);
     gl.uniform1f(this.locations.bias, 0.5);
@@ -309,4 +298,15 @@ export default class TextRenderer extends ShaderProgram {
 
     gl.bindVertexArray(null);
   }  
+
+  // Release GPU and CPU-side resources
+  clean() {
+    const gl = this.gl;
+
+    if (this.vao) { gl.deleteVertexArray(this.vao); this.vao = null; }
+    if (this.buffers.point) { gl.deleteBuffer(this.buffers.point); this.buffers.point = null; }
+    if (this.buffers.position) { gl.deleteBuffer(this.buffers.position); this.buffers.position = null; }
+    if (this.buffers.charSize) { gl.deleteBuffer(this.buffers.charSize); this.buffers.charSize = null; }
+    if (this.buffers.texturePosition) { gl.deleteBuffer(this.buffers.texturePosition); this.buffers.texturePosition = null; }
+  }
 }

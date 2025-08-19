@@ -19,16 +19,15 @@ class Visualization {
   constructor() {
     
     this.canvas = document.getElementById('webgl-canvas');
-    this.canvas.visualization = this; 
-    //as much as I hate this, it is the easiest way to get the canvas in the controls
-    //I think, uhhhhhhhhh this code is a mess
     
     this.webgl = new WebGLContext(this.canvas);
-    this.controls = new Controls(this.canvas);
-    this.DataLoader = new DataLoader();
-    this.circleRenderer = new CircleRenderer(this.webgl.gl);
     this.textRenderer = new TextRenderer(this.webgl.gl);
-    this.searchManager = new SearchManager(this.circleRenderer, this.controls);    
+    this.circleRenderer = new CircleRenderer(this.webgl.gl);
+    this.controls = new Controls(this.canvas, this);
+    this.DataLoader = new DataLoader();
+    this.searchManager = new SearchManager(this, this.controls);
+
+    this.processedData = null;
     
     this.animationFrameId = null;
     this.initializing = false;
@@ -43,11 +42,12 @@ class Visualization {
     this.lastFpsUpdate = 0;
     this.fps = 0;
 
+    document.getElementById('load-button').addEventListener('click', () => this.initialize()); 
+
     this.setupIntroOverlay();
 
   }
   
-  //Assuming this is gonna be a simple website I can go the vanilla way. Or use vue like anvaka
   setupIntroOverlay() {
     const introOverlay = document.getElementById('intro-overlay');
     const startExplorationButton = document.getElementById('start-exploration');
@@ -61,35 +61,11 @@ class Visualization {
       introOverlay.style.display = 'none';
       
       this.initialize();
-    });
-    
-    
+    }); 
   }
 
-  showLoadingIndicator(show) {
-    const loadingElement = document.getElementById('loading');
-    loadingElement.style.display = show ? 'flex' : 'none';
-    this.pctEl.textContent = show ? '0%' : '';
-  }
-  
-  updateFpsCounter(timestamp) {
-    this.frameCount++;
-    
-    // Update FPS display every 500ms
-    if (timestamp - this.lastFpsUpdate >= 500) {
-      // FPS: frames / elapsed time in seconds
-      this.fps = Math.round((this.frameCount * 1000) / (timestamp - this.lastFpsUpdate));
-      if (this.fpsCounter) {
-        this.fpsCounter.textContent = `${this.fps} FPS`;
-      }
-      
-      this.lastFpsUpdate = timestamp;
-      this.frameCount = 0;
-    }
-  }
-  
   //Needs cleaning
-  async initialize() {
+  async initialize() { // i probably need to clean all those gpu side data
 
     if (this.initializing) return;
     this.initializing = true;
@@ -99,30 +75,18 @@ class Visualization {
     
     this.showLoadingIndicator(true);
 
-    // Process data
     const rawData = await this.DataLoader.loadCSV(selectedValue, percent => {
       this.pctEl.textContent = `${Math.floor(percent)}%`;
     });
     console.log(`Loaded ${rawData.length} data points from CSV`);
 
-    const processedData = this.DataLoader.processData(rawData);
-    console.log(`Processed data: ${processedData.numItems} items`);
+    this.processedData = this.DataLoader.processData(rawData);
+    console.log(`Processed data: ${this.processedData.numItems} items`);
 
-    // initialize renderers
-    this.circleRenderer.setData(processedData);
+    this.circleRenderer.setData(this.processedData);
 
-    this.textRenderer.characterCount = 0;
     await this.textRenderer.loadFont();
 
-    this.allTextData = processedData.titles.map((title, i) => ({
-      text: title,
-      x: processedData.offsets[i * 2],
-      y: processedData.offsets[i * 2 + 1],
-      limit: 2 * processedData.sizes[i],
-      cx: 0.51, // Still not sure how these work
-      cy: 0.5,
-      radius: processedData.sizes[i]
-    }));
     this.updateVisibleText();
 
     this.controls.reset();
@@ -140,6 +104,81 @@ class Visualization {
     
     this.animationFrameId = requestAnimationFrame(timestamp => this.draw(timestamp));
   }
+
+  showLoadingIndicator(show) {
+    const loadingElement = document.getElementById('loading');
+    loadingElement.style.display = show ? 'flex' : 'none';
+  }
+  
+  updateFpsCounter(timestamp) {
+    this.frameCount++;
+    
+    if (timestamp - this.lastFpsUpdate >= 500) {
+      // FPS: frames / elapsed time in seconds
+      this.fps = Math.round((this.frameCount * 1000) / (timestamp - this.lastFpsUpdate));
+      if (this.fpsCounter) {
+        this.fpsCounter.textContent = `${this.fps} FPS`;
+      }
+      
+      this.lastFpsUpdate = timestamp;
+      this.frameCount = 0;
+    }
+  }
+
+  updateVisibleText() {    
+    
+    const topLeft = this.controls.screenToWorld(0, 0);
+    const bottomRight = this.controls.screenToWorld(this.canvas.width, this.canvas.height);
+    
+    const viewBounds = {
+      minX: Math.min(topLeft.x, bottomRight.x),
+      maxX: Math.max(topLeft.x, bottomRight.x),
+      minY: Math.min(topLeft.y, bottomRight.y),
+      maxY: Math.max(topLeft.y, bottomRight.y)
+    };
+
+    let threshold = 3000;
+
+    if((viewBounds.maxX - viewBounds.minX) * (viewBounds.maxY - viewBounds.minY) > threshold){
+      return;
+    }
+    
+    const visibleTextData = [];
+    const { offsets, sizes, titles, numItems } = this.processedData;
+
+    for (let i = 0; i < numItems; i++) {
+      const x = offsets[i * 2];
+      const y = offsets[i * 2 + 1];
+      
+      if (x >= viewBounds.minX && x <= viewBounds.maxX &&
+          y >= viewBounds.minY && y <= viewBounds.maxY) {
+          visibleTextData.push({
+            text: titles[i],
+            x: x,
+            y: y,
+            limit: 2 * sizes[i],
+            cx: 0.51, 
+            cy: 0.5,
+            radius: sizes[i]
+          });
+      }
+    }
+    
+    const maxLabels = 1000;
+    let labelsToShow = visibleTextData;
+    
+    if (visibleTextData.length > maxLabels) {
+      // Sort by size (larger circles get priority) and take the top maxLabels
+      labelsToShow = visibleTextData
+        .sort((a, b) => b.radius - a.radius)
+        .slice(0, maxLabels);
+    }
+
+    console.log(`Showing ${labelsToShow.length} labels out of ${visibleTextData.length} visible circles`);
+    
+    this.textRenderer.batchAddText(labelsToShow);
+  }
+
   
   draw(timestamp) {
     
@@ -168,87 +207,4 @@ class Visualization {
     
     this.animationFrameId = requestAnimationFrame(timestamp => this.draw(timestamp));
   }
-  
-  
-  updateVisibleText() {    
-    
-    const topLeft = this.controls.screenToWorld(0, 0);
-    const bottomRight = this.controls.screenToWorld(this.canvas.width, this.canvas.height);
-    
-    const viewBounds = {
-      minX: Math.min(topLeft.x, bottomRight.x),
-      maxX: Math.max(topLeft.x, bottomRight.x),
-      minY: Math.min(topLeft.y, bottomRight.y),
-      maxY: Math.max(topLeft.y, bottomRight.y)
-    };
-
-    let threshold = 3000;
-
-    if((viewBounds.maxX - viewBounds.minX) * (viewBounds.maxY - viewBounds.minY) > threshold){
-      return;
-    }
-    
-    const visibleTextData = this.allTextData.filter(text => {
-      return (
-        text.x >= viewBounds.minX &&
-        text.x <= viewBounds.maxX &&
-        text.y >= viewBounds.minY &&
-        text.y <= viewBounds.maxY
-      );
-    });
-    
-    const maxLabels = 1000;
-    let labelsToShow = visibleTextData;
-    
-    if (visibleTextData.length > maxLabels) {
-      // Sort by size (larger circles get priority) and take the top maxLabels
-      labelsToShow = visibleTextData
-        .sort((a, b) => b.radius - a.radius)
-        .slice(0, maxLabels);
-    }
-  
-    console.log(`Showing ${labelsToShow.length} labels out of ${visibleTextData.length} visible circles`);
-    
-    this.textRenderer.batchAddText(labelsToShow);
-  }
-
-  showEmbeddedWikiArticle(id) {
-    const container = document.getElementById('wiki-embed-container');
-    const iframe = document.getElementById('wiki-iframe');
-    const closeBtn = document.getElementById('close-wiki-btn');
-
-    const wikiUrl = `https://en.wikipedia.org/?curid=${id}`;
-
-    iframe.src = wikiUrl;
-    container.classList.add('active');
-
-    closeBtn.onclick = () => {
-      container.classList.remove('active');
-      setTimeout(() => {
-        iframe.src = 'about:blank';
-      }, 300);
-    };
-
-
-      document.addEventListener('click', (e) => {
-        if (!container.contains(e.target) &&
-          container.classList.contains('active') &&
-          !e.target.closest('#webgl-canvas')) {
-          closeBtn.click();
-        }
-      });
-  }
-
-  goToRandomArticle() {
-
-    const randomIndex = Math.floor(Math.random() * this.circleRenderer.numCircles);
-
-    const targetX = this.circleRenderer.offsets[randomIndex * 2];
-    const targetY = this.circleRenderer.offsets[randomIndex * 2 + 1];
-    const targetZoom = this.circleRenderer.sizes[randomIndex] * 5;
-
-    this.controls.smoothTransition(targetX, targetY, targetZoom);
-  }
 }
-
-
