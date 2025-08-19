@@ -2,16 +2,8 @@ import math
 import random
 
 class RandomBoxLayout:
-    """Places circles randomly within defined limits, avoiding overlaps."""
-
+    """A layout that places circles randomly within a defined box."""
     def __init__(self, nodes, axis_limits):
-        """
-        Initializes the layout with nodes and axis limits.
-
-        Args:
-            nodes: A list of tuples, where each tuple contains (size, data).
-            axis_limits: The maximum absolute value for x and y coordinates.
-        """
         self.coordinates = []
         self.placed_circles = []
         self.axis_limits = axis_limits
@@ -20,7 +12,6 @@ class RandomBoxLayout:
             self._place_circle(size, data, i)
 
     def _place_circle(self, size, data, index):
-        """Places a single circle, handling collisions and boundary checks."""
         dbg = 0
         while True:
             x_offset = random.uniform(-self.axis_limits, self.axis_limits)
@@ -38,21 +29,19 @@ class RandomBoxLayout:
                 break
 
     def _check_collision(self, x_offset, y_offset, size):
-        """Checks for collisions with existing circles."""
         for cx, cy, radius in self.placed_circles:
             distance = math.sqrt((cx - x_offset) ** 2 + (cy - y_offset) ** 2)
             if distance < radius + size:
-                return True  # Collision detected
-        return False  # No collision
+                return True 
+        return False 
 
     def _check_boundaries(self, x_offset, y_offset, size):
-        """Checks if the circle is within the defined boundaries."""
         if (x_offset + size > self.axis_limits or
             x_offset - size < -self.axis_limits or
             y_offset + size > self.axis_limits * 9 / 16 or
             y_offset - size < -self.axis_limits * 9 / 16):
-            return True #Out of Bounds
-        return False #Within Bounds
+            return True
+        return False
 
     def get_coordinates(self):
         return self.coordinates

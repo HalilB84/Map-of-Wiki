@@ -13,7 +13,6 @@ All of the data is collected from Wikimedia dumps. Igraph is used to make it eas
 
 Right now, there are two layouts possible, "singular" and "hierarchal." These two modes place nodes based on spiral_layout.py and random_circle_layout.py. You will see the results in the photos section below. I would argue that the hierarchal layout looks cool and more galaxy-like.  
 
-
 ## TODO (For getting the graph layout)
 
 - ~~Fix community detection (needs to be more accurate)~~
@@ -32,16 +31,15 @@ Right now, there are two layouts possible, "singular" and "hierarchal." These tw
  - ~~instanced MSDF text rendering for text placement, which is harder than I thought, but it is possible. Working on it -> Done!~~
  - ~~Projection matrix bug fix~~
  - ~~The actual Wikipedia page pops out from the left side -> Literally will just embed the Wiki page~~
- - Structure code - > Done for now -> I have to structure again -> Done -> AGAIN -> beyond repair
+ - ~~Structure code - > Done for now -> I have to structure again -> Done -> AGAIN -> beyond repair -> good enough for now~~
  - ~~Improved memory management~~
  - ~~screen space to world space (for clicking and text optimization)~~
- - ~~Make it usable for mobile -> Partly done~
+ - ~~Make it usable for mobile -> Partly done~~
+ - Implement a web worker for fuzzysort
+ - fix camera distance performance
+ - 
  - File Uploading -> Right now it is hosted under github which is probably not nice.
  - Create better UI (Right now its just html/css/js)
- - After getting the WebGL renderer to a reasonable state, I am just planning to move on. Although it's been fun, I want to move on to another project. 
-
-
-
 
 ## Photos
 

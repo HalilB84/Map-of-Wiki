@@ -176,7 +176,6 @@ class LayoutManager:
                     self.graph.vs[coord[2]]['color'] = colors
 
     def get_axis_limits(self):
-        #get minx maxx miny maxy
         minx = min(self.graph.vs['x'])
         maxx = max(self.graph.vs['x'])
         miny = min(self.graph.vs['y'])
@@ -190,6 +189,5 @@ class LayoutManager:
             f.write('id,title,x,y,size,r,g,b\n')
             for i in range(self.graph.vcount()):
                 # Escape commas and double quotes in the title
-                #print(self.graph.vs[i]['name'], self.graph.vs[i]['title'], self.graph.vs[i]['x'], self.graph.vs[i]['y'], self.graph.vs[i]['size'], self.graph.vs[i]['color'])
                 title = self.graph.vs[i]['title'].replace('"', '""')  # Escape double quotes
                 f.write(f'{self.graph.vs[i]["name"]},"{title}",{self.graph.vs[i]["x"]},{self.graph.vs[i]["y"]},{self.graph.vs[i]["size"]},{self.graph.vs[i]["color"][0]},{self.graph.vs[i]["color"][1]},{self.graph.vs[i]["color"][2]}\n')      

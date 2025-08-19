@@ -2,33 +2,25 @@ import math
 import random
 
 class RandomCircleLayout:
-    """Places circles randomly within a circular area, avoiding overlaps."""
-
+    """A layout that places circles randomly within a defined circular area."""
     def __init__(self, nodes):
-        """
-        Initializes the layout with nodes.
-
-        Args:
-            nodes: A list of tuples, where each tuple contains (size, data).
-        """
         self.placed_circles = []
-        self.radius = nodes[0][0]  # Initial radius based on the first node
-        self.max_radius = self.radius #Keeps track of the largest radius encountered.
+        self.radius = nodes[0][0] 
+        self.max_radius = self.radius 
         self.coordinates = []
-        self.ring = 1 #better placement of circles
+        self.ring = 1 
 
         for i, (size, data) in enumerate(nodes):
             self._place_circle(size, data, i)
 
     def _place_circle(self, size, data, index):
-        """Places a single circle, handling collisions."""
         dbg = 0
         while True:
             dbg += 1
             if dbg % 1000 == 0:
                 print(index, 'Most likely stuck in infinite loop. Increasing radius')
                 self.radius += size * 2
-                self.max_radius = max(self.max_radius, self.radius) #Update max radius if needed
+                self.max_radius = max(self.max_radius, self.radius)
 
             x, y = self._generate_random_point(size)
 
@@ -38,25 +30,21 @@ class RandomCircleLayout:
                 break
 
     def _generate_random_point(self, size):
-        """Generates a random point within the current circle."""
         theta = random.uniform(0, 2 * math.pi)
-        r = math.sqrt(random.uniform(self.ring, 1)) * (self.radius - size) #Ensure new circle is within the radius.
+        r = math.sqrt(random.uniform(self.ring, 1)) * (self.radius - size)
         x = r * math.cos(theta)
         y = r * math.sin(theta)
         return x, y
 
     def _check_collision(self, x, y, size):
-        """Checks for collisions with existing circles."""
         for cx, cy, cradius in self.placed_circles:
             distance = math.sqrt((cx - x) ** 2 + (cy - y) ** 2)
             if distance < cradius + size:
-                return True  # Collision detected
-        return False  # No collision
+                return True
+        return False
 
     def get_coordinates(self):
-      """Returns the calculated coordinates."""
       return self.coordinates
 
     def get_max_radius(self):
-      """Returns the maximum radius used during placement."""
-      return self.max_radius
+        return self.max_radius
