@@ -46,7 +46,6 @@ export default class Controls {
     document.getElementById('random-button').addEventListener('click', () => this.goToRandomArticle());
   }
 
-
   handleMouseDown(e) {
     if (this.transitionActive) return;
     this.isDragging = true;
@@ -77,7 +76,6 @@ export default class Controls {
     this.lastMouseY = e.touches[0].clientY;
   }
 
-
   handleTouchMove(e) {
     if (this.transitionActive) return;
     //pinch zoom
@@ -107,7 +105,6 @@ export default class Controls {
     this.wasDragging = true;
     this.updateCameraPosition(e.touches[0].clientX, e.touches[0].clientY);
   }
-
 
   getTouchDistance(touches) {
     const dx = touches[0].clientX - touches[1].clientX;

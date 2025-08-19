@@ -25,7 +25,6 @@ export default class DataLoader {
 
   // wtf is this, it works tho. Will make sure to understand how it works before publishing
   async loadSingleCSV(filePath, onProgress) {
-    
       const response = await fetch(filePath);
       const fileName = filePath.split("/").pop();
       const total = DataLoader.FILE_SIZES[fileName];

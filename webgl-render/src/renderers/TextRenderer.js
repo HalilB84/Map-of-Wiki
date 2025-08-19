@@ -194,7 +194,6 @@ export default class TextRenderer extends ShaderProgram {
     }
   }
 
-
   allocateBuffers(charCount) { 
     this.positions = new Float32Array(charCount * 3);;
     this.charSizes = new Float32Array(charCount * 2);
@@ -219,10 +218,8 @@ export default class TextRenderer extends ShaderProgram {
     this.initBuffers();
   }
  
-
   //copied directly from anvaka's code with little changes
   addText(textInfo) {
-
     let { text, x = 0, y = 0, z = 0 } = textInfo;
         
     let dx = 0;
@@ -278,11 +275,9 @@ export default class TextRenderer extends ShaderProgram {
     this.characterCount += text.length;
   }
 
-  
   draw(modelViewProjection) {
     const gl = this.gl;
     
-
     gl.useProgram(this.program);
     gl.bindVertexArray(this.vao);
 

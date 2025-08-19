@@ -118,8 +118,8 @@ export default class CircleRenderer extends ShaderProgram {
   }
 
   draw(projectionMatrix, zoomLevel) {
-
     const gl = this.gl;
+    
     gl.useProgram(this.program);
     gl.bindVertexArray(this.vao);
 

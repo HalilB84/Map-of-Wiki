@@ -14,10 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-
 class Visualization {
   constructor() {
-    
     this.canvas = document.getElementById('webgl-canvas');
     
     this.webgl = new WebGLContext(this.canvas);
@@ -45,7 +43,6 @@ class Visualization {
     document.getElementById('load-button').addEventListener('click', () => this.initialize()); 
 
     this.setupIntroOverlay();
-
   }
   
   setupIntroOverlay() {
@@ -66,7 +63,6 @@ class Visualization {
 
   //Needs cleaning
   async initialize() { // i probably need to clean all those gpu side data
-
     if (this.initializing) return;
     this.initializing = true;
 
@@ -126,7 +122,6 @@ class Visualization {
   }
 
   updateVisibleText() {    
-    
     const topLeft = this.controls.screenToWorld(0, 0);
     const bottomRight = this.controls.screenToWorld(this.canvas.width, this.canvas.height);
     
@@ -179,9 +174,7 @@ class Visualization {
     this.textRenderer.batchAddText(labelsToShow);
   }
 
-  
   draw(timestamp) {
-    
     this.webgl.clear();
     this.webgl.resizeCanvas();
 

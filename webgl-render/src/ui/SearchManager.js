@@ -11,7 +11,6 @@ export default class SearchManager {
     
     this.searchButton.addEventListener('click', () => this.performSearch());
     this.searchInput.addEventListener('input', () => this.clearResults());
-    
   }
 
   showLoading(show) {
@@ -71,7 +70,6 @@ export default class SearchManager {
   }
 
   handleSearchResult(title) {
-    
     const index = this.visualization.processedData.titles.indexOf(title);
     if (index === -1) return;
 
