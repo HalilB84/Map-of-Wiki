@@ -59,8 +59,7 @@ export default class TextRenderer extends ShaderProgram {
       }
   
       void main() {
-
-        
+ 
         if (vColor.a <= 0.0) {
           discard;
           return;
@@ -194,11 +193,6 @@ export default class TextRenderer extends ShaderProgram {
     }
   }
 
-  allocateBuffers(charCount) { 
-    this.positions = new Float32Array(charCount * 3);;
-    this.charSizes = new Float32Array(charCount * 2);
-    this.texturePositions = new Float32Array(charCount * 4);
-  }
 
   batchAddText(textInfoArray) {
     let totalChars = 0;
@@ -209,7 +203,9 @@ export default class TextRenderer extends ShaderProgram {
     }
     
     this.characterCount = 0;
-    this.allocateBuffers(totalChars);
+    this.positions = new Float32Array(totalChars * 3);;
+    this.charSizes = new Float32Array(totalChars * 2);
+    this.texturePositions = new Float32Array(totalChars * 4);
     
     for (const info of textInfoArray) {
       this.addText(info);

@@ -1,5 +1,3 @@
-import fuzzysort from 'fuzzysort';
-
 export default class SearchManager {
   constructor(visualization, controls) {
     this.visualization = visualization;
@@ -8,6 +6,9 @@ export default class SearchManager {
     this.resultsContainer = document.getElementById('search-results');
     this.loadingIndicator = document.querySelector('.search-loading');
     this.searchButton = document.getElementById('search-button');
+    
+    this.searchWorker = new Worker(new URL('../workers/searchWorker.js', import.meta.url), { type: 'module' });
+    this.searchWorker.onmessage = (e) => this.handleWorkerMessage(e);
     
     this.searchButton.addEventListener('click', () => this.performSearch());
     this.searchInput.addEventListener('input', () => this.clearResults());
@@ -19,7 +20,7 @@ export default class SearchManager {
     }
   }
 
-  performSearch() { //implement a web worker fo this to not freeze the UI 
+  async performSearch() {
     const query = this.searchInput.value.trim();
     
     if (!query) {
@@ -29,18 +30,20 @@ export default class SearchManager {
 
     this.showLoading(true);
     
-    try {
-      const results = fuzzysort.go(query, this.visualization.processedData.titles, {
+    this.searchWorker.postMessage({
+      query: query,
+      titles: this.visualization.processedData.titles,
+      options: {
         limit: 5,
         threshold: -10000 
-      });
-      
-      this.displayResults(results);
-    } catch (err) {
-      console.error('Search error:', err);
-    } finally {
-      this.showLoading(false);
-    }
+      }
+    });
+  }
+
+  handleWorkerMessage(e) {
+    const { results } = e.data;
+    this.displayResults(results);
+    this.showLoading(false);
   }
 
   displayResults(results) {
@@ -89,5 +92,12 @@ export default class SearchManager {
   clearResults() {
     this.resultsContainer.innerHTML = '';
     this.resultsContainer.style.display = 'none';
+  }
+
+  // Clean up web worker when SearchManager is destroyed
+  destroy() {
+    if (this.searchWorker) {
+      this.searchWorker.terminate();
+    }
   }
 } 

@@ -312,7 +312,7 @@ select option {
 }
 
 /* 9. Mobile */
-@media (max-width:600px) {
+@media (max-width:700px) {
   /* Search Container */
   #search-container { top:auto; bottom:0; left:50%; transform:translateX(-50%); width:calc(100% - 20px); }
 
@@ -325,8 +325,14 @@ select option {
     box-sizing: border-box;
   }
   #dropdown-container label { display:none; }
-  #dropdown-container select { flex:2; margin-right:10px; }
-  #dropdown-container button { flex: 0.2 0 auto; padding:4px 0; }
+  #dropdown-container select {
+    flex: 1;
+    min-width: 100px;
+  }
+  #dropdown-container button {
+    flex: 0 0 auto;
+    min-width: 60px;
+  }
 
   /* FPS Counter */
   #fps-counter { top:auto; bottom:0; right:0; }

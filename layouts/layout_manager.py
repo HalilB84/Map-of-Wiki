@@ -14,7 +14,6 @@ class LayoutManager:
         self.graph = graph
         self.graph_params = graph_params
 
-
     def apply_community_partitioning(self):
         #either singular or hierechal
 
@@ -22,7 +21,6 @@ class LayoutManager:
             partition = la.find_partition(self.graph, la.CPMVertexPartition, resolution_parameter=self.graph_params['resolution_parameter'])
             #partition = la.find_partition(self.graph, la.RBConfigurationVertexPartition, resolution_parameter=20)
 
-            
             num_communities = len(set(partition.membership))
             print('number of communities', num_communities)
 
@@ -68,7 +66,6 @@ class LayoutManager:
 
             current_partitions.append(list(range(0, self.graph.vcount())))
 
-
             for _ in range(self.graph_params['max_levels']):
                 swap_partitions = []
                 index = 0
@@ -85,7 +82,6 @@ class LayoutManager:
                 current_partitions = swap_partitions
                 print("The number of total partitions in level: ", len(current_partitions))
 
-
             #apply random layout to each final partition
 
             for i in range(len(current_partitions)):
@@ -100,7 +96,6 @@ class LayoutManager:
 
                 current_partitions_size.append(radius)
                 
-
             for level_num in reversed(range(self.graph_params['max_levels'])):
 
                 temp_sizes = []
@@ -137,8 +132,6 @@ class LayoutManager:
         else:
             print('Invalid partitioning type')
 
-
-
     def apply_layout(self, nodes, layout_type):
         #either randomS, randomB, spiral
         #return coordinates and add** to graph
@@ -156,8 +149,6 @@ class LayoutManager:
         return layout.get_coordinates(), layout.get_max_radius()
     
     def add_coords(self, coords, color):
-
-        
         cmap = plt.get_cmap("gist_rainbow")
         colors = cmap(random.random())[:3] 
 

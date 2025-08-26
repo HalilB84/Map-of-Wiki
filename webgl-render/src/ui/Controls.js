@@ -29,7 +29,9 @@ export default class Controls {
     this.canvas.addEventListener('mousedown', e => this.handleMouseDown(e));
     this.canvas.addEventListener('touchstart', e => this.handleTouchStart(e), { passive: false });
 
-    this.canvas.addEventListener('mouseup', () => this.isDragging = false);
+    this.canvas.addEventListener('mouseup', () => this.handleMouseUp());
+    this.canvas.addEventListener('mouseleave', () => this.handleMouseUp());
+
     this.canvas.addEventListener('touchend', () => this.isDragging = false);
 
     this.canvas.addEventListener('mousemove', e => this.handleMouseMove(e));
@@ -51,6 +53,10 @@ export default class Controls {
     this.isDragging = true;
     this.lastMouseX = e.clientX;
     this.lastMouseY = e.clientY;
+  }
+
+  handleMouseUp() {
+    this.isDragging = false;
   }
 
   //only when mouse down
