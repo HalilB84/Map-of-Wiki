@@ -1,12 +1,18 @@
 import fuzzysort from 'fuzzysort';
 
-self.onmessage = function(data) { //I should probably send the data once but oh well
+let storedTitles = null;
+
+self.onmessage = function(data) {
   const { query, titles, options } = data.data;
+
+  if (titles !== null) {
+    storedTitles = titles;
+    return;
+  }
   
-    const results = fuzzysort.go(query, titles, options);
-    
-    self.postMessage({
-      results: results
-    });
- 
+  const results = fuzzysort.go(query, storedTitles, options);
+  
+  self.postMessage({
+    results: results
+  });
 };

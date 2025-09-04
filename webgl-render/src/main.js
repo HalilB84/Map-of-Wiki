@@ -5,14 +5,6 @@ import DataLoader from './utils/DataLoader.js';
 import SearchManager from './ui/SearchManager.js';
 import Controls from './ui/Controls.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    new Visualization();
-  } catch (error) {
-    console.error('Failed to initialize application:', error);
-    alert('Failed to initialize the application. See console for details.');
-  }
-});
 
 class Visualization {
   constructor() {
@@ -62,7 +54,7 @@ class Visualization {
   }
 
   //Needs cleaning
-  async initialize() { // i probably need to clean all those gpu side data
+  async initialize() { 
     if (this.initializing) return;
     this.initializing = true;
 
@@ -121,7 +113,7 @@ class Visualization {
     }
   }
 
-  updateVisibleText() {    
+  updateVisibleText() { //Also possible for this to be in workers? would decrease lag I think
     const topLeft = this.controls.screenToWorld(0, 0);
     const bottomRight = this.controls.screenToWorld(this.canvas.width, this.canvas.height);
     
@@ -200,4 +192,11 @@ class Visualization {
     
     this.animationFrameId = requestAnimationFrame(timestamp => this.draw(timestamp));
   }
+}
+
+try {
+  new Visualization();
+} catch (error) {
+  console.error('Failed to initialize application:', error);
+  alert('Failed to initialize the application. See console for details.');
 }

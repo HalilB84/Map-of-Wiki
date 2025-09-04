@@ -26,10 +26,11 @@ export default class CircleRenderer extends ShaderProgram {
       uniform float cameraDistance;
       out vec2 v_point;    
       out vec4 v_color;     
+
       void main() {
-        vec2 scaledPosition = a_position * (a_size  + cameraDistance) + a_offset;
+        vec2 scaledPosition = a_position * (a_size + cameraDistance) + a_offset;
         gl_Position = u_projection * vec4(scaledPosition, 0.0, 1.0);
-        v_point = a_position; //we give position so it can be interpolated and we can use to discard fragments outside the circle
+        v_point = a_position; // we give the position so it can be interpolated and we can use it to discard fragments outside the circle
         v_color = a_color; 
       }
     `;

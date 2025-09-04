@@ -6,9 +6,10 @@ export default class SearchManager {
     this.resultsContainer = document.getElementById('search-results');
     this.loadingIndicator = document.querySelector('.search-loading');
     this.searchButton = document.getElementById('search-button');
+    this.isDataInitialized = false;
     
     this.searchWorker = new Worker(new URL('../workers/searchWorker.js', import.meta.url), { type: 'module' });
-    this.searchWorker.onmessage = (e) => this.handleWorkerMessage(e);
+    this.searchWorker.onmessage = (data) => this.handleWorkerMessage(data);
     
     this.searchButton.addEventListener('click', () => this.performSearch());
     this.searchInput.addEventListener('input', () => this.clearResults());
@@ -29,19 +30,31 @@ export default class SearchManager {
     }
 
     this.showLoading(true);
+
+    if (!this.isDataInitialized) {
+      this.searchWorker.postMessage({
+        query: query,
+        titles: this.visualization.processedData.titles,
+        options: {
+          limit: 5,
+          threshold: -10000
+        }
+      });
+      this.isDataInitialized = true;
+    }
     
     this.searchWorker.postMessage({
       query: query,
-      titles: this.visualization.processedData.titles,
+      titles: null,
       options: {
         limit: 5,
-        threshold: -10000 
+        threshold: -10000
       }
     });
   }
 
-  handleWorkerMessage(e) {
-    const { results } = e.data;
+  handleWorkerMessage(data) {
+    const { results } = data.data;
     this.displayResults(results);
     this.showLoading(false);
   }
