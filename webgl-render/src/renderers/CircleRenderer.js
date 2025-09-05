@@ -18,52 +18,52 @@ export default class CircleRenderer extends ShaderProgram {
 
   initShaders() {
     const vertexShaderSource = `#version 300 es
-      in vec2 a_position;    
-      in vec2 a_offset;     
-      in float a_size;
-      in vec4 a_color;       
-      uniform mat4 u_projection;   
+      in vec2 point;      
+      in vec2 position;   
+      in float size;
+      in vec4 color;      
+      uniform mat4 modelViewProjection; 
       uniform float cameraDistance;
-      out vec2 v_point;    
-      out vec4 v_color;     
+      out vec2 vPoint;    
+      out vec4 vColor;    
 
       void main() {
-        vec2 scaledPosition = a_position * (a_size + cameraDistance) + a_offset;
-        gl_Position = u_projection * vec4(scaledPosition, 0.0, 1.0);
-        v_point = a_position; // we give the position so it can be interpolated and we can use it to discard fragments outside the circle
-        v_color = a_color; 
+        vec2 scaledPosition = point * (size + cameraDistance) + position;
+        gl_Position = modelViewProjection * vec4(scaledPosition, 0.0, 1.0);
+        vPoint = point; // we give the position so it can be interpolated and we can use it to discard fragments outside the circle
+        vColor = color; 
       }
     `;
 
     const fragmentShaderSource = `#version 300 es
       precision highp float;
-      in vec2 v_point;         
-      in vec4 v_color; 
+      in vec2 vPoint;     
+      in vec4 vColor; 
       out vec4 fragColor;
       
       void main() {
-        float dist = length(v_point); 
+        float dist = length(vPoint); 
         if (dist > 1.0) discard;     
         
         // Mix the color with white to make it more pastel
-        vec3 pastelColor = mix(v_color.rgb, vec3(1.0), 0.3); 
-        fragColor = vec4(pastelColor, v_color.a);
+        vec3 pastelColor = mix(vColor.rgb, vec3(1.0), 0.3); 
+        fragColor = vec4(pastelColor, vColor.a);
       }
     `;
 
     this.program = this.createProgram(vertexShaderSource, fragmentShaderSource);
     
     this.locations = {
-      position: this.gl.getAttribLocation(this.program, 'a_position'),
-      offset: this.gl.getAttribLocation(this.program, 'a_offset'),
-      size: this.gl.getAttribLocation(this.program, 'a_size'),
-      color: this.gl.getAttribLocation(this.program, 'a_color'),
-      projection: this.gl.getUniformLocation(this.program, 'u_projection'),
+      point: this.gl.getAttribLocation(this.program, 'point'),
+      position: this.gl.getAttribLocation(this.program, 'position'),
+      size: this.gl.getAttribLocation(this.program, 'size'),
+      color: this.gl.getAttribLocation(this.program, 'color'),
+      modelViewProjection: this.gl.getUniformLocation(this.program, 'modelViewProjection'),
       cameraDistance: this.gl.getUniformLocation(this.program, 'cameraDistance')
     };
   }
 
-  setData(processedData) {
+  batchAddCircles(processedData) {
     this.numCircles = processedData.numItems;
     this.offsets = processedData.offsets;
     this.sizes = processedData.sizes;
@@ -90,16 +90,16 @@ export default class CircleRenderer extends ShaderProgram {
     this.buffers.position = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
     gl.bufferData(gl.ARRAY_BUFFER, quadVertices, gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(this.locations.position);
-    gl.vertexAttribPointer(this.locations.position, 2, gl.FLOAT, false, 0, 0);
-    gl.vertexAttribDivisor(this.locations.position, 0);
+    gl.enableVertexAttribArray(this.locations.point);
+    gl.vertexAttribPointer(this.locations.point, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribDivisor(this.locations.point, 0);
 
     this.buffers.offset = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.offset);
     gl.bufferData(gl.ARRAY_BUFFER, this.offsets, gl.DYNAMIC_DRAW);
-    gl.enableVertexAttribArray(this.locations.offset);
-    gl.vertexAttribPointer(this.locations.offset, 2, gl.FLOAT, false, 0, 0);
-    gl.vertexAttribDivisor(this.locations.offset, 1);
+    gl.enableVertexAttribArray(this.locations.position);
+    gl.vertexAttribPointer(this.locations.position, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribDivisor(this.locations.position, 1);
 
     this.buffers.size = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.size);
@@ -118,13 +118,13 @@ export default class CircleRenderer extends ShaderProgram {
     gl.bindVertexArray(null);
   }
 
-  draw(projectionMatrix, zoomLevel) {
+  draw(modelViewProjection, zoomLevel) {
     const gl = this.gl;
     
     gl.useProgram(this.program);
     gl.bindVertexArray(this.vao);
 
-    gl.uniformMatrix4fv(this.locations.projection, false, projectionMatrix);
+    gl.uniformMatrix4fv(this.locations.modelViewProjection, false, modelViewProjection);
     gl.uniform1f(this.locations.cameraDistance, zoomLevel * 0.0006); //fix
 
     gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, this.numCircles);

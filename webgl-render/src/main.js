@@ -71,7 +71,7 @@ class Visualization {
     this.processedData = this.DataLoader.processData(rawData);
     console.log(`Processed data: ${this.processedData.numItems} items`);
 
-    this.circleRenderer.setData(this.processedData);
+    this.circleRenderer.batchAddCircles(this.processedData);
 
     await this.textRenderer.loadFont();
 

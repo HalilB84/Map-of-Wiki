@@ -24,7 +24,6 @@ export default class TextRenderer extends ShaderProgram {
       
       uniform mat4 modelViewProjection;
       uniform vec4 color;
-      uniform vec2 viewportSize;
   
       in vec3 position;
       in vec2 point;
@@ -100,16 +99,16 @@ export default class TextRenderer extends ShaderProgram {
     this.clean();
 
     this.vao = gl.createVertexArray();
-      gl.bindVertexArray(this.vao);
-      
-      const quadPoints = new Float32Array([
-        0, 0,
-        1, 0,
-        1, 1,
-        1, 1,
-        0, 0,
-        0, 1
-      ]);
+    gl.bindVertexArray(this.vao);
+    
+    const quadPoints = new Float32Array([
+      0, 0,
+      1, 0,
+      1, 1,
+      1, 1,
+      0, 0,
+      0, 1
+    ]);
       
     this.buffers.point = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.point);
@@ -290,7 +289,6 @@ export default class TextRenderer extends ShaderProgram {
     gl.bindVertexArray(null);
   }  
 
-  // Release GPU and CPU-side resources
   clean() {
     const gl = this.gl;
 
