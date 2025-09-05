@@ -61,3 +61,10 @@ Hierarchal layout with 60k nodes
 ![6.5th Iteration, without edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_6.5.png)
 
 
+## Credits
+
+Parts of this project use code adapted from:
+
+- Map of Reddit (MIT licensed, © 2021–2025 Andrei Kashcha)
+
+
