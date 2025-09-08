@@ -21,7 +21,7 @@ export default class SearchManager {
     }
   }
 
-  async performSearch() {
+  performSearch() {
     const query = this.searchInput.value.trim();
     
     if (!query) {
@@ -74,14 +74,15 @@ export default class SearchManager {
       
     this.resultsContainer.style.display = 'block';
     
-    this.resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+    this.resultsContainer.querySelectorAll('.search-result-item').forEach(item => { //uhh is not deleting this bad?
       item.addEventListener('click', e => this.handleResultClick(e));
     });
   }
 
   handleResultClick(event) {
     const title = event.target.closest('.search-result-item').dataset.title;
-    this.clearSearch();
+    this.searchInput.value = '';
+    this.clearResults();
     this.handleSearchResult(title);
   }
 
@@ -96,21 +97,8 @@ export default class SearchManager {
     this.controls.smoothTransition(targetX, targetY, targetZoom, true);
   }
 
-  clearSearch() {
-    this.searchInput.value = '';
-    this.clearResults();
-    this.showLoading(false);
-  }
-
   clearResults() {
     this.resultsContainer.innerHTML = '';
     this.resultsContainer.style.display = 'none';
-  }
-
-  // Clean up web worker when SearchManager is destroyed
-  destroy() {
-    if (this.searchWorker) {
-      this.searchWorker.terminate();
-    }
   }
 } 

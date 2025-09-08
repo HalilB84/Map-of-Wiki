@@ -37,8 +37,7 @@ Right now, there are two layouts possible, "singular" and "hierarchal." These tw
  - ~~Make it usable for mobile -> Partly done~~
  - ~~Implement a web worker for fuzzysort~~
  - fix camera distance performance
- - File Uploading -> Right now it is hosted under github which is probably not nice.
- - Create better UI (Right now its just html/css/js)
+ - Create better UI / Rewrite the entire codebase
 
 ## Photos
 

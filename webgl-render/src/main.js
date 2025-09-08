@@ -76,6 +76,7 @@ class Visualization {
     await this.textRenderer.loadFont();
 
     this.updateVisibleText();
+    this.searchManager.isDataInitialized = false; //Yes I know this is bad, bla bla Im gonna rewrite the entire codebase
 
     this.controls.reset();
     if (!this.animationFrameId) {
