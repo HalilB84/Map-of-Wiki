@@ -19,7 +19,7 @@ export default class Controls {
 		this.stage2Duration = 2000;
 		this.transitionStartTime = 0;
 
-		this.wheelSensitivity = 0.001;
+		this.wheelSensitivity = 0.002; //fix by creating a settings menu
 		this.touchSensitivity = 0.004;
 		this.lastTouchDistance = null;
 

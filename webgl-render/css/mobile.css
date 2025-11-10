@@ -5,6 +5,7 @@
 		left: 50%;
 		transform: translateX(-50%);
 		width: calc(100% - 20px);
+		max-width: 100%;
 	}
 
 	#dropdown-container {
@@ -19,6 +20,7 @@
 		justify-content: space-between;
 		background: rgba(18, 18, 18, 1);
 		box-sizing: border-box;
+		max-width: 100%;
 	}
 	#dropdown-container label {
 		display: none;
