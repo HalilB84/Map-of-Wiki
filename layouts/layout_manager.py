@@ -43,7 +43,7 @@ class LayoutManager:
                 partitioned_nodes[i] = sorted(partitioned_nodes[i], key=lambda x: x[0], reverse=True)
                 coords, size = self.apply_layout(partitioned_nodes[i], self.graph_params['level1'])
 
-                self.add_coords(coords, color = True)
+                self._add_coords(coords, color = True)
 
                 #only need node ids for next level after size
                 next_level_partitioned_nodes.append([size, [node[1] for node in partitioned_nodes[i]]])
@@ -51,7 +51,7 @@ class LayoutManager:
             next_level_partitioned_nodes = sorted(next_level_partitioned_nodes, key=lambda x: x[0], reverse=True)
             coords, size = self.apply_layout(next_level_partitioned_nodes, self.graph_params['level2'])
 
-            self.add_coords(coords, color = False)
+            self._add_coords(coords, color = False)
 
 
 #################################################################################################################
@@ -92,7 +92,7 @@ class LayoutManager:
                 
                 #layout here
                 coords, radius = self.apply_layout(nodes, self.graph_params['level1'])
-                self.add_coords(coords, color = True)
+                self._add_coords(coords, color = True)
 
                 current_partitions_size.append(radius)
                 
@@ -106,7 +106,7 @@ class LayoutManager:
                     nodes = sorted(nodes, key=lambda x: x[0], reverse=True)
  
                     coords, radius = self.apply_layout(nodes, self.graph_params['level2']) #should be level X, fix it
-                    self.add_coords(coords, color = False)
+                    self._add_coords(coords, color = False)
 
                     temp_sizes.append(radius)
 
@@ -132,23 +132,7 @@ class LayoutManager:
         else:
             print('Invalid partitioning type')
 
-    def apply_layout(self, nodes, layout_type):
-        #either randomS, randomB, spiral
-        #return coordinates and add** to graph
-        match layout_type:
-            case 'random_circle':
-                layout = random_circle_layout.RandomCircleLayout(nodes)
-            case 'random_box':
-                layout = random_box_layout.RandomBoxLayout(nodes, self.graph_params['axis_limits'])
-            case 'spiral':
-                layout = spiral_layout.SpiralLayout(nodes)
-            case _:
-                print('Invalid layout type')
-                return None
-            
-        return layout.get_coordinates(), layout.get_max_radius()
-    
-    def add_coords(self, coords, color):
+    def _add_coords(self, coords, color):
         cmap = plt.get_cmap("gist_rainbow")
         colors = cmap(random.random())[:3] 
 
@@ -166,6 +150,22 @@ class LayoutManager:
                 if color:
                     self.graph.vs[coord[2]]['color'] = colors
 
+    def apply_layout(self, nodes, layout_type):
+        #either randomS, randomB, spiral
+        #return coordinates and add** to graph
+        match layout_type:
+            case 'random_circle':
+                layout = random_circle_layout.RandomCircleLayout(nodes)
+            case 'random_box':
+                layout = random_box_layout.RandomBoxLayout(nodes, self.graph_params['axis_limits'])
+            case 'spiral':
+                layout = spiral_layout.SpiralLayout(nodes)
+            case _:
+                print('Invalid layout type')
+                return None
+            
+        return layout.get_coordinates(), layout.get_max_radius()
+    
     def get_axis_limits(self):
         minx = min(self.graph.vs['x'])
         maxx = max(self.graph.vs['x'])
@@ -175,10 +175,10 @@ class LayoutManager:
         return maxx, minx, maxy, miny
    
     def save_layout(self, filename):
-    # Save layout to CSV in this order: id, title, x, y, size, r, g, b
+    #order: id, title, x, y, size, r, g, b
         with open(filename, 'w', encoding='utf-8') as f:
             f.write('id,title,x,y,size,r,g,b\n')
             for i in range(self.graph.vcount()):
-                # Escape commas and double quotes in the title
-                title = self.graph.vs[i]['title'].replace('"', '""')  # Escape double quotes
+
+                title = self.graph.vs[i]['title'].replace('"', '""')  # Escape double quotes because titles tend to have ""
                 f.write(f'{self.graph.vs[i]["name"]},"{title}",{self.graph.vs[i]["x"]},{self.graph.vs[i]["y"]},{self.graph.vs[i]["size"]},{self.graph.vs[i]["color"][0]},{self.graph.vs[i]["color"][1]},{self.graph.vs[i]["color"][2]}\n')      

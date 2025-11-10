@@ -13,9 +13,8 @@ NOTE:
 
 import csv
 
-# Global data structures
-map_page = {}         # Maps page IDs to titles (~6.7M entries expected)
-page_id_cnt = {}      # Tracks page view counts and titles
+map_page = {}           # Maps page IDs to titles (~6.7M entries expected)
+page_id_cnt = {}        # Tracks page view counts and titles
 link_target_remap = {}  # Remaps link targets to page IDs
 
 # Function to parse ~60M rows and extract titles and IDs for non-redirect pages
