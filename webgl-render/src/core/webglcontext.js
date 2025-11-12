@@ -32,15 +32,21 @@ export default class WebGLContext {
 		}
 	}
 
+    //https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/orthographic-projection-matrix.html
 	createProjectionMatrix(cameraX, cameraY, zoomLevel) {
-		const aspectRatio = this.canvas.width / this.canvas.height; 
-		const correctedZoom = aspectRatio > 1 ? zoomLevel / aspectRatio : zoomLevel;	
-		const scale = 1 / correctedZoom;
+		const viewWidth = this.canvas.width * zoomLevel;
+		const viewHeight = this.canvas.height * zoomLevel;
+		
+		const left = cameraX - viewWidth / 2;
+		const right = cameraX + viewWidth / 2;
+		const bottom = cameraY - viewHeight / 2;
+		const top = cameraY + viewHeight / 2;
+		
 		return new Float32Array([
-			scale / aspectRatio, 0, 0, 0,
-			0, scale, 0, 0,
-			0, 0, 1, 0,
-			-cameraX * scale / aspectRatio, -cameraY * scale, 0, 1,
+			2 / (right - left), 0, 0, 0,
+			0, 2 / (top - bottom), 0, 0,
+			0, 0, -1, 0,
+			-(right + left) / (right - left), -(top + bottom) / (top - bottom), 0, 1
 		]);
  	}
 

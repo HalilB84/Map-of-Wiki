@@ -64,8 +64,8 @@ button:hover {
 
 #dropdown-container {
 	position: absolute;
-	top: 5px;
-	right: 5px;
+	top: 0px;
+	right: 0px;
 	display: flex;
 	flex-direction: column;
 	gap: 5px;
@@ -73,18 +73,15 @@ button:hover {
 	padding: 10px;
 	border-radius: 2px;
 	border: 1px solid rgba(255, 255, 255, 0.1);
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
 	width: 20vw;
 	max-width: 400px;
 
 }
-#dropdown-container.expanded {
-	width: calc(90% - 20px);
-	max-width: 400px;
-	left: 50%;
-	transform: translateX(-50%);
-	flex-direction: row;
-	justify-content: space-between;
+
+input[type='range'] { 
+	accent-color: gray; 
+	width: 100%;
 }
+
 

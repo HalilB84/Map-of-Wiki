@@ -12,8 +12,6 @@ export default class Visualization {
 
 		this.pctEl = document.getElementById("loading-percent");
 
-		const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
 		this.stats = new Stats({
 			trackGPU: false,
 			trackHz: false,
@@ -160,7 +158,7 @@ export default class Visualization {
 
 		const projectionMatrix = this.bus.webgl.createProjectionMatrix(this.bus.controls.cameraX, this.bus.controls.cameraY, this.bus.controls.zoomLevel);
 
-		this.bus.circleRenderer.draw(projectionMatrix, Math.min(this.bus.controls.zoomLevel, 70));//TODO: figure out why scaling stuff kills performance so much
+		this.bus.circleRenderer.draw(projectionMatrix, this.bus.controls.zoomLevel / 3.);
 		this.bus.textRenderer.draw(projectionMatrix);
 
 		this.animationFrameId = requestAnimationFrame((timestamp) => this.draw(timestamp));

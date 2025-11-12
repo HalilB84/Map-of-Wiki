@@ -122,7 +122,7 @@ export default class CircleRenderer extends ShaderProgram {
 		gl.bindVertexArray(this.vao);
 
 		gl.uniformMatrix4fv(this.locations.modelViewProjection, false, modelViewProjection);
-		gl.uniform1f(this.locations.cameraDistance, zoomLevel * 0.0006); //fix
+		gl.uniform1f(this.locations.cameraDistance, zoomLevel); //fix
 
 		gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, this.numCircles);
 	}

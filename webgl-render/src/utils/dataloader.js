@@ -1,7 +1,7 @@
 import Papa from "papaparse";
 
 export default class DataLoader {
-	// hardcoded uncompressed byte sizes for CSVs
+	// hardcoded uncompressed byte sizes for CSVs because the browser doesn't give these numbers directly
 	static FILE_SIZES = {
 		"layout60k-Sep-10-2024.csv": 6792224,
 		"layout500k-Sep-10-2024.csv": 57693366,
@@ -69,6 +69,11 @@ export default class DataLoader {
 		const titles = new Array(numItems);
 		const ids = new Array(numItems);
 
+		let maxy = offsets[0 * 2 + 1] + sizes[0];
+		let maxx = offsets[0 * 2] + sizes[0];
+		let miny = offsets[0 * 2 + 1] - sizes[0];
+		let minx = offsets[0 * 2] - sizes[0];
+
 		for (let i = 0; i < numItems; i++) {
 			const item = data[i];
 
@@ -84,6 +89,11 @@ export default class DataLoader {
 
 			titles[i] = item.title;
 			ids[i] = parseInt(item.id);
+
+			maxy = Math.max(maxy, offsets[i * 2 + 1] + sizes[i]);
+			maxx = Math.max(maxx, offsets[i * 2] + sizes[i]);
+			miny = Math.min(miny, offsets[i * 2 + 1] - sizes[i]);
+			minx = Math.min(minx, offsets[i * 2] - sizes[i]);
 		}
 
 		return {
@@ -93,6 +103,7 @@ export default class DataLoader {
 			colors,
 			titles,
 			ids,
+			axisLimits: [minx, miny, maxx, maxy],
 		};
 	}
 }

@@ -1,6 +1,6 @@
 export default class Controls {
 	constructor(bus) {
-		this.zoomLevel = 1;
+		this.zoomLevel;
 		this.cameraX = 0;
 		this.cameraY = 0;
 
@@ -19,14 +19,13 @@ export default class Controls {
 		this.stage2Duration = 2000;
 		this.transitionStartTime = 0;
 
-		this.wheelSensitivity = 0.002; //fix by creating a settings menu
-		this.touchSensitivity = 0.004;
+		this.sensitivity = 0.002;
 		this.lastTouchDistance = null;
 
 		this.bus = bus;
 
 		this.bus.webgl.canvas.addEventListener("mousedown", (e) => this.handleMouseDown(e));
-		this.bus.webgl.canvas.addEventListener("touchstart", (e) => this.handleTouchStart(e));
+		this.bus.webgl.canvas.addEventListener("touchstart", (e) => this.handleTouchStart(e), {passive: false});
 
 		this.bus.webgl.canvas.addEventListener("mouseup", () => this.handleMouseUp());
 		this.bus.webgl.canvas.addEventListener("mouseleave", () => this.handleMouseUp());
@@ -34,9 +33,9 @@ export default class Controls {
 		this.bus.webgl.canvas.addEventListener("touchend", () => (this.isDragging = false));
 
 		this.bus.webgl.canvas.addEventListener("mousemove", (e) => this.handleMouseMove(e));
-		this.bus.webgl.canvas.addEventListener("touchmove", (e) => this.handleTouchMove(e));
+		this.bus.webgl.canvas.addEventListener("touchmove", (e) => this.handleTouchMove(e), {passive: false});
 
-		this.bus.webgl.canvas.addEventListener("wheel", (e) => this.handleZoom(e));
+		this.bus.webgl.canvas.addEventListener("wheel", (e) => this.handleZoom(e) , {passive: true});
 		this.bus.webgl.canvas.addEventListener("click", (e) => {
 			//This is probably not the best way to do this
 			if (!this.wasDragging) {
@@ -46,8 +45,13 @@ export default class Controls {
 		});
 
 		document.getElementById("random-button").addEventListener("click", () => this.goToRandomArticle());
+		window.addEventListener("resize", () => this.zoomLevel = Math.min(this.zoomLevel, this.getMaxZoomLevel()));
+		document.getElementById("sensitivity-range").addEventListener("input", (e) => {
+			this.sensitivity = e.target.value / 25000;
+		});
 	}
 
+	
 	handleMouseDown(e) {
 		if (this.transitionActive) return;
 		this.isDragging = true;
@@ -60,33 +64,35 @@ export default class Controls {
 	}
 
 	//only when mouse down
-	handleMouseMove(e) {
+	handleMouseMove(e) { //chrome for some reason also fires this event if you touch on a laptop
 		if (!this.isDragging || this.transitionActive) return;
 		this.wasDragging = true;
 		this.updateCameraPosition(e.clientX, e.clientY);
 	}
 
-	handleTouchStart(e) {//broken on laptop touchscreen
+	handleTouchStart(e) {
 		if (this.transitionActive) return;
 		console.log("touch start");
 
 		e.preventDefault();
+		
 		//pinch-zoom
 		if (e.touches.length === 2) {
 			this.lastTouchDistance = this.getTouchDistance(e.touches);
-			return;
 		}
+
 		// single-touch pan
-		this.isDragging = true;
-		this.lastMouseX = e.touches[0].clientX;
-		this.lastMouseY = e.touches[0].clientY;
+		else if (e.touches.length === 1) {
+			this.isDragging = true;
+			this.lastMouseX = e.touches[0].clientX;
+			this.lastMouseY = e.touches[0].clientY;
+		}
 	}
 
 	handleTouchMove(e) {
 		if (this.transitionActive) return;
 		e.preventDefault();
 		//pinch zoom
-		//same logic as handle zoom
 		if (e.touches.length === 2) {
 			const dist = this.getTouchDistance(e.touches);
 			const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
@@ -96,8 +102,8 @@ export default class Controls {
 
 			const worldPos = this.screenToWorld(centerX, centerY);
 			this.zoomLevel *= 1 / zoomFactor;
-			this.zoomLevel = Math.min(this.zoomLevel, 300); //TODO; make this dynamic based on which graph
-			this.zoomLevel = Math.max(this.zoomLevel, 0.001);
+			this.zoomLevel = Math.min(this.zoomLevel, this.getMaxZoomLevel());
+			this.zoomLevel = Math.max(this.zoomLevel, 0.0000001);
 
 			const newWorldPos = this.screenToWorld(centerX, centerY);
 
@@ -105,12 +111,11 @@ export default class Controls {
 			this.cameraY += worldPos.y - newWorldPos.y;
 
 			this.lastTouchDistance = dist;
-			return;
 		}
 		// single-touch pan
-		if (!this.isDragging) return;
-		this.wasDragging = true;
-		this.updateCameraPosition(e.touches[0].clientX, e.touches[0].clientY);
+		else if (e.touches.length === 1 && this.isDragging) {
+			this.updateCameraPosition(e.touches[0].clientX, e.touches[0].clientY);
+		}
 	}
 
 	getTouchDistance(touches) {
@@ -122,17 +127,13 @@ export default class Controls {
 	//I now understand what is happening
 	handleZoom(e) {
 		if (this.transitionActive) return;
-
-		// https://stackoverflow.com/questions/77863197/distinguish-trackpad-and-mouse-on-wheel-event
-		const isMouseWheel = Number.isInteger(e.deltaY) && e.deltaX === 0;
-		const sens = isMouseWheel ? this.wheelSensitivity : this.touchSensitivity;
-		const zoomFactor = Math.exp(e.deltaY * sens);
+		const zoomFactor = Math.exp(e.deltaY * this.sensitivity);
 
 		//Why does this work? After the zoomfactor is applied the mouse will be at a different world location (why? because now the area being covered is different but the mouse is still in the same place, so obviously world loc is different) and move the camera by that difference so the cursor points to the same world loc
 		const worldPos = this.screenToWorld(e.clientX, e.clientY);
 		this.zoomLevel *= zoomFactor;
-		this.zoomLevel = Math.min(this.zoomLevel, 300); //TODO; make this dynamic based on which graph
-		this.zoomLevel = Math.max(this.zoomLevel, 0.001);
+		this.zoomLevel = Math.min(this.zoomLevel, this.getMaxZoomLevel());
+		this.zoomLevel = Math.max(this.zoomLevel, 0.0000001);
 		const newWorldPos = this.screenToWorld(e.clientX, e.clientY);
 
 		this.cameraX += worldPos.x - newWorldPos.x;
@@ -142,30 +143,33 @@ export default class Controls {
 	screenToWorld(screenX, screenY) {
 		const rect = this.bus.webgl.canvas.getBoundingClientRect(); //the correct way to get size
 
-		const canvasWidth = rect.width;
-		const canvasHeight = rect.height;
+		const canvasX = (screenX - rect.left) / rect.width;
+		const canvasY = (screenY - rect.top) / rect.height;
 
-		// Convert screen coordinates to canvas-relative coordinates (0 to 1)
-		const canvasX = (screenX - rect.left) / canvasWidth;
-		const canvasY = (screenY - rect.top) / canvasHeight;
+		const ndcX = canvasX * 2 - 1;
+		const ndcY = -(canvasY * 2 - 1);
 
-		// Convert to clip space (-1 to 1)
-		const clipX = canvasX * 2 - 1;
-		const clipY = -(canvasY * 2 - 1);
+		const viewWidth = this.bus.webgl.canvas.width * this.zoomLevel;
+		const viewHeight = this.bus.webgl.canvas.height * this.zoomLevel;
 
-		// Account for the aspect ratio
-		const aspectRatio = canvasWidth / canvasHeight;
-
-		let correctedZoom = this.zoomLevel;
-		if (aspectRatio > 1) {
-			correctedZoom = this.zoomLevel / aspectRatio;
-		}
-
-		// Convert from clip space to world space
-		const worldX = this.cameraX + clipX * correctedZoom * aspectRatio;
-		const worldY = this.cameraY + clipY * correctedZoom;
+		const worldX = this.cameraX + ndcX * viewWidth / 2;
+		const worldY = this.cameraY + ndcY * viewHeight / 2;
 
 		return { x: worldX, y: worldY };
+	}
+
+	getMaxZoomLevel() {
+		if(!this.bus.data.axisLimits) return;
+		
+		const [minx, miny, maxx, maxy] = this.bus.data.axisLimits;
+		const worldWidth = maxx - minx;
+		const worldHeight = maxy - miny;
+		
+		const canvas = this.bus.webgl.canvas;
+		const zoomWidth = worldWidth / canvas.width;
+		const zoomHeight = worldHeight / canvas.height;
+		
+		return Math.max(zoomWidth * 1.1, zoomHeight * 1.1);
 	}
 
 	updateCameraPosition(currX, currY) {
@@ -196,7 +200,7 @@ export default class Controls {
 			const dy = this.endState.y - this.startState.y;
 
 			const dist = Math.hypot(dx, dy);
-			const midZoom = Math.max(this.startState.zoom, dist * 0.8);
+			const midZoom = Math.max(this.startState.zoom, dist * 0.0008);
 
 			this.midState = { x: this.cameraX, y: this.cameraY, zoom: midZoom };
 			this.stageCount = 2;
@@ -259,8 +263,8 @@ export default class Controls {
 	reset() {
 		this.cameraX = 0;
 		this.cameraY = 0;
-		this.zoomLevel = 1;
-		this.smoothTransition(0, 0, 60, false);
+		this.zoomLevel = 0;
+		this.smoothTransition(0, 0, this.getMaxZoomLevel(), false);
 	}
 
 	clickArticle(e) {
@@ -324,7 +328,7 @@ export default class Controls {
 
 		const targetX = this.bus.data.offsets[randomIndex * 2];
 		const targetY = this.bus.data.offsets[randomIndex * 2 + 1];
-		const targetZoom = this.bus.data.sizes[randomIndex] * 5;
+		const targetZoom = this.bus.data.sizes[randomIndex] * 0.005;
 
 		this.smoothTransition(targetX, targetY, targetZoom, true);
 	}

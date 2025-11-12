@@ -73,7 +73,7 @@ export default class SearchManager {
 
 		const targetX = this.bus.data.offsets[index * 2];
 		const targetY = this.bus.data.offsets[index * 2 + 1];
-		const targetZoom = this.bus.data.sizes[index] * 5;
+		const targetZoom = this.bus.data.sizes[index] * 0.005;
 
 		this.bus.controls.smoothTransition(targetX, targetY, targetZoom, true);
 	}
