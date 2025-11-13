@@ -19,7 +19,7 @@ export default class Controls {
 		this.stage2Duration = 2000;
 		this.transitionStartTime = 0;
 
-		this.sensitivity = 0.002;
+		this.sensitivity = 0.003;
 		this.lastTouchDistance = null;
 
 		this.bus = bus;
@@ -149,8 +149,8 @@ export default class Controls {
 		const ndcX = canvasX * 2 - 1;
 		const ndcY = -(canvasY * 2 - 1);
 
-		const viewWidth = this.bus.webgl.canvas.width * this.zoomLevel;
-		const viewHeight = this.bus.webgl.canvas.height * this.zoomLevel;
+		const viewWidth = this.zoomLevel * this.bus.webgl.canvas.width / this.bus.webgl.canvas.height;
+		const viewHeight = this.zoomLevel;
 
 		const worldX = this.cameraX + ndcX * viewWidth / 2;
 		const worldY = this.cameraY + ndcY * viewHeight / 2;
@@ -166,10 +166,12 @@ export default class Controls {
 		const worldHeight = maxy - miny;
 		
 		const canvas = this.bus.webgl.canvas;
-		const zoomWidth = worldWidth / canvas.width;
-		const zoomHeight = worldHeight / canvas.height;
+		const aspectRatio = canvas.width / canvas.height;
+
+		const maxHeightW = worldWidth / aspectRatio;
+		const maxHeightH = worldHeight;
 		
-		return Math.max(zoomWidth * 1.1, zoomHeight * 1.1);
+		return Math.max(maxHeightW, maxHeightH) * 1.1;
 	}
 
 	updateCameraPosition(currX, currY) {
@@ -200,7 +202,7 @@ export default class Controls {
 			const dy = this.endState.y - this.startState.y;
 
 			const dist = Math.hypot(dx, dy);
-			const midZoom = Math.max(this.startState.zoom, dist * 0.0008);
+			const midZoom = Math.max(this.startState.zoom, dist);
 
 			this.midState = { x: this.cameraX, y: this.cameraY, zoom: midZoom };
 			this.stageCount = 2;
@@ -328,7 +330,7 @@ export default class Controls {
 
 		const targetX = this.bus.data.offsets[randomIndex * 2];
 		const targetY = this.bus.data.offsets[randomIndex * 2 + 1];
-		const targetZoom = this.bus.data.sizes[randomIndex] * 0.005;
+		const targetZoom = this.bus.data.sizes[randomIndex] * 5;
 
 		this.smoothTransition(targetX, targetY, targetZoom, true);
 	}

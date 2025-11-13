@@ -158,7 +158,7 @@ export default class Visualization {
 
 		const projectionMatrix = this.bus.webgl.createProjectionMatrix(this.bus.controls.cameraX, this.bus.controls.cameraY, this.bus.controls.zoomLevel);
 
-		this.bus.circleRenderer.draw(projectionMatrix, this.bus.controls.zoomLevel / 3.);
+		this.bus.circleRenderer.draw(projectionMatrix, this.bus.controls.zoomLevel * 0.0003);
 		this.bus.textRenderer.draw(projectionMatrix);
 
 		this.animationFrameId = requestAnimationFrame((timestamp) => this.draw(timestamp));
