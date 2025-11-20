@@ -34,15 +34,11 @@
 	white-space: nowrap;
 }
 
-
-
 #search:focus {
 	outline: none;
 	background: rgba(255, 255, 255, 0.1);
 	border-color: rgba(255, 255, 255, 0.4);
 }
-
-
 
 .search-loading {
 	position: absolute;
@@ -75,4 +71,3 @@
 #search-results div:hover {
 	background: rgba(255, 255, 255, 0.1);
 }
-

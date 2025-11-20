@@ -26,14 +26,13 @@ export default class Visualization {
 			mode: 0,
 		});
 
-		this.stats.dom.style.position = "fixed";  
-		this.stats.dom.style.bottom = "45px";   
-		this.stats.dom.style.right = "180px";      
+		this.stats.dom.style.position = "fixed";
+		this.stats.dom.style.bottom = "45px";
+		this.stats.dom.style.right = "180px";
 		this.stats.dom.style.top = "auto";
 		this.stats.dom.style.left = "auto";
 		document.body.appendChild(this.stats.dom);
 		document.getElementById("load-button").addEventListener("click", () => this.initialize());
-
 
 		this.setupIntroOverlay();
 	}
@@ -89,7 +88,6 @@ export default class Visualization {
 		loadingElement.style.display = "none";
 		this.initializing = false;
 	}
-
 
 	updateVisibleText() {
 		//Also possible for this to be in workers? would decrease lag I think

@@ -26,7 +26,7 @@ export default class Controls {
 		this.lastAspectRatio = this.bus.webgl.canvas.width / this.bus.webgl.canvas.height;
 
 		this.bus.webgl.canvas.addEventListener("mousedown", (e) => this.handleMouseDown(e));
-		this.bus.webgl.canvas.addEventListener("touchstart", (e) => this.handleTouchStart(e), {passive: false});
+		this.bus.webgl.canvas.addEventListener("touchstart", (e) => this.handleTouchStart(e), { passive: false });
 
 		this.bus.webgl.canvas.addEventListener("mouseup", () => this.handleMouseUp());
 		this.bus.webgl.canvas.addEventListener("mouseleave", () => this.handleMouseUp());
@@ -34,9 +34,9 @@ export default class Controls {
 		this.bus.webgl.canvas.addEventListener("touchend", () => (this.isDragging = false));
 
 		this.bus.webgl.canvas.addEventListener("mousemove", (e) => this.handleMouseMove(e));
-		this.bus.webgl.canvas.addEventListener("touchmove", (e) => this.handleTouchMove(e), {passive: false});
+		this.bus.webgl.canvas.addEventListener("touchmove", (e) => this.handleTouchMove(e), { passive: false });
 
-		this.bus.webgl.canvas.addEventListener("wheel", (e) => this.handleZoom(e) , {passive: true});
+		this.bus.webgl.canvas.addEventListener("wheel", (e) => this.handleZoom(e), { passive: true });
 		this.bus.webgl.canvas.addEventListener("click", (e) => {
 			//This is probably not the best way to do this
 			if (!this.wasDragging) {
@@ -62,10 +62,14 @@ export default class Controls {
 
 		document.getElementById("sensitivity-range").addEventListener("input", (e) => {
 			this.sensitivity = e.target.value / 25000;
+			document.getElementById("sensitivity-value").textContent = e.target.value;
 		});
+
+		if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+			document.getElementById("sensitivity-container").style.display = "none";
+		}
 	}
 
-	
 	handleMouseDown(e) {
 		if (this.transitionActive) return;
 		this.isDragging = true;
@@ -78,7 +82,8 @@ export default class Controls {
 	}
 
 	//only when mouse down
-	handleMouseMove(e) { //chrome for some reason also fires this event if you touch on a laptop
+	handleMouseMove(e) {
+		//chrome for some reason also fires this event if you touch on a laptop
 		if (!this.isDragging || this.transitionActive) return;
 		this.wasDragging = true;
 		this.updateCameraPosition(e.clientX, e.clientY);
@@ -89,7 +94,7 @@ export default class Controls {
 		console.log("touch start");
 
 		e.preventDefault();
-		
+
 		//pinch-zoom
 		if (e.touches.length === 2) {
 			this.lastTouchDistance = this.getTouchDistance(e.touches);
@@ -163,30 +168,29 @@ export default class Controls {
 		const ndcX = canvasX * 2 - 1;
 		const ndcY = -(canvasY * 2 - 1);
 
-		const viewWidth = this.zoomLevel * this.bus.webgl.canvas.width / this.bus.webgl.canvas.height;
+		const viewWidth = (this.zoomLevel * this.bus.webgl.canvas.width) / this.bus.webgl.canvas.height;
 		const viewHeight = this.zoomLevel;
 
-		const worldX = this.cameraX + ndcX * viewWidth / 2;
-		const worldY = this.cameraY + ndcY * viewHeight / 2;
+		const worldX = this.cameraX + (ndcX * viewWidth) / 2;
+		const worldY = this.cameraY + (ndcY * viewHeight) / 2;
 
 		return { x: worldX, y: worldY };
 	}
 
 	getMaxZoomLevel() {
-		if(!this.bus.data) return;
-		
+		if (!this.bus.data) return;
+
 		const [minx, miny, maxx, maxy] = this.bus.data.axisLimits;
 		const worldWidth = maxx - minx;
 		const worldHeight = maxy - miny;
-		
+
 		const canvas = this.bus.webgl.canvas;
 		const aspectRatio = canvas.width / canvas.height;
 
 		const maxHeightW = worldWidth / aspectRatio;
 		const maxHeightH = worldHeight;
-		
+
 		return Math.max(maxHeightW, maxHeightH) * 1.1;
-		
 	}
 
 	updateCameraPosition(currX, currY) {

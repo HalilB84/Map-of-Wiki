@@ -36,8 +36,8 @@ button:hover {
 }
 
 .random-button:focus {
-    outline: none;
-    background: rgba(255, 255, 255, 0.05);  
+	outline: none;
+	background: rgba(255, 255, 255, 0.05);
 }
 
 .random-icon {
@@ -76,7 +76,6 @@ button:hover {
 
 	width: 20vw;
 	max-width: 400px;
-
 }
 
 input[type='range'] { 
@@ -84,4 +83,9 @@ input[type='range'] {
 	width: 100%;
 }
 
+#sensitivity-container {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
 
