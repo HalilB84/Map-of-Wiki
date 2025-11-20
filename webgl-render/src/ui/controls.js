@@ -19,10 +19,11 @@ export default class Controls {
 		this.stage2Duration = 2000;
 		this.transitionStartTime = 0;
 
-		this.sensitivity = 0.003;
+		this.sensitivity = 0.002;
 		this.lastTouchDistance = null;
 
 		this.bus = bus;
+		this.lastAspectRatio = this.bus.webgl.canvas.width / this.bus.webgl.canvas.height;
 
 		this.bus.webgl.canvas.addEventListener("mousedown", (e) => this.handleMouseDown(e));
 		this.bus.webgl.canvas.addEventListener("touchstart", (e) => this.handleTouchStart(e), {passive: false});
@@ -45,7 +46,20 @@ export default class Controls {
 		});
 
 		document.getElementById("random-button").addEventListener("click", () => this.goToRandomArticle());
-		window.addEventListener("resize", () => this.zoomLevel = Math.min(this.zoomLevel, this.getMaxZoomLevel()));
+		//temporary fix
+		window.addEventListener("resize", () => {
+			this.bus.webgl.resizeCanvas();
+			const currentAspectRatio = this.bus.webgl.canvas.width / this.bus.webgl.canvas.height;
+
+			if ((this.lastAspectRatio > 1 && currentAspectRatio < 1) || (this.lastAspectRatio < 1 && currentAspectRatio > 1)) {
+				this.cameraX = 0;
+				this.cameraY = 0;
+				this.zoomLevel = this.getMaxZoomLevel();
+			}
+			this.lastAspectRatio = currentAspectRatio;
+			this.zoomLevel = Math.min(this.zoomLevel, this.getMaxZoomLevel());
+		});
+
 		document.getElementById("sensitivity-range").addEventListener("input", (e) => {
 			this.sensitivity = e.target.value / 25000;
 		});
@@ -159,7 +173,7 @@ export default class Controls {
 	}
 
 	getMaxZoomLevel() {
-		if(!this.bus.data.axisLimits) return;
+		if(!this.bus.data) return;
 		
 		const [minx, miny, maxx, maxy] = this.bus.data.axisLimits;
 		const worldWidth = maxx - minx;
@@ -172,6 +186,7 @@ export default class Controls {
 		const maxHeightH = worldHeight;
 		
 		return Math.max(maxHeightW, maxHeightH) * 1.1;
+		
 	}
 
 	updateCameraPosition(currX, currY) {
