@@ -1,6 +1,6 @@
 // Adapted from https://github.com/anvaka/map-of-reddit/blob/main/src/lib/PointCollection.js
 
-import ShaderProgram from "../core/shaderprogram.js";
+import ShaderProgram from "./shaderprogram.js";
 
 export default class CircleRenderer extends ShaderProgram {
 	constructor(bus) {

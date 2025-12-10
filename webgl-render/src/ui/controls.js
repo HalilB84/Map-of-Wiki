@@ -1,6 +1,6 @@
 export default class Controls {
 	constructor(bus) {
-		this.zoomLevel;
+		this.zoomLevel = 0;
 		this.cameraX = 0;
 		this.cameraY = 0;
 
@@ -24,50 +24,6 @@ export default class Controls {
 
 		this.bus = bus;
 		this.lastAspectRatio = this.bus.webgl.canvas.width / this.bus.webgl.canvas.height;
-
-		this.bus.webgl.canvas.addEventListener("mousedown", (e) => this.handleMouseDown(e));
-		this.bus.webgl.canvas.addEventListener("touchstart", (e) => this.handleTouchStart(e), { passive: false });
-
-		this.bus.webgl.canvas.addEventListener("mouseup", () => this.handleMouseUp());
-		this.bus.webgl.canvas.addEventListener("mouseleave", () => this.handleMouseUp());
-
-		this.bus.webgl.canvas.addEventListener("touchend", () => (this.isDragging = false));
-
-		this.bus.webgl.canvas.addEventListener("mousemove", (e) => this.handleMouseMove(e));
-		this.bus.webgl.canvas.addEventListener("touchmove", (e) => this.handleTouchMove(e), { passive: false });
-
-		this.bus.webgl.canvas.addEventListener("wheel", (e) => this.handleZoom(e), { passive: true });
-		this.bus.webgl.canvas.addEventListener("click", (e) => {
-			//This is probably not the best way to do this
-			if (!this.wasDragging) {
-				this.clickArticle(e);
-			}
-			this.wasDragging = false;
-		});
-
-		document.getElementById("random-button").addEventListener("click", () => this.goToRandomArticle());
-		//temporary fix
-		window.addEventListener("resize", () => {
-			this.bus.webgl.resizeCanvas();
-			const currentAspectRatio = this.bus.webgl.canvas.width / this.bus.webgl.canvas.height;
-
-			if ((this.lastAspectRatio > 1 && currentAspectRatio < 1) || (this.lastAspectRatio < 1 && currentAspectRatio > 1)) {
-				this.cameraX = 0;
-				this.cameraY = 0;
-				this.zoomLevel = this.getMaxZoomLevel();
-			}
-			this.lastAspectRatio = currentAspectRatio;
-			this.zoomLevel = Math.min(this.zoomLevel, this.getMaxZoomLevel());
-		});
-
-		document.getElementById("sensitivity-range").addEventListener("input", (e) => {
-			this.sensitivity = e.target.value / 25000;
-			document.getElementById("sensitivity-value").textContent = e.target.value;
-		});
-
-		if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-			document.getElementById("sensitivity-container").style.display = "none";
-		}
 	}
 
 	handleMouseDown(e) {
@@ -89,9 +45,32 @@ export default class Controls {
 		this.updateCameraPosition(e.clientX, e.clientY);
 	}
 
+	handleClick(e) {
+		//This is probably not the best way to do this
+		if (!this.wasDragging) {
+			this.clickArticle(e);
+		}
+		this.wasDragging = false;
+	}
+
+	//I now understand what is happening
+	handleZoom(e) {
+		if (this.transitionActive) return;
+		const zoomFactor = Math.exp(e.deltaY * this.sensitivity);
+
+		//Why does this work? After the zoomfactor is applied the mouse will be at a different world location (why? because now the area being covered is different but the mouse is still in the same place, so obviously world loc is different) and move the camera by that difference so the cursor points to the same world loc
+		const worldPos = this.screenToWorld(e.clientX, e.clientY);
+		this.zoomLevel *= zoomFactor;
+		this.zoomLevel = Math.min(this.zoomLevel, this.getMaxZoomLevel());
+		this.zoomLevel = Math.max(this.zoomLevel, 0.0000001);
+		const newWorldPos = this.screenToWorld(e.clientX, e.clientY);
+
+		this.cameraX += worldPos.x - newWorldPos.x;
+		this.cameraY += worldPos.y - newWorldPos.y;
+	}
+
 	handleTouchStart(e) {
 		if (this.transitionActive) return;
-		console.log("touch start");
 
 		e.preventDefault();
 
@@ -137,26 +116,27 @@ export default class Controls {
 		}
 	}
 
+	handleTouchEnd() {
+		this.isDragging = false;
+	}
+
 	getTouchDistance(touches) {
 		const dx = touches[0].clientX - touches[1].clientX;
 		const dy = touches[0].clientY - touches[1].clientY;
 		return Math.hypot(dx, dy);
 	}
 
-	//I now understand what is happening
-	handleZoom(e) {
-		if (this.transitionActive) return;
-		const zoomFactor = Math.exp(e.deltaY * this.sensitivity);
+	handleResize() {
+		const currentAspectRatio = this.bus.webgl.canvas.width / this.bus.webgl.canvas.height;
 
-		//Why does this work? After the zoomfactor is applied the mouse will be at a different world location (why? because now the area being covered is different but the mouse is still in the same place, so obviously world loc is different) and move the camera by that difference so the cursor points to the same world loc
-		const worldPos = this.screenToWorld(e.clientX, e.clientY);
-		this.zoomLevel *= zoomFactor;
+		if ((this.lastAspectRatio > 1 && currentAspectRatio < 1) || (this.lastAspectRatio < 1 && currentAspectRatio > 1)) {
+			this.cameraX = 0;
+			this.cameraY = 0;
+			this.zoomLevel = this.getMaxZoomLevel();
+		}
+
+		this.lastAspectRatio = currentAspectRatio;
 		this.zoomLevel = Math.min(this.zoomLevel, this.getMaxZoomLevel());
-		this.zoomLevel = Math.max(this.zoomLevel, 0.0000001);
-		const newWorldPos = this.screenToWorld(e.clientX, e.clientY);
-
-		this.cameraX += worldPos.x - newWorldPos.x;
-		this.cameraY += worldPos.y - newWorldPos.y;
 	}
 
 	screenToWorld(screenX, screenY) {
@@ -290,7 +270,7 @@ export default class Controls {
 
 	clickArticle(e) {
 		const worldPos = this.screenToWorld(e.clientX, e.clientY);
-		console.log("cursor", worldPos);
+		//console.log("cursor", worldPos);
 
 		const { offsets, sizes, ids, titles, numItems } = this.bus.data;
 
@@ -305,10 +285,6 @@ export default class Controls {
 
 			if (distance <= radius) {
 				const articleId = ids[i];
-				const articleTitle = titles[i];
-				console.log(cx, cy, radius);
-				console.log(`Clicked on article: ${articleTitle} (ID: ${articleId})`);
-
 				this.showEmbeddedWikiArticle(articleId);
 				return;
 			}
@@ -316,32 +292,18 @@ export default class Controls {
 	}
 
 	showEmbeddedWikiArticle(id) {
-		const container = document.getElementById("wiki-embed-container");
+		const wiki = document.getElementById("wiki");
 		const iframe = document.getElementById("wiki-iframe");
-		const closeBtn = document.getElementById("close-wiki-btn");
 
 		const wikiUrl = `https://en.wikipedia.org/?curid=${id}`;
 
 		iframe.src = wikiUrl;
-		container.classList.add("active");
+		wiki.classList.add("active");
 
-		if (!this._outsideClickHandler) {
-			this._outsideClickHandler = (e) => {
-				if (!container.contains(e.target) && container.classList.contains("active") && !e.target.closest("#webgl-canvas")) {
-					closeBtn.click();
-				}
-			};
-		}
-
-		closeBtn.onclick = () => {
-			container.classList.remove("active");
-			document.removeEventListener("click", this._outsideClickHandler);
-			setTimeout(() => {
-				iframe.src = "about:blank";
-			}, 300);
+		document.getElementById("close-wiki").onclick = () => {
+			wiki.classList.remove("active");
+			iframe.src = "about:blank";
 		};
-
-		document.addEventListener("click", this._outsideClickHandler);
 	}
 
 	goToRandomArticle() {

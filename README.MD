@@ -1,29 +1,38 @@
 # Mapping Wikipedia
 
-## Note
-This project was inspired by adumb's graphing Wikipedia video (https://www.youtube.com/watch?v=JheGL6uSF-4&t=3s). The main goal behind the project is to create different graph visualizations and create an animation/interactable website version. There are many graphing frameworks out there, like Gephi, but I couldn't make it work the way I liked (honestly, I was just looking for an excuse to code a project). The current version of the project implements some layouts I came up with using the Leidens algorithm. Unlike in adumb's video, I used Leiden's algorithm to create the graph layout itself. The reason for this was that, unlike force-directed layouts, it runs significantly faster and has other features many other algorithms lack (no overlapping, for example) 
+## About The Project
+This project was started with the inspiration I got from adumb's graphing Wikipedia [video](https://www.youtube.com/watch?v=JheGL6uSF-4&t=3s) and Map of Reddit.
 
-The algorithm I cooked up doesn't make much sense as it is not supposed to be used for layouts, but it does look cool (which is what we all care about, right?)
-Although I am not satisfied with the looks compared to other actual layouts so I am in the works of adding a proper force-directed algorithm, but it will require a lot of research. 
+Here is a basic breakdown of how this all works:
 
-Finally, I would like to add that this is the first project that I have worked on for more than a single day, so I am in the process of learning things. I assume my code structure and how some things are implemented are not the best. Hopefully, I will have time to fix those. 
+All of the data is collected from Wikimedia data dumps. Then, with some basic Python scripts, everything is parsed into a CSV file. The graph data from the CSV files is loaded into the Python code using igraph (I was able to fit 1 Million nodes and 160 Million? edges, which nearly took all memory. This is why you should use dedicated tools for this, not plain Python). 
 
-## Quick Rundown
-All of the data is collected from Wikimedia dumps. Igraph is used to make it easier to handle data, and the backbone of the project relies on the Leiden algorithm package for Python. The layout of the graph is custom-built, and finally, the rendering is done by Matplotlib. Recently, I also implemented an interactive webgl renderer (not really interactive, but working on it, also as an excuse to learn graphics). The webgl renderer is WIP
+After the data is loaded, I perform community detection on all the data using Leiden's algorithm from [this package](https://github.com/vtraag/leidenalg). Now here it gets a little weird. Early on, I dabbled with graphing tools a lot (like Gephi), which were either impossible to render due to the size or limited in the features I wanted. Normally, graphs like this are rendered using force-directed algorithms. However, I had no idea how I would make it work since implementing one myself looked grim, and all other existing tools didn't exactly give what I wanted. Instead, I had the brilliant idea of making one myself /s. 
 
-Right now, there are two layouts possible, "singular" and "hierarchal." These two modes place nodes based on spiral_layout.py and random_circle_layout.py. You will see the results in the photos section below. I would argue that the hierarchal layout looks cool and more galaxy-like.  
+The custom graph layout is a simple algorithm that arranges nodes in either a random or spiral pattern. The reason it looks like similar communities are together is that I use a hierarchical Leiden's pass. Basically, I first perform Leiden's algorithm on the entire data. Say that gives 15 distinct communities, these are randomly or in spiral placed in the circle (also, I make sure there is no overlap). Then I do the exact same thing on every sub-community. This worked out to some extent, but it is nothing close to actual graphing algorithms. 
 
-## TODO (For getting the graph layout)
+The last stage is the WebGL renderer. I initially started with Matplotlib, but that only goes so far. After looking at Map of Reddit's source code and learning cosmos.gl exists, I understood that WebGL was the way to go. WebGL wise, there is nothing fancy going on. It's just two simple fragment shaders, one for rendering circles and the other for the article titles. These were both adapted from Map of Reddit. Then I created a small website for all the user interactions. Probably the biggest mistake here was relying on AI too much. I went into this with no preexisting webdev knowledge, so the extremely fast progress with AI gen code blinded me. Then I had to learn everything from scratch after realizing I didn't understand the code. Big lesson to my future self.
+
+That's it. I hereby declare this project complete. I want to do this bigger and better after learning how to apply force-directed layouts for millions of nodes and edges using GPU/AI magic. But till then, I'll just fix small things and reorganize code. 
+
+Since I've done this project, I have come across better ways to map this data. I encourage you to check them out if you are interested in large scale data viz:
+
+- Turns out that graphing Wikipedia is a [popular thing](https://github.com/search?q=wikipedia+graph&type=repositories&ref=advsearch&s=updated&o=desc&p=1)
+
+- https://lmcinnes.github.io/datamapplot_examples/wikipedia/ (Runs slower but way more accurate and complete in terms of clustering articles. Uses AI embedding magic)
+
+- [cosmograph/cosmos.gl](https://github.com/cosmosgl/graph) is one of the best frameworks out there for large scale data viz. Namely, see https://eightyeightthirty.one/ for a cool application. 
+
+## TODO (For the graph layout)
 
 - ~~Fix community detection (needs to be more accurate)~~
 - ~~Placing communities non randomly -> cluster using force-directed or somehow using the similarity between communities -> I have a plan for this -> hierarchal layout -> completely switching to force-directed layouts~~
 - ~~rewrite the entire code - Very High Priority -> In progress _> Done!~~
 - ~~Fix labels -> no improvement -> will solve this by using an interactive renderer on the browser~~
 - ~~interactive website? -> Would it solve the problem of labels and edges -> Webgl renderer? -> Proof of concept is done it seems to work~~
-- Optimize accessing node and edge attributes, and maybe switch to neo4j? -> needs research
-- create a new layout (force-directed) -> needs extensive research
+- Create a new layout (force-directed) -> needs extensive research
 - Look into creating animations -> need to have a force-directed layout
-- highly possible change of switching to wikitext parsing for better layout results 
+- Highly possible change of switching to wikitext parsing for better layout results 
 
 ## TODO (For the webgl renderer)
 
@@ -36,12 +45,12 @@ Right now, there are two layouts possible, "singular" and "hierarchal." These tw
  - ~~screen space to world space (for clicking and text optimization)~~
  - ~~Make it usable for mobile -> Partly done~~
  - ~~Implement a web worker for fuzzysort~~
- - fix camera distance performance
- - Create better UI / Rewrite the entire codebase
+ - fix camera distance performance -> no idea
+ - ~~Create better UI / Rewrite the entire codebase~~ -> Done part 1
 
 ## Photos
 
-Many of these photos are from the first iterations, now the best way to view them is by using the Webgl renderer. Although I will update some of these and just keep it here anyway.
+Many of these photos are from the first iterations, now the best way to view them is by using the WebGL renderer. Although I will update some of these and just keep it here anyway.
 
 Most 60k popular articles from September 11, 2024 (Singular Layout). Each Island indicates a different community. To see everything, you need to download the file and zoom in.
 
@@ -64,6 +73,6 @@ Hierarchal layout with 60k nodes
 
 Parts of this project use code adapted from:
 
-- Map of Reddit (MIT licensed, © 2021–2025 Andrei Kashcha)
+- [Map of Reddit](https://github.com/anvaka/map-of-reddit)
 
 

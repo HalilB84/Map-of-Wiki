@@ -1,17 +1,15 @@
-export default class SearchManager {
+//to be refactored later
+
+export default class Search {
 	constructor(bus) {
 		this.bus = bus;
 		this.searchInput = document.getElementById("search");
 		this.resultsContainer = document.getElementById("search-results");
-		this.loadingIndicator = document.querySelector(".search-loading");
-		this.searchButton = document.getElementById("search-button");
+		this.loadingIndicator = document.getElementById("loader");
 		this.isDataInitialized = false;
 
-		this.searchWorker = new Worker(new URL("../workers/searchworker.js", import.meta.url), { type: "module" });
+		this.searchWorker = new Worker(new URL("../utils/searchworker.js", import.meta.url), { type: "module" });
 		this.searchWorker.onmessage = (data) => this.handleWorkerMessage(data);
-
-		this.searchButton.addEventListener("click", () => this.performSearch());
-		this.searchInput.addEventListener("input", () => this.clearResults());
 	}
 
 	performSearch() {
@@ -22,7 +20,7 @@ export default class SearchManager {
 			return;
 		}
 
-		this.loadingIndicator.style.display = "block";
+		this.loadingIndicator.style.display = "grid";
 
 		this.searchWorker.postMessage({
 			query: query,
@@ -41,27 +39,26 @@ export default class SearchManager {
 
 	displayResults(results) {
 		if (results.length === 0) {
-			this.resultsContainer.innerHTML = '<div class="search-result-empty">No results found</div>';
+			this.resultsContainer.innerHTML = "<div class='search-result-item'>No results found</div>";
 			this.resultsContainer.style.display = "block";
 			return;
 		}
 
 		this.resultsContainer.innerHTML = results
 			.map((result) => {
-				return `<div class="search-result-item" data-title="${result.target}">${result.target}</div>`;
+				return `<div class="search-result-item">${result.target}</div>`;
 			})
 			.join("");
 
 		this.resultsContainer.style.display = "block";
 
 		this.resultsContainer.querySelectorAll(".search-result-item").forEach((item) => {
-			//uhh is not deleting this bad?
 			item.addEventListener("click", (e) => this.handleResultClick(e));
 		});
 	}
 
-	handleResultClick(event) {
-		const title = event.target.closest(".search-result-item").dataset.title;
+	handleResultClick(e) {
+		const title = e.target.closest(".search-result-item").textContent;
 		this.searchInput.value = "";
 		this.clearResults();
 		this.handleSearchResult(title);

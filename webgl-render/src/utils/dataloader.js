@@ -23,7 +23,6 @@ export default class DataLoader {
 		return allData;
 	}
 
-	// i still dont know how exactly this works, figure it out
 	async loadSingleCSV(filePath, onProgress) {
 		const response = await fetch(filePath);
 		const fileName = filePath.split("/").pop();

@@ -1,64 +1,21 @@
-@media (max-width: 700px) {
-	#search-container {
+@media (max-width: 730px) {
+	#dropdown {
 		top: auto;
-		bottom: 0;
-		left: 50%;
-		transform: translateX(-50%);
-		width: calc(100% - 20px);
-		max-width: 100%;
+		right: auto;
+
+		bottom: 10px;
+		left: 10px;
+		right: 10px;
 	}
 
-	#dropdown-container {
-		top: 0;
-		left: 0;
-		right: 0;
-		transform: none;
-		width: 100%;
-		padding: 4px;
-		flex-direction: row;
-		align-items: center;
-		justify-content: space-between;
-		background: rgba(18, 18, 18, 1);
-		box-sizing: border-box;
-		max-width: 100%;
-	}
-	#dropdown-container label {
-		display: none;
-	}
-	#dropdown-container select {
-		flex: 1;
-		min-width: 100px;
-	}
-	#dropdown-container button {
-		flex: 0 0 auto;
-		min-width: 60px;
-	}
+	#search-wrapper {
+		top: auto;
+		left: auto;
 
-	.overlay-content {
-		max-width: 95%;
-		padding: 20px;
-		margin: 20px 10px;
-	}
-	.overlay-content h1 {
-		font-size: 24px;
-	}
-	.overlay-content p {
-		font-size: 14px;
-		line-height: 1.4;
-	}
-	.intro-section {
-		margin: 20px 0;
-		padding: 15px;
-	}
-	.intro-section h2 {
-		font-size: 20px;
-	}
+		top: 10px;
+		left: 10px;
+		right: 10px;
 
-	.intro-section ul,
-	.intro-section li,
-	.dataset-option strong,
-	.dataset-option span {
-		font-size: 14px;
-		line-height: 1.4;
+		flex-direction: column;
 	}
 }
