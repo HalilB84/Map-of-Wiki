@@ -56,10 +56,6 @@ Most 60k popular articles from September 11, 2024 (Singular Layout). Each Island
 
 ![4th Iteration, with edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_4.png)
 
-Another iteration (Quality dropped because the file size is too big for GitHub)
-
-![5th Iteration, with edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_5_lowered.png)
-
 The latest iteration, has 500k nodes (Hierarchal layout) (It also has the 1 million node version in the Images directory, but you can only see things when zoomed in due to sheer massiveness) 
 
 ![6th Iteration, without edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_6.png)
