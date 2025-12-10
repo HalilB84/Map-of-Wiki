@@ -1,7 +1,7 @@
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 #intro {
@@ -76,10 +76,6 @@
 }
 
 #start {
-	font-family: "Departure Mono";
-	font-size: 16px;
-	font-weight: normal;
-
 	position: relative;
 	z-index: 0;
 

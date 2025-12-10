@@ -21,6 +21,7 @@ export default class UI {
 		this.canvas.addEventListener("mouseup", () => {
 			this.bus.controls.handleMouseUp();
 		});
+		
 		this.canvas.addEventListener("mouseleave", () => {
 			this.bus.controls.handleMouseUp();
 		});
@@ -32,6 +33,7 @@ export default class UI {
 		this.canvas.addEventListener("mousemove", (e) => {
 			this.bus.controls.handleMouseMove(e);
 		});
+
 		this.canvas.addEventListener(
 			"touchmove",
 			(e) => {
@@ -47,6 +49,7 @@ export default class UI {
 			},
 			{ passive: true },
 		);
+		
 		this.canvas.addEventListener("click", (e) => {
 			this.bus.controls.handleClick(e);
 		});
@@ -54,6 +57,7 @@ export default class UI {
 		document.getElementById("random-button").addEventListener("click", () => {
 			this.bus.controls.goToRandomArticle();
 		});
+
 		window.addEventListener("resize", () => {
 			this.bus.webgl.resizeCanvas();
 			this.bus.controls.handleResize();
@@ -69,17 +73,22 @@ export default class UI {
 		}
 
 		//search
+		this.searchInput = document.getElementById("search");
+		this.loadingIndicator = document.getElementById("loader");
+		this.resultsContainer = document.getElementById("search-results");
+
 		document.getElementById("search-button").addEventListener("click", () => {
-			this.bus.search.performSearch();
+			this.bus.search.performSearch(this.searchInput.value.trim());
 		});
 
 		document.getElementById("search").addEventListener("input", () => {
-			this.bus.search.clearResults();
+			this.clearResults();
 		});
 
 		//main
 		const introOverlay = document.getElementById("intro");
 		const startButton = document.getElementById("start");
+
 		document.getElementById("load-button").addEventListener("click", () => {
 			this.bus.visualization.initialize(document.getElementById("selected").value);
 		});
@@ -116,6 +125,44 @@ export default class UI {
 		this.pctEl = document.getElementById("loading-percent");
 	}
 
+	//search
+	clearResults() {
+		this.resultsContainer.innerHTML = "";
+		this.resultsContainer.style.display = "none";
+	}
+
+	toggleSearchLoading(show) {
+		this.loadingIndicator.style.display = show ? "grid" : "none";
+	}
+
+	displayResults(results) {
+		if (results.length === 0) {
+			this.resultsContainer.innerHTML = "<div class='search-result-item'>No results found</div>";
+			this.resultsContainer.style.display = "block";
+			return;
+		}
+
+		this.resultsContainer.innerHTML = results
+			.map((result) => {
+				return `<div class="search-result-item">${result.target}</div>`;
+			})
+			.join("");
+
+		this.resultsContainer.style.display = "block";
+
+		this.resultsContainer.querySelectorAll(".search-result-item").forEach((item) => {
+			item.addEventListener("click", (e) => this.handleResultClick(e));
+		});
+	}
+
+	handleResultClick(e) {
+		const title = e.target.closest(".search-result-item").textContent;
+		this.searchInput.value = "";
+		this.clearResults();
+		this.bus.search.handleSearchResult(title);
+	}
+
+	//main
 	setProgress(progress) {
 		this.pctEl.textContent = `${progress}%`;
 	}

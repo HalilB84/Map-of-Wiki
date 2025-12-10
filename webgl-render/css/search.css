@@ -2,6 +2,7 @@
 	position: fixed;
 	top: 10px;
 	left: 10px;
+	max-width: 40%;
 	z-index: 1;
 
 	display: flex;
@@ -11,24 +12,22 @@
 	display: flex;
 	flex-direction: column;
 
+	width: 100%;
+
 	gap: 5px;
 }
 
 .search-row {
 	display: flex;
-
 	gap: 5px;
 }
 
 #search {
-	font-family: "Departure Mono";
-	font-size: 16px;
-	font-weight: normal;
-
 	background: #000000;
 	border: 1px solid #ffffff;
 	color: #ffffff;
 	padding: 0px 15px 0px 15px;
+	min-width: 0;
 }
 
 #search::placeholder {
@@ -49,10 +48,6 @@
 
 #search-button,
 #random-button {
-	font-family: "Departure Mono";
-	font-size: 16px;
-	font-weight: normal;
-
 	position: relative;
 	z-index: 0;
 
@@ -88,6 +83,10 @@
 	transition:
 		color 0.25s ease,
 		background-color 0.25s ease;
+
+	overflow: hidden;
+	text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 @media (hover: hover) {

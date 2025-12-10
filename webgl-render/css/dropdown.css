@@ -4,6 +4,8 @@
 	right: 10px;
 	z-index: 1;
 
+	max-width: 40%;
+
 	display: flex;
 	flex-direction: column;
 
@@ -11,9 +13,6 @@
 }
 
 #selected {
-	font-family: "Departure Mono";
-	font-size: 16px;
-
 	background: #000000;
 	color: #ffffff;
 	border: 1px solid #ffffff;
@@ -25,10 +24,6 @@
 }
 
 #load-button {
-	font-family: "Departure Mono";
-	font-size: 16px;
-	font-weight: normal;
-
 	position: relative;
 	z-index: 0;
 
