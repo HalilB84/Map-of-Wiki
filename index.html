@@ -16,8 +16,8 @@
 
 			gtag("config", "G-HTVMYJR7TY");
 		</script>
-		<script type="module" crossorigin src="/assets/index-D079B31L.js"></script>
-		<link rel="stylesheet" crossorigin href="/assets/index-CWx3hzU5.css">
+		<script type="module" crossorigin src="/assets/index-D19X6aL2.js"></script>
+		<link rel="stylesheet" crossorigin href="/assets/index-BohrBXHL.css">
 	</head>
 	<body>
 		<div id="intro">
@@ -26,24 +26,23 @@
 			<h2>About this Project</h2>
 			<p>What you will see is a graphical representation of Wikipedia. Each circle represents an article in the English Wikipedia.</p>
 			<p>The size of a circle depends on how many real pageviews it got on a particular day. For example you will see that the Main Wikipedia article is the biggest one as it gets the most views.</p>
-			<p>The placement of the circles is based on the links between the articles. The more closely linked the two articles are, the closer they appear.</p>
-			<p>The current algorithm for the placement of the circles is naive, includes randomness and is not totally accurate. This will be improved (hopefully).</p>
+			<p>The placement of the circles is based on the links between the articles. The more closely linked the two articles are, the closer they appear. The current algorithm for the placement of the circles is naive, includes randomness and is not totally accurate. This will be improved (hopefully).</p>
 
 			<h2>Choose a Dataset</h2>
 			<p>Select the size of the Wikipedia map you'd like to explore. The larger the dataset you choose, the more accurate the placement will be.</p>
 
 			<div class="dataset-option">
-				<input type="radio" id="dataset-60k" name="dataset" value="/layouts/layout60k-Sep-10-2024.csv" />
+				<input id="dataset-60k" type="radio" name="dataset" value="/layouts/layout60k-Sep-10-2024.csv" />
 				<label for="dataset-60k"> 60,000 Articles (September 10, 2024) Recommended for very slow computers and phones. </label>
 			</div>
 
 			<div class="dataset-option">
-				<input type="radio" id="dataset-500k" name="dataset" value="/layouts/layout500k-Sep-10-2024.csv" checked />
+				<input id="dataset-500k" type="radio" name="dataset" value="/layouts/layout500k-Sep-10-2024.csv" checked />
 				<label for="dataset-500k"> 500,000 Articles (September 10, 2024) Should run decently in any computer or phone. </label>
 			</div>
 
 			<div class="dataset-option">
-				<input type="radio" id="dataset-1m" name="dataset" value="/layouts/layout1m-part1-Sep-10-2024.csv,/layouts/layout1m-part2-Sep-10-2024.csv" />
+				<input id="dataset-1m" type="radio" name="dataset" value="/layouts/layout1m-part1-Sep-10-2024.csv,/layouts/layout1m-part2-Sep-10-2024.csv" />
 				<label for="dataset-1m"> 1,000,000 Articles (September 10, 2024) Runs 60fps on my ThinkPad L13. Probably runs well on mid-high end devices. </label>
 			</div>
 
@@ -83,7 +82,7 @@
 		<div id="search-wrapper">
 			<div id="search-box">
 				<div class="search-row">
-					<input type="text" id="search" placeholder="Search an article..." autocomplete="off" />
+					<input id="search" type="text" placeholder="Search an article..." autocomplete="off" />
 					<button id="search-button">Search</button>
 				</div>
 
@@ -104,7 +103,7 @@
 
 			<div id="sensitivity">
 				<label for="sensitivity-range">Mouse/Trackpad sensitivity:</label>
-				<input type="range" id="sensitivity-range" name="sensitivity" min="0" max="100" value="50" autocomplete="off" />
+				<input id="sensitivity-range" type="range" name="sensitivity" min="0" max="100" value="50" autocomplete="off" />
 				<span id="sensitivity-value">50</span>
 			</div>
 		</div>
