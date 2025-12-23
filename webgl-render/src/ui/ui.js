@@ -21,7 +21,7 @@ export default class UI {
 		this.canvas.addEventListener("mouseup", () => {
 			this.bus.controls.handleMouseUp();
 		});
-		
+
 		this.canvas.addEventListener("mouseleave", () => {
 			this.bus.controls.handleMouseUp();
 		});
@@ -49,7 +49,7 @@ export default class UI {
 			},
 			{ passive: true },
 		);
-		
+
 		this.canvas.addEventListener("click", (e) => {
 			this.bus.controls.handleClick(e);
 		});
@@ -65,7 +65,7 @@ export default class UI {
 
 		document.getElementById("sensitivity-range").addEventListener("input", (e) => {
 			this.bus.controls.sensitivity = e.target.value / 25000;
-			document.getElementById("sensitivity-value").textContent = e.target.value;
+			document.getElementById("sensitivity-value").textContent = e.target.value.padStart(3, "0");
 		});
 
 		if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {

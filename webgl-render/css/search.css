@@ -86,7 +86,7 @@
 
 	overflow: hidden;
 	text-overflow: ellipsis;
-    white-space: nowrap;
+	white-space: nowrap;
 }
 
 @media (hover: hover) {
@@ -110,8 +110,8 @@
 #loader {
 	display: none;
 
-	margin-top: 20px;
-	margin-left: 20px;
+	margin-top: 27px;
+	margin-left: 22px;
 
 	width: 15px;
 	height: 15px;

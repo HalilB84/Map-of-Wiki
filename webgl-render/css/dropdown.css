@@ -62,6 +62,9 @@
 	align-items: center;
 	background: #000000;
 
+	border: 1px solid #ffffff;
+	padding: 4px;
+
 	gap: 4px;
 }
 
