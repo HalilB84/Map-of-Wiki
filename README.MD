@@ -67,6 +67,6 @@ Hierarchal layout with 60k nodes
 
 
 ## License & Attribution
-Parts of this project are based on code from [Map of Reddit](https://github.com/anvaka/map-of-reddit) ([ Andrei Kashcha ](https://github.com/anvaka)), used under the MIT License.
+Parts of this project are based on code from [Map of Reddit](https://github.com/anvaka/map-of-reddit) ([Andrei Kashcha](https://github.com/anvaka)), used under the MIT License.
 
 
