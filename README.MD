@@ -11,7 +11,7 @@ After the data is loaded, I perform community detection on all the data using Le
 
 The custom graph layout is a simple algorithm that arranges nodes in either a random or spiral pattern. The reason it looks like similar communities are together is that apply Leiden's alg hierarchically. Basically, I first perform Leiden's alg on the entire data. Say that gives 15 distinct communities, these are randomly or in spiral placed in the circle (also, I make sure there is no overlap). Then I do the exact same thing on every sub-community. This worked out to some extent, but it is nothing close to actual graphing algorithms. 
 
-The last stage is the WebGL renderer. I initially started with Matplotlib, but that only goes so far. After looking at Map of Reddit's source code and learning cosmos.gl exists, I understood that WebGL was the way to go. WebGL wise, It was two simple shaders adapted from the Map of Reddit code (circles and MSDF text). Then I created a small website for all the user interactions. Finally as a last updated switched to Three.js because less code with the same functionality is something I love.  
+The last stage is the WebGL renderer. I initially started with Matplotlib, but that only goes so far. After looking at Map of Reddit's source code and learning cosmos.gl exists, I understood that WebGL was the way to go. WebGL wise, It was two simple shaders adapted from the Map of Reddit code (circles and MSDF text). Then I created a small website for all the user interactions. Finally as a last update, I switched to Three.js because less code with the same functionality is something I love.  
 
 Just as a heads up, when I was first working on this, I used AI generated code extensively without understanding the basics of graphics and webdev. Because of the guilt of not understanding and not writing the code, I have since properly learned things and rewrote a good portion of the code. I am putting this here as a personal note to myself for future reference, as this was a big life lesson to me.   
 
@@ -45,7 +45,7 @@ Since I've done this project, I have come across better ways to map this data. I
  - ~~screen space to world space (for clicking and text optimization)~~
  - ~~Make it usable for mobile -> Partly done~~
  - ~~Implement a web worker for fuzzysort~~
- - ~~Create better UI / Rewrite the entire codebase~~ -> Done part 1
+ - ~~Create better UI / Rewrite the entire codebase -> Done part 1 -> Done part 2~~
 
 ## Photos
 
