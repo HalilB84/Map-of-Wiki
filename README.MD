@@ -14,6 +14,7 @@ The custom graph layout is a simple algorithm that arranges nodes in either a ra
 The last stage is the WebGL renderer. I initially started with Matplotlib, but that only goes so far. After looking at Map of Reddit's source code and learning cosmos.gl exists, I understood that WebGL was the way to go. WebGL wise, It was two simple shaders adapted from the Map of Reddit code (circles and MSDF text). Then I created a small website for all the user interactions. Finally as a last updated switched to Three.js because less code with the same functionality is something I love.  
 
 Just as a heads up, when I was first working on this, I used AI generated code extensively without understanding the basics of graphics and webdev. Because of the guilt of not understanding and not writing the code, I have since properly learned things and rewrote a good portion of the code. I am putting this here as a personal note to myself for future reference, as this was a big life lesson to me.   
+The last stage is the WebGL renderer. I initially started with Matplotlib, but that only goes so far. After looking at Map of Reddit's source code and learning cosmos.gl exists, I understood that WebGL was the way to go. WebGL wise, there is nothing fancy going on. It's just two simple shaders, one for rendering circles and the other for the article titles (which both work by rendering quads and discarding fragments to get the shape). These were both adapted from Map of Reddit. Then I created a small website for all the user interactions. Probably the biggest mistake here was relying on AI too much. I went into this with no preexisting webdev knowledge, so the extremely fast progress with AI gen code blinded me. Then I had to learn everything from scratch after realizing I didn't understand the code. Big lesson to my future self.
 
 That's it. I hereby declare this project complete. I want to do this bigger and better after learning how to apply force-directed layouts for millions of nodes and edges using GPU/AI magic. But till then, I'll just fix small things and reorganize code. 
 
@@ -64,5 +65,8 @@ Hierarchal layout with 60k nodes
 ![6.5th Iteration, without edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_6.5.png)
 
 
+
+## License & Attribution
+Parts of this project are based on code from [Map of Reddit](https://github.com/anvaka/map-of-reddit) ([Andrei Kashcha](https://github.com/anvaka)), used under the MIT License.
 
 
