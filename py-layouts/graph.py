@@ -26,7 +26,7 @@ for i in range(g.vcount()):
      g.vs[i]['y'] = 0
 
 
-#fix nodes with no links / still havent fixed this
+#fix nodes with no links -> never happening
 _max = node_data['count'].iloc[0]
 for index, row in node_data.iterrows():
 
@@ -83,7 +83,6 @@ ax.set_axis_off()
 
 print(f'rendering stage... {time.time() - start_time:.2f} seconds')
 
-#uncomment this to draw edges
 '''
 segments = []
 line_colors = []

@@ -2,7 +2,7 @@ import math
 import random
 
 class RandomBoxLayout:
-    """A layout that places circles randomly within a defined box."""
+    #puts circles randomly in a box and checks collision 
     def __init__(self, nodes, axis_limits):
         self.coordinates = []
         self.placed_circles = []

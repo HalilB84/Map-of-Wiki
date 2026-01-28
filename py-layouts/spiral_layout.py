@@ -1,7 +1,7 @@
 import math
 
 class SpiralLayout:
-    """A layout that arranges nodes in a spiral pattern."""
+    #below is bad way I came up with putting circles in a spiral without overapping, math can probably be simplified a lot. 
     def __init__(self, nodes):
         self.nodes = nodes[:] 
         self.coordinates = [[0, 0, self.nodes[0][1]]]  
@@ -13,7 +13,7 @@ class SpiralLayout:
         while(len(self.nodes)!=0):
             self._arrange_nodes()
 
-    def _get_intersections(self, x0, y0, r0, x1, y1, r1):
+    def _get_intersections(self, x0, y0, r0, x1, y1, r1): 
         d = math.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2)
 
         if d > r0 + r1 or d < abs(r0 - r1) or (d == 0 and r0 == r1):

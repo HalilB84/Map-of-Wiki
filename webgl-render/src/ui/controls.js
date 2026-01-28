@@ -1,5 +1,5 @@
-export default class Controls {
-	constructor(bus) {
+export class Controls {
+	constructor(state) {
 		this.zoomLevel = 0;
 		this.cameraX = 0;
 		this.cameraY = 0;
@@ -22,8 +22,9 @@ export default class Controls {
 		this.sensitivity = 0.002;
 		this.lastTouchDistance = null;
 
-		this.bus = bus;
-		this.lastAspectRatio = this.bus.webgl.canvas.width / this.bus.webgl.canvas.height;
+		this.state = state;
+
+		this.lastAspectRatio = this.state.width / this.state.height;
 	}
 
 	handleMouseDown(e) {
@@ -127,7 +128,7 @@ export default class Controls {
 	}
 
 	handleResize() {
-		const currentAspectRatio = this.bus.webgl.canvas.width / this.bus.webgl.canvas.height;
+		const currentAspectRatio = this.state.width / this.state.height;
 
 		if ((this.lastAspectRatio > 1 && currentAspectRatio < 1) || (this.lastAspectRatio < 1 && currentAspectRatio > 1)) {
 			this.cameraX = 0;
@@ -140,7 +141,7 @@ export default class Controls {
 	}
 
 	screenToWorld(screenX, screenY) {
-		const rect = this.bus.webgl.canvas.getBoundingClientRect(); //the correct way to get size
+		const rect = this.state.canvas.getBoundingClientRect();
 
 		const canvasX = (screenX - rect.left) / rect.width;
 		const canvasY = (screenY - rect.top) / rect.height;
@@ -148,7 +149,7 @@ export default class Controls {
 		const ndcX = canvasX * 2 - 1;
 		const ndcY = -(canvasY * 2 - 1);
 
-		const viewWidth = (this.zoomLevel * this.bus.webgl.canvas.width) / this.bus.webgl.canvas.height;
+		const viewWidth = (this.zoomLevel * this.state.width) / this.state.height;
 		const viewHeight = this.zoomLevel;
 
 		const worldX = this.cameraX + (ndcX * viewWidth) / 2;
@@ -158,14 +159,13 @@ export default class Controls {
 	}
 
 	getMaxZoomLevel() {
-		if (!this.bus.data) return;
+		if (!this.state.data) return;
 
-		const [minx, miny, maxx, maxy] = this.bus.data.axisLimits;
+		const [minx, miny, maxx, maxy] = this.state.data.axisLimits;
 		const worldWidth = maxx - minx;
 		const worldHeight = maxy - miny;
 
-		const canvas = this.bus.webgl.canvas;
-		const aspectRatio = canvas.width / canvas.height;
+		const aspectRatio = this.state.width / this.state.height;
 
 		const maxHeightW = worldWidth / aspectRatio;
 		const maxHeightH = worldHeight;
@@ -272,7 +272,7 @@ export default class Controls {
 		const worldPos = this.screenToWorld(e.clientX, e.clientY);
 		//console.log("cursor", worldPos);
 
-		const { offsets, sizes, ids, titles, numItems } = this.bus.data;
+		const { offsets, sizes, ids, titles, numItems } = this.state.data;
 
 		for (let i = 0; i < numItems; i++) {
 			const cx = offsets[i * 2];
@@ -307,11 +307,11 @@ export default class Controls {
 	}
 
 	goToRandomArticle() {
-		const randomIndex = Math.floor(Math.random() * this.bus.data.numItems);
+		const randomIndex = Math.floor(Math.random() * this.state.data.numItems);
 
-		const targetX = this.bus.data.offsets[randomIndex * 2];
-		const targetY = this.bus.data.offsets[randomIndex * 2 + 1];
-		const targetZoom = this.bus.data.sizes[randomIndex] * 5;
+		const targetX = this.state.data.offsets[randomIndex * 2];
+		const targetY = this.state.data.offsets[randomIndex * 2 + 1];
+		const targetZoom = this.state.data.sizes[randomIndex] * 5;
 
 		this.smoothTransition(targetX, targetY, targetZoom, true);
 	}

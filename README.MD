@@ -9,9 +9,11 @@ All of the data is collected from Wikimedia data dumps. Then, with some basic Py
 
 After the data is loaded, I perform community detection on all the data using Leiden's algorithm from [this package](https://github.com/vtraag/leidenalg). Now here it gets a little weird. Early on, I dabbled with graphing tools a lot (like Gephi), which were either impossible to render due to the size or limited in the features I wanted. Normally, graphs like this are rendered using force-directed algorithms. However, I had no idea how I would make it work since implementing one myself looked grim, and all other existing tools didn't exactly give what I wanted. Instead, I had the brilliant idea of making one myself /s. 
 
-The custom graph layout is a simple algorithm that arranges nodes in either a random or spiral pattern. The reason it looks like similar communities are together is that I use a hierarchical Leiden's pass. Basically, I first perform Leiden's algorithm on the entire data. Say that gives 15 distinct communities, these are randomly or in spiral placed in the circle (also, I make sure there is no overlap). Then I do the exact same thing on every sub-community. This worked out to some extent, but it is nothing close to actual graphing algorithms. 
+The custom graph layout is a simple algorithm that arranges nodes in either a random or spiral pattern. The reason it looks like similar communities are together is that apply Leiden's alg hierarchically. Basically, I first perform Leiden's alg on the entire data. Say that gives 15 distinct communities, these are randomly or in spiral placed in the circle (also, I make sure there is no overlap). Then I do the exact same thing on every sub-community. This worked out to some extent, but it is nothing close to actual graphing algorithms. 
 
-The last stage is the WebGL renderer. I initially started with Matplotlib, but that only goes so far. After looking at Map of Reddit's source code and learning cosmos.gl exists, I understood that WebGL was the way to go. WebGL wise, there is nothing fancy going on. It's just two simple fragment shaders, one for rendering circles and the other for the article titles. These were both adapted from Map of Reddit. Then I created a small website for all the user interactions. Probably the biggest mistake here was relying on AI too much. I went into this with no preexisting webdev knowledge, so the extremely fast progress with AI gen code blinded me. Then I had to learn everything from scratch after realizing I didn't understand the code. Big lesson to my future self.
+The last stage is the WebGL renderer. I initially started with Matplotlib, but that only goes so far. After looking at Map of Reddit's source code and learning cosmos.gl exists, I understood that WebGL was the way to go. WebGL wise, It was two simple shaders adapted from the Map of Reddit code (circles and MSDF text). Then I created a small website for all the user interactions. Finally as a last updated switched to Three.js because less code with the same functionality is something I love.  
+
+Just as a heads up, when I was first working on this, I used AI generated code extensively without understanding the basics of graphics and webdev. Because of the guilt of not understanding and not writing the code, I have since properly learned things and rewrote a good portion of the code. I am putting this here as a personal note to myself for future reference, as this was a big life lesson to me.   
 
 That's it. I hereby declare this project complete. I want to do this bigger and better after learning how to apply force-directed layouts for millions of nodes and edges using GPU/AI magic. But till then, I'll just fix small things and reorganize code. 
 
@@ -30,11 +32,9 @@ Since I've done this project, I have come across better ways to map this data. I
 - ~~rewrite the entire code - Very High Priority -> In progress _> Done!~~
 - ~~Fix labels -> no improvement -> will solve this by using an interactive renderer on the browser~~
 - ~~interactive website? -> Would it solve the problem of labels and edges -> Webgl renderer? -> Proof of concept is done it seems to work~~
-- Create a new layout (force-directed) -> needs extensive research
-- Look into creating animations -> need to have a force-directed layout
-- Highly possible change of switching to wikitext parsing for better layout results 
+- Create a new layout (force-directed) -> new project
 
-## TODO (For the webgl renderer)
+## TODO (For the renderer)
 
  - ~~Understand instanced rendering and create circles (Tested up to 5 million with no issues)~~
  - ~~instanced MSDF text rendering for text placement, which is harder than I thought, but it is possible. Working on it -> Done!~~
@@ -45,12 +45,11 @@ Since I've done this project, I have come across better ways to map this data. I
  - ~~screen space to world space (for clicking and text optimization)~~
  - ~~Make it usable for mobile -> Partly done~~
  - ~~Implement a web worker for fuzzysort~~
- - fix camera distance performance -> no idea
  - ~~Create better UI / Rewrite the entire codebase~~ -> Done part 1
 
 ## Photos
 
-Many of these photos are from the first iterations, now the best way to view them is by using the WebGL renderer. Although I will update some of these and just keep it here anyway.
+Many of these photos are from the first iterations, now the best way to view them is by using the renderer. Although I will update some of these and just keep it here anyway.
 
 Most 60k popular articles from September 11, 2024 (Singular Layout). Each Island indicates a different community. To see everything, you need to download the file and zoom in.
 
@@ -65,10 +64,5 @@ Hierarchal layout with 60k nodes
 ![6.5th Iteration, without edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_6.5.png)
 
 
-## Credits
-
-Parts of this project use code adapted from:
-
-- [Map of Reddit](https://github.com/anvaka/map-of-reddit)
 
 

@@ -1,43 +1,43 @@
 import Stats from "stats-gl";
-export default class UI {
-	constructor(bus) {
-		this.bus = bus;
+export class UI {
+	constructor(state) {
+		this.state = state;
 
 		//controls
-		this.canvas = document.getElementById("webgl");
+		this.canvas = this.state.canvas;
 
 		this.canvas.addEventListener("mousedown", (e) => {
-			this.bus.controls.handleMouseDown(e);
+			this.state.controls.handleMouseDown(e);
 		});
 
 		this.canvas.addEventListener(
 			"touchstart",
 			(e) => {
-				this.bus.controls.handleTouchStart(e);
+				this.state.controls.handleTouchStart(e);
 			},
 			{ passive: false },
 		);
 
 		this.canvas.addEventListener("mouseup", () => {
-			this.bus.controls.handleMouseUp();
+			this.state.controls.handleMouseUp();
 		});
 
 		this.canvas.addEventListener("mouseleave", () => {
-			this.bus.controls.handleMouseUp();
+			this.state.controls.handleMouseUp();
 		});
 
 		this.canvas.addEventListener("touchend", () => {
-			this.bus.controls.handleTouchEnd();
+			this.state.controls.handleTouchEnd();
 		});
 
 		this.canvas.addEventListener("mousemove", (e) => {
-			this.bus.controls.handleMouseMove(e);
+			this.state.controls.handleMouseMove(e);
 		});
 
 		this.canvas.addEventListener(
 			"touchmove",
 			(e) => {
-				this.bus.controls.handleTouchMove(e);
+				this.state.controls.handleTouchMove(e);
 			},
 			{ passive: false },
 		);
@@ -45,26 +45,26 @@ export default class UI {
 		this.canvas.addEventListener(
 			"wheel",
 			(e) => {
-				this.bus.controls.handleZoom(e);
+				this.state.controls.handleZoom(e);
 			},
 			{ passive: true },
 		);
 
 		this.canvas.addEventListener("click", (e) => {
-			this.bus.controls.handleClick(e);
+			this.state.controls.handleClick(e);
 		});
 
 		document.getElementById("random-button").addEventListener("click", () => {
-			this.bus.controls.goToRandomArticle();
+			this.state.controls.goToRandomArticle();
 		});
 
 		window.addEventListener("resize", () => {
-			this.bus.webgl.resizeCanvas();
-			this.bus.controls.handleResize();
+			this.state.resize();
+			this.state.controls.handleResize();
 		});
 
 		document.getElementById("sensitivity-range").addEventListener("input", (e) => {
-			this.bus.controls.sensitivity = e.target.value / 25000;
+			this.state.controls.sensitivity = e.target.value / 25000;
 			document.getElementById("sensitivity-value").textContent = e.target.value.padStart(3, "0");
 		});
 
@@ -78,7 +78,7 @@ export default class UI {
 		this.resultsContainer = document.getElementById("search-results");
 
 		document.getElementById("search-button").addEventListener("click", () => {
-			this.bus.search.performSearch(this.searchInput.value.trim());
+			this.state.search.performSearch(this.searchInput.value.trim());
 		});
 
 		document.getElementById("search").addEventListener("input", () => {
@@ -90,7 +90,7 @@ export default class UI {
 		const startButton = document.getElementById("start");
 
 		document.getElementById("load-button").addEventListener("click", () => {
-			this.bus.visualization.initialize(document.getElementById("selected").value);
+			this.state.initialize(document.getElementById("selected").value);
 		});
 
 		startButton.addEventListener("click", () => {
@@ -98,11 +98,11 @@ export default class UI {
 
 			introOverlay.style.display = "none";
 
-			this.bus.visualization.initialize(initialSelected);
+			this.state.initialize(initialSelected);
 		});
 
 		this.stats = new Stats({
-			trackGPU: false,
+			trackGPU: true,
 			trackHz: false,
 			trackCPT: false,
 			logsPerSecond: 4,
@@ -159,7 +159,7 @@ export default class UI {
 		const title = e.target.closest(".search-result-item").textContent;
 		this.searchInput.value = "";
 		this.clearResults();
-		this.bus.search.handleSearchResult(title);
+		this.state.search.handleSearchResult(title);
 	}
 
 	//main

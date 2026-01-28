@@ -1,23 +1,11 @@
-"""
-Scripts to process Wikipedia SQL dumps into a usable CSV format.
-
-WARNING:
-- The code is not optimized for speed or memory usage, but it is faster than SQL imports
-- Right now works fine but there are many edge cases that might break in the future
-- Tested on an Intel Core Ultra 5 125U, 8GB RAM laptop with ~30 minutes execution time (to run all scripts) for all eng wiki articles.
-
-NOTE:
-- Handles large datasets (~30M - 800M rows) and is memory-intensive.
-- Files not included for storage reasons; all data is from Wikipedia dumps
-"""
-
+#bad code with bare bones for what I needed
 import csv
 
-map_page = {}           # Maps page IDs to titles (~6.7M entries expected)
-page_id_cnt = {}        # Tracks page view counts and titles
-link_target_remap = {}  # Remaps link targets to page IDs
+map_page = {} #should be the size of wikipedia en articles      
+page_id_cnt = {} 
+link_target_remap = {}  
 
-# Function to parse ~60M rows and extract titles and IDs for non-redirect pages
+#60M rows of parsing to make sure we only get non redirect wiki pages and maps the page id of the article to the title
 def title_id_extract(filename):
     with open(filename, 'r', encoding='utf-8', errors="replace") as file:
         reader = csv.reader(file)
@@ -28,14 +16,14 @@ def title_id_extract(filename):
 
             page_id, namespace, title, redirect = int(row[0]), int(row[1]), row[2], int(row[3])
             if namespace == 0 and redirect == 0:
-                map_page[page_id] = title  # Map page ID to title
+                map_page[page_id] = title  
 
             dbg += 1
 
             if dbg % 1_000_000 == 0:
                 print(f"Processed {dbg} rows in title_id_extract")
 
-# Function to parse ~33M rows and remap link targets to page IDs
+#33M rows of me not understanding why wikipedia would have link targets? Not sure how this worked but links between articles are not just plain article ids, there is a middleman which is what this is
 def remap(filename):
     with open(filename, 'r') as file:
         reader = csv.reader(file)
@@ -53,7 +41,7 @@ def remap(filename):
             if dbg % 1_000_000 == 0:
                 print(f"Processed {dbg} rows in remap")
 
-# Function to parse ~796M rows, filter links to actual articles, and write to a CSV
+#800M rows of linkes between articles but needs above function
 def page2page(input_filename, output_filename):
     with open(input_filename, 'r') as file:
         reader = csv.reader(file)
@@ -75,7 +63,7 @@ def page2page(input_filename, output_filename):
                 if cnt % 1_000_000 == 0:
                     print(f"Processed {cnt} rows in page2page")
 
-# Function to extract node data and write sorted page views and titles to a CSV
+#finally just tidy things up here and boom
 def get_nodes(input_filename, output_filename, top_n=None):
 
     with open(input_filename, 'r', encoding='utf-8') as txt_file:
@@ -115,7 +103,7 @@ def get_nodes(input_filename, output_filename, top_n=None):
 
         print(f"Top {top_n} nodes saved to {output_filename}")
 
-# Function to generate edges between pages and write to a CSV
+#helper function after remapping
 def generate_edges(input_nodes_file, input_links_file, output_edges_file):
     arc = {}
     with open(input_nodes_file, 'r') as file:

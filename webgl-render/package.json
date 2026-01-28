@@ -15,6 +15,9 @@
   },
   "dependencies": {
     "fuzzysort": "^3.1.0",
-    "papaparse": "^5.5.1"
+    "papaparse": "^5.5.1",
+    "stats-gl": "^3.8.0",
+    "three": "^0.182.0",
+    "troika-three-text": "^0.52.4"
   }
 }

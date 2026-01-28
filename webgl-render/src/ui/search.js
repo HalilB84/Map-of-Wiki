@@ -1,8 +1,8 @@
 //to be refactored later
 
-export default class Search {
-	constructor(bus) {
-		this.bus = bus;
+export class Search {
+	constructor(state) {
+		this.state = state;
 
 		this.isDataInitialized = false;
 
@@ -12,15 +12,15 @@ export default class Search {
 
 	performSearch(query) {
 		if (!query) {
-			this.bus.ui.clearResults();
+			this.state.ui.clearResults();
 			return;
 		}
 
-		this.bus.ui.toggleSearchLoading(true);
+		this.state.ui.toggleSearchLoading(true);
 
 		this.searchWorker.postMessage({
 			query: query,
-			titles: this.isDataInitialized ? null : this.bus.data.titles,
+			titles: this.isDataInitialized ? null : this.state.data.titles,
 			options: { limit: 5 },
 		});
 
@@ -29,18 +29,18 @@ export default class Search {
 
 	handleWorkerMessage(data) {
 		const { results } = data.data;
-		this.bus.ui.displayResults(results);
-		this.bus.ui.toggleSearchLoading(false);
+		this.state.ui.displayResults(results);
+		this.state.ui.toggleSearchLoading(false);
 	}
 
 	handleSearchResult(title) {
-		const index = this.bus.data.titles.indexOf(title);
+		const index = this.state.data.titles.indexOf(title);
 		if (index === -1) return;
 
-		const targetX = this.bus.data.offsets[index * 2];
-		const targetY = this.bus.data.offsets[index * 2 + 1];
-		const targetZoom = this.bus.data.sizes[index] * 5;
+		const targetX = this.state.data.offsets[index * 2];
+		const targetY = this.state.data.offsets[index * 2 + 1];
+		const targetZoom = this.state.data.sizes[index] * 5;
 
-		this.bus.controls.smoothTransition(targetX, targetY, targetZoom, true);
+		this.state.controls.smoothTransition(targetX, targetY, targetZoom, true);
 	}
 }

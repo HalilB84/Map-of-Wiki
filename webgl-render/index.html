@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<meta charset="UTF-8" />
+		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Map of Wikipedia</title>
 
@@ -70,14 +70,12 @@
 
 			<p><a href="https://github.com/HalilB84/Map-of-Wiki" target="_blank">Source Code on GitHub</a></p>
 			<p>Data is collected from Wikimedia dumps</p>
-			<p>Uses Leiden algorithm for community detection (and to build the graph itself)</p>
-			<p>Custom built graph layout algorithm (very naive tho)</p>
-			<p>WebGL based rendering for high performance</p>
+			<p>Uses Leiden algorithm for community detection and to build the graph itself</p>
+			<p>Custom built graph layout algorithm (naive)</p>
+			<p>WebGL (Three.js) with instanced rendering + troika-three-text</p>
 		</div>
 
 		<!-- seperation -->
-		<canvas id="webgl"></canvas>
-
 		<div id="search-wrapper">
 			<div id="search-box">
 				<div class="search-row">

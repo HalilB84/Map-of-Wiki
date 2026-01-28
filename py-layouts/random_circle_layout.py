@@ -2,7 +2,7 @@ import math
 import random
 
 class RandomCircleLayout:
-    """A layout that places circles randomly within a defined circular area."""
+    #just put circles randomly and check for collision although it has that ring thingy i never figured out. 
     def __init__(self, nodes):
         self.placed_circles = []
         self.radius = nodes[0][0] 
@@ -18,7 +18,7 @@ class RandomCircleLayout:
         while True:
             dbg += 1
             if dbg % 1000 == 0:
-                print(index, 'Most likely stuck in infinite loop. Increasing radius')
+                print(index, 'most likely stuck. Increase limits')
                 self.radius += size * 2
                 self.max_radius = max(self.max_radius, self.radius)
 
