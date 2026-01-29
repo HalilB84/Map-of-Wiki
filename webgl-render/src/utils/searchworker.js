@@ -2,7 +2,7 @@ import fuzzysort from "fuzzysort";
 
 let storedTitles = null;
 
-self.onmessage = function (data) {
+self.addEventListener("message", (data) => {
 	const { query, titles, options } = data.data;
 
 	if (titles !== null) {
@@ -14,4 +14,4 @@ self.onmessage = function (data) {
 	self.postMessage({
 		results: results,
 	});
-};
+});

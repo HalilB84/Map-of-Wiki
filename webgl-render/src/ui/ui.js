@@ -102,7 +102,7 @@ export class UI {
 		});
 
 		this.stats = new Stats({
-			trackGPU: true,
+			trackGPU: false,
 			trackHz: false,
 			trackCPT: false,
 			logsPerSecond: 4,
@@ -111,17 +111,16 @@ export class UI {
 			samplesGraph: 10,
 			precision: 2,
 			horizontal: true,
-			minimal: false,
+			minimal: true,
 			mode: 0,
-		});
+		});		
 
-		this.stats.dom.style.position = "fixed";
-		this.stats.dom.style.bottom = "45px";
-		this.stats.dom.style.right = "180px";
 		this.stats.dom.style.top = "auto";
 		this.stats.dom.style.left = "auto";
-
+		this.stats.dom.style.bottom = "50px";
+		this.stats.dom.style.right = "90px";
 		document.body.appendChild(this.stats.dom);
+
 		this.pctEl = document.getElementById("loading-percent");
 	}
 
@@ -164,7 +163,7 @@ export class UI {
 
 	//main
 	setProgress(progress) {
-		this.pctEl.textContent = `${progress}%`;
+		this.pctEl.textContent = progress + "%";
 	}
 
 	toggleLoading(show) {

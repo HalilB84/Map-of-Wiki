@@ -8,6 +8,8 @@ export class Controls {
 		this.wasDragging = false;
 		this.lastMouseX = 0;
 		this.lastMouseY = 0;
+		this.sensitivity = 0.002;
+		this.lastTouchDistance = null;
 
 		this.transitionActive = false;
 		this.startState = null;
@@ -18,9 +20,6 @@ export class Controls {
 		this.stage1Duration = 2000;
 		this.stage2Duration = 2000;
 		this.transitionStartTime = 0;
-
-		this.sensitivity = 0.002;
-		this.lastTouchDistance = null;
 
 		this.state = state;
 
@@ -34,11 +33,6 @@ export class Controls {
 		this.lastMouseY = e.clientY;
 	}
 
-	handleMouseUp() {
-		this.isDragging = false;
-	}
-
-	//only when mouse down
 	handleMouseMove(e) {
 		//chrome for some reason also fires this event if you touch on a laptop
 		if (!this.isDragging || this.transitionActive) return;
@@ -46,28 +40,22 @@ export class Controls {
 		this.updateCameraPosition(e.clientX, e.clientY);
 	}
 
+	handleMouseUp() {
+		this.isDragging = false;
+	}
+
 	handleClick(e) {
-		//This is probably not the best way to do this
 		if (!this.wasDragging) {
 			this.clickArticle(e);
 		}
 		this.wasDragging = false;
 	}
 
-	//I now understand what is happening
 	handleZoom(e) {
 		if (this.transitionActive) return;
 		const zoomFactor = Math.exp(e.deltaY * this.sensitivity);
-
 		//Why does this work? After the zoomfactor is applied the mouse will be at a different world location (why? because now the area being covered is different but the mouse is still in the same place, so obviously world loc is different) and move the camera by that difference so the cursor points to the same world loc
-		const worldPos = this.screenToWorld(e.clientX, e.clientY);
-		this.zoomLevel *= zoomFactor;
-		this.zoomLevel = Math.min(this.zoomLevel, this.getMaxZoomLevel());
-		this.zoomLevel = Math.max(this.zoomLevel, 0.0000001);
-		const newWorldPos = this.screenToWorld(e.clientX, e.clientY);
-
-		this.cameraX += worldPos.x - newWorldPos.x;
-		this.cameraY += worldPos.y - newWorldPos.y;
+		this.updateCameraPosition(e.clientX, e.clientY, zoomFactor);
 	}
 
 	handleTouchStart(e) {
@@ -97,17 +85,9 @@ export class Controls {
 			const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
 			const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
 
-			const zoomFactor = dist / this.lastTouchDistance;
+			const zoomFactor = this.lastTouchDistance / dist;
 
-			const worldPos = this.screenToWorld(centerX, centerY);
-			this.zoomLevel *= 1 / zoomFactor;
-			this.zoomLevel = Math.min(this.zoomLevel, this.getMaxZoomLevel());
-			this.zoomLevel = Math.max(this.zoomLevel, 0.0000001);
-
-			const newWorldPos = this.screenToWorld(centerX, centerY);
-
-			this.cameraX += worldPos.x - newWorldPos.x;
-			this.cameraY += worldPos.y - newWorldPos.y;
+			this.updateCameraPosition(centerX, centerY, zoomFactor);
 
 			this.lastTouchDistance = dist;
 		}
@@ -156,6 +136,24 @@ export class Controls {
 		return { x: worldX, y: worldY };
 	}
 
+	updateCameraPosition(currX, currY, zoomFactor) {
+		const prevWorld = this.screenToWorld(zoomFactor ? currX : this.lastMouseX, zoomFactor ? currY : this.lastMouseY);
+
+		if (zoomFactor) {
+			this.zoomLevel *= zoomFactor;
+			this.zoomLevel = Math.min(this.zoomLevel, this.getMaxZoomLevel());
+			this.zoomLevel = Math.max(this.zoomLevel, 0.0000001);
+		}
+
+		const currWorld = this.screenToWorld(currX, currY);
+
+		this.cameraX += prevWorld.x - currWorld.x;
+		this.cameraY += prevWorld.y - currWorld.y;
+
+		this.lastMouseX = currX;
+		this.lastMouseY = currY;
+	}
+
 	getMaxZoomLevel() {
 		if (!this.state.data) return;
 
@@ -171,34 +169,22 @@ export class Controls {
 		return Math.max(maxHeightW, maxHeightH) * 1.1;
 	}
 
-	updateCameraPosition(currX, currY) {
-		const prevWorld = this.screenToWorld(this.lastMouseX, this.lastMouseY);
-		const currWorld = this.screenToWorld(currX, currY);
-
-		this.cameraX += prevWorld.x - currWorld.x;
-		this.cameraY += prevWorld.y - currWorld.y;
-
-		this.lastMouseX = currX;
-		this.lastMouseY = currY;
-	}
-
 	smoothTransition(targetX, targetY, targetZoom, multi) {
 		this.transitionActive = true;
 
 		this.startState = { x: this.cameraX, y: this.cameraY, zoom: this.zoomLevel };
 		this.endState = { x: targetX, y: targetY, zoom: targetZoom };
 
-		this.stage1Duration = 2000; // to be changed
+		this.stage1Duration = 2000;
 		this.stage2Duration = 2000;
 
 		if (multi === false) {
 			this.stageCount = 1;
 		} else {
-			//fix timing later, right now its just 2000ms
-			const dx = this.endState.x - this.startState.x;
-			const dy = this.endState.y - this.startState.y;
+			const xd = this.endState.x - this.startState.x;
+			const yd = this.endState.y - this.startState.y;
 
-			const dist = Math.hypot(dx, dy);
+			const dist = Math.hypot(xd, yd);
 			const midZoom = Math.max(this.startState.zoom, dist);
 
 			this.midState = { x: this.cameraX, y: this.cameraY, zoom: midZoom };
@@ -206,7 +192,7 @@ export class Controls {
 			this.stage = 0;
 
 			if (this.zoomLevel === midZoom) {
-				this.stage1Duration = 0; //to be removed with proper timings
+				this.stage1Duration = 0;
 			}
 		}
 		this.transitionStartTime = performance.now();
@@ -268,22 +254,20 @@ export class Controls {
 
 	clickArticle(e) {
 		const worldPos = this.screenToWorld(e.clientX, e.clientY);
-		//console.log("cursor", worldPos);
 
-		const { offsets, sizes, ids, titles, numItems } = this.state.data;
+		const { offsets, sizes, ids, numItems } = this.state.data;
 
 		for (let i = 0; i < numItems; i++) {
 			const cx = offsets[i * 2];
 			const cy = offsets[i * 2 + 1];
 			const radius = sizes[i];
 
-			const dx = worldPos.x - cx;
-			const dy = worldPos.y - cy;
-			const distance = Math.sqrt(dx * dx + dy * dy);
+			const xd = worldPos.x - cx;
+			const yd = worldPos.y - cy;
+			const distance = Math.hypot(xd, yd);
 
 			if (distance <= radius) {
-				const articleId = ids[i];
-				this.showEmbeddedWikiArticle(articleId);
+				this.showEmbeddedWikiArticle(ids[i]);
 				return;
 			}
 		}

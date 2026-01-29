@@ -12,15 +12,10 @@ class State {
 	constructor() {
 		this.data = null;
 
-		this.renderer = new THREE.WebGLRenderer();
-		document.body.appendChild(this.renderer.domElement);
+		this.renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("webgl") });
 		this.canvas = this.renderer.domElement;
 
-		this.dpr = window.devicePixelRatio;
-		this.width = Math.floor(this.canvas.clientWidth * this.dpr);
-		this.height = Math.floor(this.canvas.clientHeight * this.dpr);
-
-		this.renderer.setSize(this.width, this.height, false);
+		this.resize();
 
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.OrthographicCamera(0, 0, 0, 0, 0, 1);
@@ -46,8 +41,6 @@ class State {
 
 		this.data = await this.dataLoader.loadCSV(selectedCSV);
 
-		//console.log(this.data);
-
 		this.scene.clear();
 		this.circle.initialize(this.scene);
 		this.textTroika.initialize(this.scene);
@@ -60,9 +53,11 @@ class State {
 	}
 
 	resize() {
-		this.width = this.canvas.clientWidth * this.dpr;
-		this.height = this.canvas.clientHeight * this.dpr;
+		this.dpr = window.devicePixelRatio;
 
+		this.width = Math.floor(this.canvas.clientWidth * this.dpr);
+		this.height = Math.floor(this.canvas.clientHeight * this.dpr);
+		
 		this.renderer.setSize(this.width, this.height, false);
 	}
 
@@ -72,7 +67,6 @@ class State {
 		}
 
 		const aspectRatio = this.width / this.height;
-
 		const viewHeight = this.controls.zoomLevel;
 		const viewWidth = this.controls.zoomLevel * aspectRatio;
 
@@ -83,7 +77,7 @@ class State {
 
 		this.camera.updateProjectionMatrix();
 
-		this.circle.mesh.material.uniforms.camera.value = this.controls.zoomLevel * 0.0005;
+		this.circle.mesh.material.uniforms.camera.value = this.controls.zoomLevel * 0.0004;
 
 		if (timestamp - this.lastTime > 1000) {
 			this.textTroika.updateVisibleText();

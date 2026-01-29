@@ -63,10 +63,9 @@ export class TextTroika {
 			const text = this.meshes[i];
 			if (i >= data.length) {
 				text.visible = false;
-				text.sync();
 			} else {
 				text.text = data[i].titles;
-				text.visible = true;
+				text.visible = true; //text._needsSync = true; //should be in sync but ts is making me mad
 
 				text.sync(() => {
 					text.position.set(data[i].x, data[i].y, 0);

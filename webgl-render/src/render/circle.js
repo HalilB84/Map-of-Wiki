@@ -25,7 +25,7 @@ export class Circle {
                 uniform float camera;
 
 				void main() { 
-					vUv = uv * 2.0 - 1.0; 
+					vUv = position.xy; 
 					vColor = instanceColor; 
 					float size = instanceMatrix[0].x;  
 
