@@ -23,3 +23,9 @@
 		flex-direction: column;
 	}
 }
+
+@media (max-width: 1400px) {
+	#intro {
+		border: none;
+	}
+}

@@ -15,16 +15,17 @@ export class TextTroika {
 
 			mesh.anchorX = "center";
 			mesh.anchorY = "middle";
+			mesh.outlineWidth = "2%";
 			mesh.visible = false;
 
-			this.meshes.push(mesh);
 			scene.add(mesh);
+			this.meshes.push(mesh);
 		}
 	}
 
 	updateVisibleText() {
 		const tl = this.state.controls.screenToWorld(0, 0);
-		const br = this.state.controls.screenToWorld(this.state.width, this.state.height);
+		const br = this.state.controls.screenToWorld(this.state.canvas.clientWidth, this.state.canvas.clientHeight);
 
 		const bounds = {
 			minX: Math.min(tl.x, br.x),
@@ -80,9 +81,7 @@ export class TextTroika {
 
 	dispose() {
 		this.meshes.forEach((mesh) => {
-			mesh.geometry.dispose();
-			mesh.material.dispose();
-            mesh.dispose();
+			mesh.dispose();
 		});
 		this.meshes = [];
 	}

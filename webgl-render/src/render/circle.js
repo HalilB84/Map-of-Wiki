@@ -11,7 +11,7 @@ export class Circle {
 	initialize(scene) {
 		this.dispose();
 
-		const geommetry = new THREE.PlaneGeometry(2, 2);
+		const geometry = new THREE.PlaneGeometry(2, 2);
 		const material = new THREE.ShaderMaterial({
 			uniforms: {
 				camera: { value: null },
@@ -24,11 +24,12 @@ export class Circle {
                 out vec3 vColor;
                 uniform float camera;
 
-                void main() {
-                    vUv = uv * 2.0 - 1.0;
-                    vColor = instanceColor;
-                    vec4 scale = vec4(vec3(position * (1.0 + camera)), 1.0);
-                    gl_Position = projectionMatrix * viewMatrix * instanceMatrix * scale; 
+				void main() { 
+					vUv = uv * 2.0 - 1.0; 
+					vColor = instanceColor; 
+					float size = instanceMatrix[0].x;  
+
+					gl_Position = projectionMatrix * viewMatrix * vec4(vUv * (size + camera) + instanceMatrix[3].xy, 0.0, 1.0); 
 
                 }
             `,
@@ -46,13 +47,13 @@ export class Circle {
 
 		const { numItems, offsets, sizes, colors } = this.state.data;
 
-		this.mesh = new THREE.InstancedMesh(geommetry, material, numItems);
+		this.mesh = new THREE.InstancedMesh(geometry, material, numItems);
 
 		const position = new THREE.Object3D();
 		const color = new THREE.Color();
 
 		for (let i = 0; i < numItems; i++) {
-			position.position.set(offsets[i * 2], offsets[i * 2 + 1], -1);
+			position.position.set(offsets[i * 2], offsets[i * 2 + 1], 0);
 			position.scale.set(sizes[i], sizes[i]);
 			position.updateMatrix();
 			color.setRGB(colors[i * 4], colors[i * 4 + 1], colors[i * 4 + 2]);
@@ -61,7 +62,7 @@ export class Circle {
 			this.mesh.setColorAt(i, color);
 		}
 
-		//this.mesh.instanceMatrix.needsUpdate = true;
+		//this.mesh.instanceMatrix.needsUpdate = true; //?
 		//this.mesh.instanceColor.needsUpdate = true;
 
 		scene.add(this.mesh);

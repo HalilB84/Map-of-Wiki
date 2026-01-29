@@ -15,7 +15,7 @@ export class DataLoader {
 
 	async loadCSV(filePath) {
 		this.state.ui.setProgress(0);
-		
+
 		const paths = filePath.split(",");
 		const totalFiles = paths.length;
 		let allData = [];
@@ -34,7 +34,7 @@ export class DataLoader {
 				if (done) break;
 				chunks.push(value);
 				received += value.length;
-				this.state.ui.setProgress(Math.floor((i + received / total) / totalFiles * 100));
+				this.state.ui.setProgress(Math.floor(((i + received / total) / totalFiles) * 100));
 			}
 
 			const blob = new Blob(chunks);
@@ -51,7 +51,6 @@ export class DataLoader {
 
 		return this.processData(allData);
 	}
-
 
 	processData(data) {
 		const numItems = data.length;

@@ -83,7 +83,7 @@ class State {
 
 		this.camera.updateProjectionMatrix();
 
-		this.circle.mesh.material.uniforms.camera.value = this.controls.zoomLevel * 0.004;
+		this.circle.mesh.material.uniforms.camera.value = this.controls.zoomLevel * 0.0005;
 
 		if (timestamp - this.lastTime > 1000) {
 			this.textTroika.updateVisibleText();

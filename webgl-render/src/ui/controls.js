@@ -141,10 +141,8 @@ export class Controls {
 	}
 
 	screenToWorld(screenX, screenY) {
-		const rect = this.state.canvas.getBoundingClientRect();
-
-		const canvasX = (screenX - rect.left) / rect.width;
-		const canvasY = (screenY - rect.top) / rect.height;
+		const canvasX = screenX / this.state.canvas.clientWidth;
+		const canvasY = screenY / this.state.canvas.clientHeight;
 
 		const ndcX = canvasX * 2 - 1;
 		const ndcY = -(canvasY * 2 - 1);
