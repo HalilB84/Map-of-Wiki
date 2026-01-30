@@ -58,10 +58,6 @@ export class UI {
 			this.state.controls.goToRandomArticle();
 		});
 
-		window.addEventListener("resize", () => {
-			this.state.resize();
-			this.state.controls.handleResize();
-		});
 
 		document.getElementById("sensitivity-range").addEventListener("input", (e) => {
 			this.state.controls.sensitivity = e.target.value / 25000;
@@ -117,7 +113,7 @@ export class UI {
 
 		this.stats.dom.style.top = "auto";
 		this.stats.dom.style.left = "auto";
-		this.stats.dom.style.bottom = "50px";
+		this.stats.dom.style.bottom = "48px";
 		this.stats.dom.style.right = "90px";
 		document.body.appendChild(this.stats.dom);
 

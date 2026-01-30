@@ -7,7 +7,7 @@ export class Search {
 		this.isDataInitialized = false;
 
 		this.searchWorker = new Worker(new URL("../utils/searchworker.js", import.meta.url), { type: "module" });
-		this.searchWorker.onmessage = (data) => this.handleWorkerMessage(data);
+		this.searchWorker.addEventListener("message", (data) => this.handleWorkerMessage(data));
 	}
 
 	performSearch(query) {

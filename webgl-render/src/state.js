@@ -62,6 +62,11 @@ class State {
 	}
 
 	render(timestamp) {
+		if(Math.floor(this.canvas.clientWidth * this.dpr) !== this.width || Math.floor(this.canvas.clientHeight * this.dpr) !== this.height) {
+			this.resize();
+			this.controls.handleResize();
+		}
+
 		if (this.controls.transitionActive) {
 			this.controls.updateTransition(timestamp);
 		}
