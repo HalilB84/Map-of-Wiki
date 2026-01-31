@@ -1,5 +1,3 @@
-//to be refactored later
-
 export class Search {
 	constructor(state) {
 		this.state = state;
@@ -31,16 +29,5 @@ export class Search {
 		const { results } = data.data;
 		this.state.ui.displayResults(results);
 		this.state.ui.toggleSearchLoading(false);
-	}
-
-	handleSearchResult(title) {
-		const index = this.state.data.titles.indexOf(title);
-		if (index === -1) return;
-
-		const targetX = this.state.data.offsets[index * 2];
-		const targetY = this.state.data.offsets[index * 2 + 1];
-		const targetZoom = this.state.data.sizes[index] * 5;
-
-		this.state.controls.smoothTransition(targetX, targetY, targetZoom, true);
 	}
 }

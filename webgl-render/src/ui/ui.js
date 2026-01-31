@@ -55,7 +55,7 @@ export class UI {
 		});
 
 		document.getElementById("random-button").addEventListener("click", () => {
-			this.state.controls.goToRandomArticle();
+			this.state.controls.goToArticle();
 		});
 
 
@@ -154,7 +154,7 @@ export class UI {
 		const title = e.target.closest(".search-result-item").textContent;
 		this.searchInput.value = "";
 		this.clearResults();
-		this.state.search.handleSearchResult(title);
+		this.state.controls.goToArticle(title);
 	}
 
 	//main

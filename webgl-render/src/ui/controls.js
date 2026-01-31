@@ -181,10 +181,13 @@ export class Controls {
 		if (multi === false) {
 			this.stageCount = 1;
 		} else {
-			const xd = this.endState.x - this.startState.x;
-			const yd = this.endState.y - this.startState.y;
+			const xd = Math.abs(this.endState.x - this.startState.x);
+			const yd = Math.abs(this.endState.y - this.startState.y);
 
-			const dist = Math.hypot(xd, yd);
+			const horizDist = (xd * 2) / (this.state.width / this.state.height);
+			const vertDist = yd * 2;
+			const dist = Math.max(vertDist, horizDist) * 1.1;
+			
 			const midZoom = Math.max(this.startState.zoom, dist);
 
 			this.midState = { x: this.cameraX, y: this.cameraY, zoom: midZoom };
@@ -288,12 +291,21 @@ export class Controls {
 		};
 	}
 
-	goToRandomArticle() {
-		const randomIndex = Math.floor(Math.random() * this.state.data.numItems);
+	goToArticle(title) {
+		let article;
 
-		const targetX = this.state.data.offsets[randomIndex * 2];
-		const targetY = this.state.data.offsets[randomIndex * 2 + 1];
-		const targetZoom = this.state.data.sizes[randomIndex] * 5;
+		if (title) {
+			article = this.state.data.titles.indexOf(title);
+			if (article === -1) return;
+		}
+
+		else {
+			article = Math.floor(Math.random() * this.state.data.numItems);
+		}
+
+		const targetX = this.state.data.offsets[article * 2];
+		const targetY = this.state.data.offsets[article * 2 + 1];
+		const targetZoom = this.state.data.sizes[article] * 5;
 
 		this.smoothTransition(targetX, targetY, targetZoom, true);
 	}
