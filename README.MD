@@ -7,14 +7,15 @@ Here is a basic breakdown of how this all works:
 
 All of the data is collected from Wikimedia data dumps. Then, with some basic Python scripts, everything is parsed into a CSV file. The graph data from the CSV files is loaded into the Python code using igraph (I was able to fit 1 Million nodes and 160 Million? edges, which nearly took all memory. This is why you should use dedicated tools for this, not plain Python). 
 
-After the data is loaded, I perform community detection on all the data using Leiden's algorithm from [this package](https://github.com/vtraag/leidenalg). Now here it gets a little weird. Early on, I dabbled with graphing tools a lot (like Gephi), which were either impossible to render due to the size or limited in the features I wanted. Normally, graphs like this are rendered using force-directed algorithms. However, I had no idea how I would make it work since implementing one myself looked grim, and all other existing tools didn't exactly give what I wanted. Instead, I had the brilliant idea of making one myself /s. 
+After sorting out the data, I performed community detection on all the data using Leiden's algorithm from [this package](https://github.com/vtraag/leidenalg). Now here it gets a little weird. Early on, I dabbled with graphing tools a lot (like Gephi), which were either impossible to render due to the size or limited in the features I wanted. Normally, graphs like this are rendered using force-directed algorithms. However, I had no idea how I would make it work since implementing one myself looked grim, and all other existing tools didn't exactly give what I wanted. Instead, I had the brilliant idea of making one myself /s. 
 
-The custom graph layout is a simple algorithm that arranges nodes in either a random or spiral pattern. The reason it looks like similar communities are together is that I apply Leiden's alg hierarchically. Basically, I first perform Leiden's alg on the entire data. Say that gives 15 distinct communities, these are randomly or in spiral placed in the circle (also, I make sure there is no overlap). Then I do the exact same thing on every sub-community. This worked out to some extent, but it is nothing close to actual graphing algorithms. 
+The custom graph layout is a simple algorithm that arranges nodes in either a random or spiral pattern. The reason it looks like similar communities are together is that I apply Leiden's alg hierarchically. Basically, I first perform Leiden's alg on the entire data. Say that gives 15 distinct communities, these are randomly or in spiral placed in the circle (also, I make sure there is no overlap). Then I do the exact same thing on every sub-community. This worked out to some extent, but it is nothing close to actual graphing algorithms.
+
 The last stage is the WebGL renderer. I initially started with Matplotlib, but that only goes so far. After looking at Map of Reddit's source code and learning cosmos.gl exists, I understood that WebGL was the way to go. WebGL wise, It was two simple shaders adapted from the Map of Reddit code (circles and MSDF text). Then I created a small website for all the user interactions. Finally as a last update, I switched to Three.js because less code with the same functionality is something I love.  
 
-Just as a heads up, when I was first working on this, I used AI generated code extensively without understanding the basics of graphics and webdev. Because of the guilt of not understanding and not writing the code, I have since properly learned things and rewrote a good portion of the code. I am putting this here as a personal note to myself for future reference, as this was a big life lesson to me.   
+Just as a heads up, when I was first working on this, I used AI generated code extensively without understanding the basics of graphics and webdev. Because of the guilt of not understanding and not writing the code, I have since properly learned things and rewrote the entire code.  
 
-That's it. I hereby declare this project complete. I want to do this bigger and better after learning how to apply force-directed layouts for millions of nodes and edges using GPU/AI magic. But till then, I'll just fix small things and reorganize code. 
+That's it. I hereby declare this project complete. I want to do this bigger and better after learning how to apply force-directed layouts for millions of nodes and edges using GPU/AI. But till then, I'll just fix small things and reorganize code. 
 
 Since I've done this project, I have come across better ways to map this data. I encourage you to check them out if you are interested in large scale data viz:
 
@@ -44,7 +45,7 @@ Since I've done this project, I have come across better ways to map this data. I
  - ~~screen space to world space (for clicking and text optimization)~~
  - ~~Make it usable for mobile -> Partly done~~
  - ~~Implement a web worker for fuzzysort~~
- - ~~Create better UI / Rewrite the entire codebase -> Done part 1 -> Done part 2~~
+ - ~~Create better UI / Rewrite the entire codebase -> Done part 1 -> Done part 2 -> Complete rewrite~~
 
 ## Photos
 

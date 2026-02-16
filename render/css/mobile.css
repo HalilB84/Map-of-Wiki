@@ -1,0 +1,31 @@
+@media (max-width: 750px) {
+    #dropdown {
+        top: auto;
+        right: auto;
+
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+
+        max-width: 100%;
+    }
+
+    #search-wrapper {
+        top: auto;
+        left: auto;
+
+        top: 10px;
+        left: 10px;
+        right: 10px;
+
+        max-width: 100%;
+
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 1300px) {
+    #intro {
+        border: none;
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "dev-host": "vite --host",
+        "build": "vite build",
+        "preview": "vite preview",
+        "deploy": "gh-pages -d dist"
+    },
+    "prettier": {
+        "useTabs": false,
+        "tabWidth": 4,
+        "printWidth": 1000000,
+        "bracketSameLine": true
+    },
+    "devDependencies": {
+        "gh-pages": "^6.3.0",
+        "prettier": "^3.6.2",
+        "vite": "^7.2.7"
+    },
+    "dependencies": {
+        "fuzzysort": "^3.1.0",
+        "stats-gl": "^4.0.2",
+        "three": "^0.182.0",
+        "troika-three-text": "^0.52.4"
+    }
+}
