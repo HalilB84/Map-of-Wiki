@@ -55,12 +55,13 @@ export class Camera {
         this.camera.top = height / 2;
         this.camera.bottom = -height / 2;
         this.camera.updateProjectionMatrix();
-        this.camera.updateMatrixWorld();
 
         if (first) this.transit(0, 0, 1);
     }
 
     screenToWorld(x, y) {
+        this.camera.updateMatrixWorld(); //the thing is this is called before every render but during initial load there is no animation loop so when transit calles this the camera is at the old state which breaks things
+        //rule of thumb should be when dealing with camera matricies (or any?) always make sure they are updated. 
         const vec = new THREE.Vector3(x, y).unproject(this.camera);
 
         return { x: vec.x, y: vec.y };

@@ -4,10 +4,30 @@ export class UI {
     constructor(state) {
         this.state = state;
 
-        //control
-        this.state.canvas.addEventListener("click", (mouse) => {
-            this.state.camera.clickArticle((mouse.clientX / this.state.width) * 2 - 1, -(mouse.clientY / this.state.height) * 2 + 1);
-        });
+		//controls
+
+		this.is = false;
+		this.valid = false;
+
+		this.state.canvas.addEventListener("mousedown", (mouse) => {
+			this.is = true;
+			this.valid = true;
+		});
+
+		this.state.canvas.addEventListener("mousemove", (mouse) => {
+			if (this.is) {
+				this.valid = false;
+			}
+		});
+
+		this.state.canvas.addEventListener("mouseup", (mouse) => {
+			if(this.valid) {
+				this.state.camera.clickArticle((mouse.clientX / this.state.width) * 2 -1, -(mouse.clientY / this.state.height) * 2 + 1);
+			}
+
+			this.is = false;
+			this.valid = false;
+		});
 
         document.getElementById("random-button").addEventListener("click", () => {
             this.state.camera.goToArticle();
