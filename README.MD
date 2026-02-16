@@ -53,15 +53,15 @@ Many of these photos are from the first iterations, now the best way to view the
 
 Most 60k popular articles from September 11, 2024 (Singular Layout). Each Island indicates a different community. To see everything, you need to download the file and zoom in.
 
-![4th Iteration, with edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_4.png)
+![4th Iteration, with edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/images/iteration_4.png)
 
 The latest iteration, has 500k nodes (Hierarchal layout) (It also has the 1 million node version in the Images directory, but you can only see things when zoomed in due to sheer massiveness) 
 
-![6th Iteration, without edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_6.png)
+![6th Iteration, without edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/images/iteration_6.png)
 
 Hierarchal layout with 60k nodes
 
-![6.5th Iteration, without edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/Images/iteration_6.5.png)
+![6.5th Iteration, without edges](https://github.com/HalilB84/Map-of-Wiki/blob/main/images/iteration_6.5.png)
 
 
 
