@@ -1,121 +1,116 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-		<title>Map of Wikipedia</title>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <title>Map of Wikipedia</title>
 
-		<!-- Google tag (gtag.js) -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=G-HTVMYJR7TY"></script>
-		<script>
-			window.dataLayer = window.dataLayer || [];
-			function gtag() {
-				dataLayer.push(arguments);
-			}
-			gtag("js", new Date());
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-HTVMYJR7TY"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
 
-			gtag("config", "G-HTVMYJR7TY");
-		</script>
-		<script type="module" crossorigin src="/assets/index-CNLE2Oea.js"></script>
-		<link rel="stylesheet" crossorigin href="/assets/index-DJ6wGv6F.css">
-	</head>
-	<body>
-		<div id="intro">
-			<h1>Map of Wikipedia</h1>
+            gtag("config", "G-HTVMYJR7TY");
+        </script>
 
-			<h2>About this Project</h2>
-			<p>What you will see is a graphical representation of Wikipedia. Each circle represents an article in the English Wikipedia.</p>
-			<p>The size of a circle depends on how many real pageviews it got on a particular day. For example you will see that the Main Wikipedia article is the biggest one as it gets the most views.</p>
-			<p>The placement of the circles is based on the links between the articles. The more closely linked the two articles are, the closer they appear. The current algorithm for the placement of the circles is naive, includes randomness and is not totally accurate. This will be improved (hopefully).</p>
+      <script type="module" crossorigin src="/assets/index-Dm8qUbAf.js"></script>
+      <link rel="stylesheet" crossorigin href="/assets/index-8W99g2SM.css">
+    </head>
 
-			<h2>Choose a Dataset</h2>
-			<p>Select the size of the Wikipedia map you'd like to explore. The larger the dataset you choose, the more accurate the placement will be.</p>
+    <body>
+        <div id="intro">
+            <h1>Map of Wikipedia</h1>
 
-			<div class="dataset-option">
-				<input id="dataset-60k" type="radio" name="dataset" value="/layouts/layout60k-Sep-10-2024.csv" />
-				<label for="dataset-60k"> 60,000 Articles (September 10, 2024) Recommended for very slow computers and phones. </label>
-			</div>
+            <h2>About this Project</h2>
+            <p>What you will see is a graphical representation of Wikipedia where each circle represents an article in the English Wikipedia.</p>
+            <p>The size of a circle depends on how many real pageviews it got on a particular month. For example you will see that the Main Wikipedia article is the biggest one as it gets the most views.</p>
+            <p>The placement of the circles is based on the links between the articles. The more closely linked the two articles are, the closer they appear. The current algorithm for the placement of the circles is naive, includes randomness and is not totally accurate.</p>
 
-			<div class="dataset-option">
-				<input id="dataset-500k" type="radio" name="dataset" value="/layouts/layout500k-Sep-10-2024.csv" checked />
-				<label for="dataset-500k"> 500,000 Articles (September 10, 2024) Should run decently in any computer or phone. </label>
-			</div>
+            <h2>Choose a Dataset</h2>
+            <p>Select the size of the Wikipedia map you'd like to explore. The larger the dataset you choose, the more accurate the placement will be.</p>
 
-			<div class="dataset-option">
-				<input id="dataset-1m" type="radio" name="dataset" value="/layouts/layout1m-part1-Sep-10-2024.csv,/layouts/layout1m-part2-Sep-10-2024.csv" />
-				<label for="dataset-1m"> 1,000,000 Articles (September 10, 2024) Runs 60fps on my ThinkPad L13. Probably runs well on mid-high end devices. </label>
-			</div>
+            <div class="dataset-option">
+                <input id="100k" type="radio" name="dataset" value="/layouts/layout_100k_jan26.csv" />
+                <label for="100k"> 100,000 articles (January 2026). Recommended for very slow computers and phones. </label>
+            </div>
 
-			<button id="start">Start Exploring</button>
+            <div class="dataset-option">
+                <input id="500k" type="radio" name="dataset" value="/layouts/layout_500k_jan26.csv" checked />
+                <label for="500k"> 500,000 articles (January 2026). Should run decently in any computer or phone. </label>
+            </div>
 
-			<h2>Warnings</h2>
+            <div class="dataset-option">
+                <input id="1m" type="radio" name="dataset" value="/layouts/layout_1m_jan26.csv" />
+                <label for="1m"> 1,000,000 articles (January 2026). Probably runs well on mid-high end devices. </label>
+            </div>
 
-			<p>Mobile is supported, but I highly recommend using a laptop/desktop for the best experience.</p>
-			<p>Due to the nature of Wikipedia, the dataset contains NSFW elements.</p>
-			<p>The placement of the articles is not perfect; you might see some articles wildly out of place.</p>
-			<p>The dataset is from September 10, 2024 and is not updated, so the articles might differ from current Wikipedia.</p>
-			<p>The dataset may contain errors.</p>
-			<p>The placement of nodes is only a result of the algorithm; it is not manually adjusted.</p>
-			<p>An example of this is the Twitter article. Although you would expect it to be near other social media apps, it is near anime communities. The reason for this is that many anime Wikipedia pages have links to twitter in their reference section. Many anime news come from twitter which means that nearly every anime article has a link to the twitter article on Wikipedia. This makes twitter appear very close on anime communities. There are many fixes for this but I am yet to implement a solution. This should be improved on future updates.</p>
+            <button id="start">Start Exploring</button>
 
-			<h2>How to Use</h2>
+            <h2>Warnings</h2>
 
-			<p><strong>Desktop:</strong> Use your mouse to pan around and your mouse wheel to zoom in and out.</p>
-			<p><strong>Laptop:</strong> Use your touchpad to pan around and two fingers to zoom in and out.</p>
-			<p><strong>Mobile:</strong> Use a finger to pan around and pinch to zoom.</p>
-			<p>Search specific articles using the Search bar.</p>
-			<p>Click any circle to open the Wikipedia article.</p>
-			<p>If the visualization runs slowly, try a smaller dataset.</p>
+            <p>I highly recommend using a laptop / desktop for the best experience.</p>
+            <p>Due to the nature of Wikipedia, the dataset contains NSFW elements.</p>
+            <p>The dataset is from January 2026 so the articles might differ from current Wikipedia, also the dataset may contain errors.</p>
+            <p>The placement of the articles is naive, you might see some articles wildly out of place.</p>
+            <p>An example of this is the Twitter article. Although you would expect it to be near other social media apps, it is near anime communities. The reason for this is that many anime Wikipedia pages have links to twitter in their reference section. Many anime news come from twitter which means that nearly every anime article has a link to the twitter article on Wikipedia. This makes twitter appear very close on anime communities. This will be improved in the next iteration.</p>
 
-			<h2>Technical Details</h2>
+            <h2>How to Use</h2>
 
-			<p><a href="https://github.com/HalilB84/Map-of-Wiki" target="_blank">Source Code on GitHub</a></p>
-			<p>Data is collected from Wikimedia dumps</p>
-			<p>Uses Leiden algorithm for community detection and to build the graph itself</p>
-			<p>Custom built graph layout algorithm (naive)</p>
-			<p>WebGL (Three.js) with instanced rendering + troika-three-text</p>
-		</div>
+            <p>If on Desktop / Laptop use your mouse / touchpad to pan and scroll. For touchpad, scroll by dragging two fingers. Click on articles to see the wiki page.</p>
+            <p>If on Mobile use one finger to pan around and pinch with two fingers to zoom in / out. Clicking articles is disabled on mobile</p>
 
-		<!-- seperation -->
-		<canvas id="webgl"></canvas>
+            <h2>Technical Details</h2>
 
-		<div id="search-wrapper">
-			<div id="search-box">
-				<div class="search-row">
-					<input id="search" type="text" placeholder="Search an article..." autocomplete="off" />
-					<button id="search-button">Search</button>
-				</div>
+            <p><a href="https://github.com/HalilB84/Map-of-Wiki" target="_blank">Source Code on GitHub</a></p>
+            <p>Data is collected from Wikimedia dumps</p>
+            <p>Uses Leiden algorithm for community detection and to build the graph itself</p>
+            <p>WebGL (Three.js) with instanced rendering + troika-three-text</p>
+        </div>
 
-				<div id="search-results"></div>
-				<button id="random-button">Random Article</button>
-			</div>
-			<div id="loader"></div>
-		</div>
+        <!-- seperation -->
+        <canvas id="webgl"></canvas>
 
-		<div id="dropdown">
-			<select id="selected">
-				<option value="/layouts/layout500k-Sep-10-2024.csv" selected>500k September 10 2024</option>
-				<option value="/layouts/layout1m-part1-Sep-10-2024.csv,/layouts/layout1m-part2-Sep-10-2024.csv">1M September 10 2024 (Experimental)</option>
-				<option value="/layouts/layout60k-Sep-10-2024.csv">60k September 10 2024</option>
-			</select>
+        <div id="search-wrapper">
+            <div id="search-box">
+                <div class="search-row">
+                    <input id="search" type="text" placeholder="Search an article..." autocomplete="off" />
+                    <button id="search-button">Search</button>
+                </div>
 
-			<button id="load-button">Load</button>
+                <div id="search-results"></div>
+                <button id="random-button">Random Article</button>
+            </div>
+            <div id="loader"></div>
+        </div>
 
-			<div id="sensitivity">
-				<label for="sensitivity-range">Mouse/Trackpad sensitivity:</label>
-				<input id="sensitivity-range" type="range" name="sensitivity" min="0" max="100" value="50" autocomplete="off" />
-				<span id="sensitivity-value">050</span>
-			</div>
-		</div>
+        <div id="dropdown">
+            <select id="selected">
+                <option value="layouts/layout_100k_jan26.csv">100k January 2026</option>
+                <option value="/layouts/layout_500k_jan26.csv" selected>500k January 2026</option>
+                <option value="/layouts/layout_1m_jan26.csv">1M January 2026</option>
+            </select>
 
-		<div id="wiki">
-			<button id="close-wiki"><img src="/close.svg" /></button>
-			<iframe id="wiki-iframe"></iframe>
-		</div>
+            <button id="load-button">Load</button>
 
-		<div id="loading">
-			<p>Loading visualization... <span id="loading-percent">0%</span></p>
-		</div>
+            <div id="sensitivity">
+                <label for="sensitivity-range">Mouse/Trackpad sensitivity:</label>
+                <input id="sensitivity-range" type="range" name="sensitivity" min="0" max="100" value="50" autocomplete="off" />
+                <span id="sensitivity-value">050</span>
+            </div>
+        </div>
 
-	</body>
+        <div id="wiki">
+            <button id="close-wiki"><img src="/close.svg" /></button>
+            <iframe id="wiki-iframe"></iframe>
+        </div>
+
+        <div id="loading">
+            <p id="loading-message"></p>
+        </div>
+
+    </body>
 </html>
