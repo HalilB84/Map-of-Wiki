@@ -3,8 +3,8 @@ import igraph as ig
 import math
 import layout_manager as la
 
-node_data = pd.read_csv('../Graph_Data/top_2m_page_counts.csv')
-edge_data = pd.read_csv('../Graph_Data/top_2m_page_edges.csv')
+node_data = pd.read_csv('Graph_Data/top_1m_page_counts.csv')
+edge_data = pd.read_csv('Graph_Data/top_1m_page_edges.csv')
 g = ig.Graph.TupleList(edge_data.itertuples(index=False), directed=False)
 
 id_to_node = {}
@@ -40,6 +40,6 @@ graph_params = {
 
 layout = la.LayoutManager(g, graph_params)
 layout.apply_community_partitioning()
-layout.save_layout('layout.csv')
+layout.save_layout('l.csv')
 
 

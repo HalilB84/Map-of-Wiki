@@ -42,7 +42,7 @@ export class Camera {
         const reqH = maxx - minx;
         const reqWH = maxy - miny;
 
-        const height = Math.max(reqH, reqWH / this.state.aspect) * 1.1;
+        const height = Math.max(reqWH, reqH / this.state.aspect) * 1.1;
         const width = height * this.state.aspect;
 
         this.camera.position.set(0, 0);

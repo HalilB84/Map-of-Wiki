@@ -8,7 +8,7 @@ class RandomCircleLayout:
         self.radius = nodes[0][0] 
         self.max_radius = self.radius 
         self.coordinates = []
-        self.ring = 1 
+        self.ring = 0
 
         for i, (size, data) in enumerate(nodes):
             self._place_circle(size, data, i)
@@ -19,7 +19,7 @@ class RandomCircleLayout:
             dbg += 1
             if dbg % 1000 == 0:
                 print(index, 'most likely stuck. Increase limits')
-                self.radius += size * 2
+                self.radius += size * 1.4
                 self.max_radius = max(self.max_radius, self.radius)
 
             x, y = self._generate_random_point(size)

@@ -154,4 +154,4 @@ class LayoutManager:
             writer.writerow(['id', 'title', 'x', 'y', 'size', 'r', 'g', 'b'])
             for i in range(self.graph.vcount()):
                 n = self.graph.vs[i]
-                writer.writerow([n['name'], n['title'], n['x'], n['y'], n['size'], n['color'][0], n['color'][1], n['color'][2]])
+                writer.writerow([n['name'], n['title'], round(n['x'], 5), round(n['y'], 5), round(n['size'], 5), round(n['color'][0], 2), round(n['color'][1], 2), round(n['color'][2], 2)])

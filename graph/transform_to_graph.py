@@ -1,5 +1,5 @@
 #bad code with bare bones for what I needed
-#some articles names are messed up due to utf stuff needs asap fix imma do that tmrw (page and linktarget)
+#make sure to read and write data in utf 8, for example for some reason powershell interferes with mysqldump_to_csv
 import csv
 
 map_page = {} #should be the size of wikipedia en articles      
@@ -9,7 +9,7 @@ link_target_remap = {}
 #only care about articles in the namespcae of 0 as other pages such as templates, user space etc. are irrelevant. Namespace 0 articles can be redirects but not counted as a separate article
 #map id to title for below functions
 def title_id_extract(filename):
-    with open(filename, 'r', encoding='utf-8', errors="replace") as file:
+    with open(filename, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         dbg = 0
         for row in reader:
@@ -27,7 +27,7 @@ def title_id_extract(filename):
 
 #https://www.mediawiki.org/wiki/Manual:Linktarget_table
 def remap(filename):
-    with open(filename, 'r', encoding='utf-8', errors="replace") as file:
+    with open(filename, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         dbg = 0
         for row in reader:
@@ -48,7 +48,7 @@ def remap(filename):
 
 #wikimedia dumpds give link between articles via the linktarget middleman so the above function needs to be run before this to resolve the actual ids
 def page2page(input_filename, output_filename):
-    with open(input_filename, 'r') as file:
+    with open(input_filename, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
 
         with open(output_filename, 'w', newline='', encoding='utf-8') as file:
@@ -112,7 +112,7 @@ def get_nodes(input_filename, output_filename, top_n=None):
 #now that top n nodes are made, generate the links between them via page2page 
 def generate_edges(input_nodes_file, input_links_file, output_edges_file):
     arc = {}
-    with open(input_nodes_file, 'r', encoding='utf-8', errors="replace") as file:
+    with open(input_nodes_file, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
 
         for row in reader:
@@ -120,9 +120,9 @@ def generate_edges(input_nodes_file, input_links_file, output_edges_file):
                 page_id = int(row[0])
                 arc[page_id] = 1
 
-    with open(input_links_file, 'r', encoding='utf-8', errors="replace") as file:
+    with open(input_links_file, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
-        with open(output_edges_file, mode='w', newline='') as file:
+        with open(output_edges_file, mode='w', newline='', encoding='utf-8') as file:
 
             writer = csv.writer(file)
             writer.writerow(['Source', 'Target'])
@@ -136,7 +136,7 @@ def generate_edges(input_nodes_file, input_links_file, output_edges_file):
                     writer.writerow([from_page, to_page])
                     tot += 1
             
-            print(str(tot) + " nodes")
+            print(str(tot) + " edges")
 
 #step1 run first three functions, then comment out remap and page2page, step2 run title, get_nodes, generate_edges
 #https://dumps.wikimedia.org/enwiki/
@@ -145,8 +145,8 @@ def generate_edges(input_nodes_file, input_links_file, output_edges_file):
 #enwiki-20260201-pagelinks.sql.gz 6.4 GB
 #https://dumps.wikimedia.org/other/pageview_complete/
 
-title_id_extract('../Data/page.csv')
+title_id_extract('Data/page.csv')
 #remap('Data/linktarget.csv')  
 #page2page('Data/pagelinks.csv', 'Data/final_links.csv')  
-get_nodes('../Data/pageviews-20260214-user', '../Graph_Data/top_2m_page_counts.csv', 2000000)
-generate_edges("../Graph_Data/top_2m_page_counts.csv", '../Data/final_links.csv', '../Graph_Data/top_2m_page_edges.csv')
+get_nodes('Data/pageviews-202601-user', 'Graph_Data/top_500k_page_counts.csv', 500000)
+generate_edges("Graph_Data/top_500k_page_counts.csv", 'Data/final_links.csv', 'Graph_Data/top_500k_page_edges.csv')

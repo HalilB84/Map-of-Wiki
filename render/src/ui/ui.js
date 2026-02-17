@@ -56,6 +56,7 @@ export class UI {
 
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
             document.getElementById("sensitivity").style.display = "none";
+            this.state.camera.controls.enableDamping = false;
         } else {
             this.state.camera.controls.zoomSpeed = 4;
         }
