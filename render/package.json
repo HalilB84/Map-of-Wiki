@@ -5,7 +5,8 @@
         "dev-host": "vite --host",
         "build": "vite build",
         "preview": "vite preview",
-        "deploy": "gh-pages -d dist"
+        "deploy": "gh-pages -d dist",
+        "format": "prettier --write ."
     },
     "prettier": {
         "useTabs": false,

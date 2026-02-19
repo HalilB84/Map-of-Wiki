@@ -3,31 +3,43 @@ import Stats from "stats-gl";
 export class UI {
     constructor(state) {
         this.state = state;
+        this.mobile = false;
 
-		//controls
+        //controls
 
-		this.is = false;
-		this.valid = false;
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            document.getElementById("sensitivity").style.display = "none";
+            this.state.camera.controls.enableDamping = false;
+            this.mobile = true;
+        } else {
+            this.state.camera.controls.zoomSpeed = 4;
+        }
 
-		this.state.canvas.addEventListener("mousedown", (mouse) => {
-			this.is = true;
-			this.valid = true;
-		});
+        this.is = false;
+        this.valid = false;
 
-		this.state.canvas.addEventListener("mousemove", (mouse) => {
-			if (this.is) {
-				this.valid = false;
-			}
-		});
+        this.state.canvas.addEventListener("mousedown", () => {
+            if (this.mobile) return;
+            this.is = true;
+            this.valid = true;
+        });
 
-		this.state.canvas.addEventListener("mouseup", (mouse) => {
-			if(this.valid) {
-				this.state.camera.clickArticle((mouse.clientX / this.state.width) * 2 -1, -(mouse.clientY / this.state.height) * 2 + 1);
-			}
+        this.state.canvas.addEventListener("mousemove", () => {
+            if (this.mobile) return;
+            if (this.is) {
+                this.valid = false;
+            }
+        });
 
-			this.is = false;
-			this.valid = false;
-		});
+        this.state.canvas.addEventListener("mouseup", (mouse) => {
+            if (this.mobile) return;
+            if (this.valid) {
+                this.state.camera.clickArticle((mouse.clientX / this.state.canvas.clientWidth) * 2 - 1, -(mouse.clientY / this.state.canvas.clientHeight) * 2 + 1);
+            }
+
+            this.is = false;
+            this.valid = false;
+        });
 
         document.getElementById("random-button").addEventListener("click", () => {
             this.state.camera.goToArticle();
@@ -53,13 +65,6 @@ export class UI {
             this.state.camera.controls.zoomSpeed = e.target.value / 12.5;
             document.getElementById("sensitivity-value").textContent = e.target.value.padStart(3, "0");
         });
-
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            document.getElementById("sensitivity").style.display = "none";
-            this.state.camera.controls.enableDamping = false;
-        } else {
-            this.state.camera.controls.zoomSpeed = 4;
-        }
 
         //search
         this.searchInput = document.getElementById("search");

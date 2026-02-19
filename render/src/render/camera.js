@@ -39,16 +39,17 @@ export class Camera {
         //AKA set max zoom level
         const { minx, miny, maxx, maxy } = this.state.data.limits;
 
-        const reqH = maxx - minx;
-        const reqWH = maxy - miny;
+        const reqWH = maxx - minx;
+        const reqH = maxy - miny;
 
-        const height = Math.max(reqWH, reqH / this.state.aspect) * 1.1;
+        const height = Math.max(reqH, reqWH / this.state.aspect) * 1.1;
         const width = height * this.state.aspect;
 
-        this.camera.position.set(0, 0);
-        this.controls.target.set(this.camera.position.x, this.camera.position.y);
-
-        this.camera.zoom = first ? 100 : 1;
+        if (first) {
+            this.camera.position.set(0, 0);
+            this.controls.target.set(this.camera.position.x, this.camera.position.y);
+            this.camera.zoom = 100;
+        }
 
         this.camera.left = -width / 2;
         this.camera.right = width / 2;
@@ -61,7 +62,7 @@ export class Camera {
 
     screenToWorld(x, y) {
         this.camera.updateMatrixWorld(); //the thing is this is called before every render but during initial load there is no animation loop so when transit calles this the camera is at the old state which breaks things
-        //rule of thumb should be when dealing with camera matricies (or any?) always make sure they are updated. 
+        //rule of thumb should be when dealing with camera matricies (or any?) always make sure they are updated.
         const vec = new THREE.Vector3(x, y).unproject(this.camera);
 
         return { x: vec.x, y: vec.y };

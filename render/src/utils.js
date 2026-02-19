@@ -3,10 +3,9 @@ export class Utils {
         this.state = state;
 
         this.fileSizes = {
-            "layout60k-Sep-10-2024.csv": 6792224,
-            "layout500k-Sep-10-2024.csv": 57693366,
-            "layout1m-part1-Sep-10-2024.csv": 59988553,
-            "layout1m-part2-Sep-10-2024.csv": 56877942,
+            "layout_100k_jan26.csv": 6579786,
+            "layout_500k_jan26.csv": 33786947,
+            "layout_1m_jan26.csv": 68473102,
         };
     }
 
@@ -56,14 +55,16 @@ export class Utils {
                     b: +res[7],
                 });
 
-                if (j % Math.floor(blob.length / 50) === 0) {
+                if (j % Math.floor(blob.length / 30) === 0) {
                     this.state.ui.setProgress("Parsing " + files[i].split("/").at(-1) + " " + Math.round((j / blob.length) * 100) + "%");
-                    await new Promise((resolve) => setTimeout(resolve, 0)); //relieve the queued ui change
+                    await new Promise((resolve) => setTimeout(resolve, 0));
+                    //basically my understanding is when the above line is called we pause and queue the setTimeout in the macrotask after the delay
+                    //so after this macrotask and the following microtask (which in this case none) finishes the browser can render the ui, also the above promise gets resolved in the macrotask created by the setTimeout
+                    //so in the following microtask (as await is just syntatic sugar for then) we run the remaining for loop untill it hits the next await and does the above steps again
+                    //https://javascript.info/event-loop
                 }
             }
         }
-
-        const num = data.length;
 
         let maxy = -Infinity;
         let maxx = -Infinity;
@@ -79,6 +80,6 @@ export class Utils {
             minx = Math.min(minx, a.x - a.size);
         });
 
-        return { num, data, limits: { minx, maxx, miny, maxy } };
+        return { num: data.length, data: data, limits: { minx, maxx, miny, maxy } };
     }
 }

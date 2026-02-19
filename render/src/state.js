@@ -50,7 +50,7 @@ class State {
         this.ui.toggleLoading(false);
     }
 
-    render(timestamp) {
+    render() {
         if (Math.floor(this.canvas.clientWidth * this.dpr) !== this.width || Math.floor(this.canvas.clientHeight * this.dpr) !== this.height) {
             this.width = Math.floor(this.canvas.clientWidth * this.dpr);
             this.height = Math.floor(this.canvas.clientHeight * this.dpr);
@@ -62,7 +62,7 @@ class State {
 
         this.camera.update();
         this.circle.update(this.camera.camera);
-        this.text.update(this.camera, timestamp);
+        this.text.update(this.camera);
 
         this.renderer.render(this.scene, this.camera.camera);
 

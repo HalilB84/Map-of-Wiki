@@ -25,9 +25,9 @@ export class TextTroika {
         }
     }
 
-    update(camera, timestamp) {
-        if (timestamp - this.last < 1000 || (camera.camera.top - camera.camera.bottom) / camera.camera.zoom > 60) return;
-        this.last = timestamp;
+    update(camera) {
+        if (performance.now() - this.last < 1000 || (camera.camera.top - camera.camera.bottom) / camera.camera.zoom > 60) return;
+        this.last = performance.now();
 
         let visible = [];
         const { num, data } = this.state.data;

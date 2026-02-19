@@ -69,7 +69,7 @@ export class Circle {
     }
 
     update(camera) {
-        this.mesh.material.uniforms.camera.value = (camera.top - camera.bottom) / camera.zoom * 0.0005;
+        this.mesh.material.uniforms.camera.value = ((camera.top - camera.bottom) / camera.zoom) * 0.0005;
     }
 
     dispose() {
