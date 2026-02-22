@@ -35,7 +35,7 @@ class State {
 
         this.renderer.setAnimationLoop(null);
         this.scene.clear();
-        this.ui.clearResults();
+        this.ui.clearResults(true);
 
         this.data = await this.utils.load(csv);
         //console.log(this.data);

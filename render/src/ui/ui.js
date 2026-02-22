@@ -3,9 +3,30 @@ import Stats from "stats-gl";
 export class UI {
     constructor(state) {
         this.state = state;
-        this.mobile = false;
+
+        //fps
+        this.stats = new Stats({
+            trackGPU: false,
+            trackHz: false,
+            trackCPT: false,
+            logsPerSecond: 4,
+            graphsPerSecond: 30,
+            samplesLog: 40,
+            samplesGraph: 10,
+            precision: 2,
+            horizontal: true,
+            minimal: true,
+            mode: 0,
+        });
+
+        this.stats.dom.style.top = "auto";
+        this.stats.dom.style.left = "auto";
+        this.stats.dom.style.bottom = "48px";
+        this.stats.dom.style.right = "90px";
+        document.body.appendChild(this.stats.dom);
 
         //controls
+        this.mobile = false;
 
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
             document.getElementById("sensitivity").style.display = "none";
@@ -46,107 +67,78 @@ export class UI {
         });
 
         //main
-        const introOverlay = document.getElementById("intro");
-        const startButton = document.getElementById("start");
+        document.getElementById("start").addEventListener("click", () => {
+            document.getElementById("intro").style.display = "none";
 
+            this.state.initialize(document.querySelector('input[name="dataset"]:checked').value);
+        });
+
+        //dropdown & sens
         document.getElementById("load-button").addEventListener("click", () => {
             this.state.initialize(document.getElementById("selected").value);
         });
 
-        startButton.addEventListener("click", () => {
-            const initialSelected = document.querySelector('input[name="dataset"]:checked').value;
-
-            introOverlay.style.display = "none";
-
-            this.state.initialize(initialSelected);
-        });
-
-        document.getElementById("sensitivity-range").addEventListener("input", (e) => {
-            this.state.camera.controls.zoomSpeed = e.target.value / 12.5;
-            document.getElementById("sensitivity-value").textContent = e.target.value.padStart(3, "0");
+        document.getElementById("sensitivity-range").addEventListener("input", (val) => {
+            this.state.camera.controls.zoomSpeed = val.target.value / 12.5;
+            document.getElementById("sensitivity-value").textContent = val.target.value.padStart(3, "0");
         });
 
         //search
-        this.searchInput = document.getElementById("search");
-        this.loadingIndicator = document.getElementById("loader");
-        this.resultsContainer = document.getElementById("search-results");
+        this.results = document.getElementById("search-results");
+        this.input = document.getElementById("search");
 
         document.getElementById("search-button").addEventListener("click", () => {
-            this.state.search.performSearch(this.searchInput.value.trim());
+            this.state.search.performSearch(this.input.value);
         });
 
         document.getElementById("search").addEventListener("input", () => {
-            this.clearResults();
+            this.clearResults(false);
         });
-
-        //fps
-        this.stats = new Stats({
-            trackGPU: false,
-            trackHz: false,
-            trackCPT: false,
-            logsPerSecond: 4,
-            graphsPerSecond: 30,
-            samplesLog: 40,
-            samplesGraph: 10,
-            precision: 2,
-            horizontal: true,
-            minimal: true,
-            mode: 0,
-        });
-
-        this.stats.dom.style.top = "auto";
-        this.stats.dom.style.left = "auto";
-        this.stats.dom.style.bottom = "48px";
-        this.stats.dom.style.right = "90px";
-        document.body.appendChild(this.stats.dom);
     }
 
     //load stuff
     setProgress(message) {
-        const prog = document.getElementById("loading-message");
-        prog.textContent = message;
+        document.getElementById("loading-message").textContent = message;
     }
 
     toggleLoading(show) {
-        const loading = document.getElementById("loading");
-        loading.style.display = show ? "flex" : "none";
+        document.getElementById("loading").style.display = show ? "flex" : "none";
         if (show) document.getElementById("wiki").style.width = "0%";
     }
 
     //search
-    clearResults() {
-        this.resultsContainer.innerHTML = "";
-        this.resultsContainer.style.display = "none";
+    clearResults(input) {
+        if (input) this.input.value = "";
+        this.results.innerHTML = "";
+        this.results.style.display = "none";
     }
 
     toggleSearchLoading(show) {
-        this.loadingIndicator.style.display = show ? "grid" : "none";
+        document.getElementById("loader").style.display = show ? "grid" : "none";
     }
 
     displayResults(results) {
+        this.results.style.display = "flex";
+
         if (results.length === 0) {
-            this.resultsContainer.innerHTML = "<div class='search-result-item'>No results found</div>";
-            this.resultsContainer.style.display = "flex";
+            this.results.innerHTML = "<div class='search-result-item'>No results found</div>";
             return;
         }
 
-        this.resultsContainer.innerHTML = results
+        this.results.innerHTML = results
             .map((result) => {
                 return `<div class="search-result-item">${result.target}</div>`;
             })
             .join("");
 
-        this.resultsContainer.style.display = "flex";
-
-        this.resultsContainer.querySelectorAll(".search-result-item").forEach((item) => {
-            item.addEventListener("click", (e) => this.handleResultClick(e));
+        this.results.querySelectorAll(".search-result-item").forEach((item) => {
+            item.addEventListener("click", (res) => this.clickResult(res));
         });
     }
 
-    handleResultClick(e) {
-        const title = e.target.closest(".search-result-item").textContent;
-        this.searchInput.value = "";
-        this.clearResults();
+    clickResult(res) {
+        const title = res.target.closest(".search-result-item").textContent;
+        this.clearResults(true);
         this.state.camera.goToArticle(title);
     }
 

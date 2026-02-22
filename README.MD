@@ -13,7 +13,7 @@ The custom graph layout is a simple algorithm that arranges nodes in either a ra
 
 The last stage is the WebGL renderer. I initially started with Matplotlib, but that only goes so far. After looking at Map of Reddit's source code and learning cosmos.gl exists, I understood that WebGL was the way to go. WebGL wise, It was two simple shaders adapted from the Map of Reddit code (circles and MSDF text). Then I created a small website for all the user interactions. Finally as a last update, I switched to Three.js because less code with the same functionality is something I love.  
 
-Just as a heads up, when I was first working on this, I used AI generated code extensively without understanding the basics of graphics and webdev. Because of the guilt of not understanding and not writing the code, I have since properly learned things and rewrote the entire code.  
+Just as a heads up, when I was first working on this, I used AI generated code extensively without understanding the basics of graphics and webdev. Because of the guilt of not understanding and not writing the code, I have since properly learned things and rewrote the entire code. Putting this here for future reference as it was a big life lesson to me.  
 
 That's it. I hereby declare this project complete. I want to do this bigger and better after learning how to apply force-directed layouts for millions of nodes and edges using GPU/AI. But till then, I'll just fix small things and reorganize code. 
 

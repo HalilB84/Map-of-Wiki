@@ -1,5 +1,4 @@
 import { Text } from "troika-three-text";
-import * as THREE from "three";
 
 export class TextTroika {
     constructor(state) {

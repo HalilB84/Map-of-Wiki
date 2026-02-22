@@ -7,10 +7,7 @@ export class Search {
     }
 
     performSearch(query) {
-        if (!query) {
-            this.state.ui.clearResults();
-            return;
-        }
+        if (!query) return;
 
         this.state.ui.toggleSearchLoading(true);
 
